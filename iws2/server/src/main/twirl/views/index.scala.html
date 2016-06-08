@@ -1,0 +1,19 @@
+@(title: String)
+<!DOCTYPE html>
+
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>@title</title>
+        <meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport'>
+        <link rel="stylesheet" media="screen" href="@routes.Assets.at("/public","stylesheets/main.min.css")">
+        <link rel="shortcut icon" type="image/png" href="@routes.Assets.at("/public","images/favicon.png")">
+        <script src="@routes.Assets.at(path="/public", "js/material_ui-bundle.js")"></script>
+        <!--script type="text/javascript" src="./target/scala-2.11/scala-js-tutorial-jsdeps.js"></script-->
+    </head>
+    <body>
+        <div id="root">
+        </div>
+        @playscalajs.html.scripts("client")
+    </body>
+</html>

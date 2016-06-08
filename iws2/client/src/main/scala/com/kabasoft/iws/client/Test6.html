@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Twitter Bootstrap : Collapsible Accordion</title>
+    <link rel="stylesheet"
+          href="http://netdna.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css">
+    <link rel="stylesheet"
+          href="http://netdna.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap-theme.min.css">
+    <script src="http://code.jquery.com/jquery.min.js"></script>
+    <script src="http://netdna.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
+    <script src="http://netdna.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
+    <script src="js.js"></script>
+</head>
+<style>
+    div.panel:first-child {
+        margin-top:20px;
+    }
+
+    div.treeview {
+        min-width: 100px;
+        min-height: 100px;
+
+        max-height: 256px;
+        overflow:auto;
+
+        padding: 4px;
+
+        margin-bottom: 20px;
+
+        color: #369;
+
+        border: solid 1px;
+        border-radius: 4px;
+    }
+    div.treeview ul:first-child:before {
+        display: none;
+    }
+    .treeview, .treeview ul {
+        margin:0;
+        padding:0;
+        list-style:none;
+
+        color: #369;
+    }
+    .treeview ul {
+        margin-left:1em;
+        position:relative
+    }
+    .treeview ul ul {
+        margin-left:.5em
+    }
+    .treeview ul:before {
+        content:"";
+        display:block;
+        width:0;
+        position:absolute;
+        top:0;
+        left:0;
+        border-left:1px solid;
+
+        /* creates a more theme-ready standard for the bootstrap themes */
+        bottom:15px;
+    }
+    .treeview li {
+        margin:0;
+        padding:0 1em;
+        line-height:2em;
+        font-weight:700;
+        position:relative
+    }
+    .treeview ul li:before {
+        content:"";
+        display:block;
+        width:10px;
+        height:0;
+        border-top:1px solid;
+        margin-top:-1px;
+        position:absolute;
+        top:1em;
+        left:0
+    }
+    .tree-indicator {
+        margin-right:5px;
+
+        cursor:pointer;
+    }
+    .treeview li a {
+        text-decoration: none;
+        color:inherit;
+
+        cursor:pointer;
+    }
+    .treeview li button, .treeview li button:active, .treeview li button:focus {
+        text-decoration: none;
+        color:inherit;
+        border:none;
+        background:transparent;
+        margin:0px 0px 0px 0px;
+        padding:0px 0px 0px 0px;
+        outline: 0;
+    }
+</style>
+<body>
+<div class="container">
+    <div class="panel panel-default">
+        <div class="panel-heading">Treeview List</div>
+        <div class="panel-body">
+            <!-- TREEVIEW CODE -->
+            <ul class="treeview">
+                <li><a href="#">Tree</a>
+                    <ul>
+                        <li><a href="#">Branch</a></li>
+                        <li><a href="#">Branch</a>
+                            <ul>
+                                <li><a href="#">Stick</a></li>
+                                <li><a href="#">Stick</a></li>
+                                <li><a href="#">Stick</a>
+                                    <ul>
+                                        <li><a href="#">Twig</a></li>
+                                        <li><a href="#">Twig</a></li>
+                                        <li><a href="#">Twig</a></li>
+                                        <li><a href="#">Twig</a>
+                                            <ul>
+                                                <li><a href="#">Leaf</a></li>
+                                                <li><a href="#">Leaf</a></li>
+                                                <li><a href="#">Leaf</a></li>
+                                                <li><a href="#">Leaf</a></li>
+                                                <li><a href="#">Leaf</a></li>
+                                                <li><a href="#">Leaf</a></li>
+                                                <li><a href="#">Leaf</a></li>
+                                                <li><a href="#">Leaf</a></li>
+                                                <li><a href="#">Leaf</a></li>
+                                            </ul>
+                                        </li>
+                                        <li><a href="#">Twig</a></li>
+                                        <li><a href="#">Twig</a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="#">Stick</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="#">Branch</a></li>
+                        <li><a href="#">Branch</a></li>
+                    </ul>
+                </li>
+            </ul>
+            <!-- TREEVIEW CODE -->
+        </div>
+    </div>
+    <div class="panel panel-default">
+        <div class="panel-heading">Treeview Div</div>
+        <div class="panel-body">
+            <!-- TREEVIEW CODE -->
+            <div class="treeview">
+                <ul>
+                    <li><a href="#">Tree</a>
+                        <ul>
+                            <li><a href="#">Branch</a></li>
+                            <li><a href="#">Branch</a>
+                                <ul>
+                                    <li><a href="#">Stick</a></li>
+                                    <li><a href="#">Stick</a></li>
+                                    <li><a href="#">Stick</a>
+                                        <ul>
+                                            <li><a href="#">Twig</a></li>
+                                            <li><a href="#">Twig</a></li>
+                                            <li><a href="#">Twig</a></li>
+                                            <li><a href="#">Twig</a>
+                                                <ul>
+                                                    <li><a href="#">Leaf</a></li>
+                                                    <li><a href="#">Leaf</a></li>
+                                                    <li><a href="#">Leaf</a></li>
+                                                    <li><a href="#">Leaf</a></li>
+                                                    <li><a href="#">Leaf</a></li>
+                                                    <li><a href="#">Leaf</a></li>
+                                                    <li><a href="#">Leaf</a></li>
+                                                    <li><a href="#">Leaf</a></li>
+                                                    <li><a href="#">Leaf</a></li>
+                                                </ul>
+                                            </li>
+                                            <li><a href="#">Twig</a></li>
+                                            <li><a href="#">Twig</a></li>
+                                        </ul>
+                                    </li>
+                                    <li><a href="#">Stick</a></li>
+                                </ul>
+                            </li>
+                            <li><a href="#">Branch</a></li>
+                            <li><a href="#">Branch</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+            <!-- TREEVIEW CODE -->
+        </div>
+    </div>
+    <!-- This section only includes notes for the snippet. Nothing more. You may ignore it if you please. -->
+    <div class="panel panel-default">
+        <div class="panel-heading">Notes</div>
+        <div class="panel-body">
+            <p>
+                This is a revised fork of an existing Bootsnippet. It allows the use of multiple treeview panels, as well as limiting the width/height of treeviews.
+                The plugin also dynamically converts DOM elements with the <span class="label label-success">treeview</span> class assigned.
+                The snippet will be edited by request should viewers want a theme-compatible version of the example. Since it requires LESS to acquire settings from the bootstrap theme, it will only be supplied in a <span class="label label-danger">code</span> block.
+            </p>
+            <hr />
+            <p></p><a href="http://bootsnipp.com/snippets/featured/bootstrap-30-treeview" class="btn btn-primary">BootStrap TreeView <span class="badge">by SeanWessell</span></a></p>
+        </div>
+    </div>
+</div>
+</body>
+</html>
