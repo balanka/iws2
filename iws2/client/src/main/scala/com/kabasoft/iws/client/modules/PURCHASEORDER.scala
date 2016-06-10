@@ -11,6 +11,7 @@ import japgolly.scalajs.react.vdom.prefix_<^._
 import com.kabasoft.iws.gui.macros.Bootstrap._
 import com.kabasoft.iws.client.logger._
 import com.kabasoft.iws.shared._
+import com.kabasoft.iws.gui.Utils._
 import com.kabasoft.iws.gui.macros._
 import scalacss.ScalaCssReact._
 
@@ -26,13 +27,12 @@ object PURCHASEORDER {
 
     def edit(item:Option[PurchaseOrder[LinePurchaseOrder]],proxy: ModelProxy[Pot[Data]]) = {
       val d =item.getOrElse(PurchaseOrder[LinePurchaseOrder]())
-      log.debug(s" current purchaseOrder is ${d}")
-      LinePurchaseOrderList.apply(proxy, d, AddNewLine, editLine, saveLine)
+      LinePurchaseOrderList.apply(proxy, d, AddNewLine, editLine, saveLine, deleteLine)
       $.modState(s => s.copy(item = Some(d)))
     }
 
     def updateOid(e: ReactEventI) = {
-      val l =e.target.value.toLong //currentTarget.value.toLong
+      val l =e.target.value.toLong
       log.debug(s"Oid is "+l)
       $.modState(s => s.copy(item = s.item.map(_.copy(oid = l))))
     }
@@ -50,43 +50,35 @@ object PURCHASEORDER {
     }
 
     def edited(item:PurchaseOrder[LinePurchaseOrder]) = {
-      Callback.log("Purchase order edited>>>>> " +item)  >>
+      val s = $.state.runNow().item.getOrElse(PurchaseOrder[LinePurchaseOrder]())
+      Callback.log(s"Purchase order edited>>>>> ${item} State: ${s}")  >>
         $.props >>= (_.proxy.dispatch(Update(item)))
-       // $.props >>= ($.modState(s => s.copy(item = item)))
-        //$.props >>= edit(Some(PurchaseOrder[LinePurchaseOrder]()))
     }
     def saveLine(line:LinePurchaseOrder) = {
-      //getLines.filter(_.tid == 0)(0))
-
-      Callback.log("Line Purchase order edited>>>>> " +line)  >>
-        $.modState( s => s.copy(item = {  val k =s.item.getOrElse(PurchaseOrder[LinePurchaseOrder]());
-          log.debug(s"purchaseOrder is xzczzxxzxz ${k}  line0 ${k.getLines.filter(_.tid == 0L).headOption.getOrElse(LinePurchaseOrder(1111L))}");
-          Some(k.m(k.getLines.filter(_.tid == 0L).headOption.getOrElse(LinePurchaseOrder()),line))})) >>
-          $.modState( s => s.copy(item = { val k1 =s.item;log.debug(s"purchaseOrder is 234565 ${k1}"); edited(k1.getOrElse(PurchaseOrder[LinePurchaseOrder]())); k1}))
-
+      val k =$.state.runNow().item.getOrElse(PurchaseOrder[LinePurchaseOrder]())
+      val k2 = k.replaceLine(k.getLines.filter(_.tid == line.tid).headOption.getOrElse(LinePurchaseOrder()), line)
+      $.modState(s => s.copy(item =Some(k2)))>> edited(k2)
     }
 
     def editLine(lineOrder:LinePurchaseOrder) = {
-
-        // $.props >>= (_.proxy.dispatch(Update(item)))
-
-      //LinePurchaseOrderList.State.apply(Some(lineOrder))
       Callback.log("Purchase  Line p order edited>>>>> " +lineOrder)  >>
       $.modState(s => s.copy(line = Some(lineOrder)))
     }
     def delete(item:PurchaseOrder[LinePurchaseOrder]) = {
-      Callback.log("PurchaseOrder deleted>>>>> " +item)  //>>
-      $.props >>= (_.proxy.dispatch(Delete(item)))
+      val s = $.state.runNow().item
+      Callback.log("PurchaseOrder deleted>>>>> ${item}  ${s}")
+      $.props >>= (_.proxy.dispatch(Delete(s)))
     }
-    def deleteLine(item:LinePurchaseOrder) = {
-      Callback.log("LinePurchaseOrder deleted>>>>> " +item)  //>>
-       $.props >>= (_.proxy.dispatch(Delete(item)))
+    def deleteLine(line1:LinePurchaseOrder) = {
+      val  deleted =line1.copy(deleted = true)
+      val k =$.state.runNow().item.getOrElse(PurchaseOrder[LinePurchaseOrder]())
+      val k2 = k.replaceLine(k.getLines.filter(_.tid == deleted.tid).headOption.getOrElse(LinePurchaseOrder()), deleted)
+       edited(k2)
     }
     def AddNewLine(line:LinePurchaseOrder) = {
        Callback.log(s"New Line Purchase order before  edit>>>>>  ${line}")  >>
         $.modState(s => s.copy(item = s.item.map(_.add(line.copy(transid=s.item.getOrElse(PurchaseOrder[LinePurchaseOrder]()).tid)))))>>
         Callback.log(s"RUNNING State>>>>>  ${ $.modState(s =>s)}")
-
     }
 
     def render(p: Props, s: State) = {
@@ -102,36 +94,20 @@ object PURCHASEORDER {
           item => edit(Some(item),p.proxy), item => p.proxy.dispatch(Delete(item))))))))
     }
 
-    def buildWItem[A](id:String , value:Option[A], defValue:A, evt:ReactEventI=> Callback) = {
-      val m = value getOrElse defValue
-      List(<.td(<.label(^.`for` := id, id)),
-           <.td(<.input.text(bss.formControl, ^.id := id, ^.value := m.toString,
-                ^.placeholder := id), ^.onChange ==> evt, ^.paddingLeft := 10))
-    }
-
-    def buildItem[A](id:String , value:Option[A], defValue:A) = {
-      val m = value getOrElse  defValue
-      List(<.td(<.label(^.`for` := id, id)),
-           <.td(<.input.text(bss.formControl, ^.id := id, ^.value := m.toString,
-                                     ^.placeholder := id), ^.paddingLeft := 1))
-    }
-
-      def buildForm (p: Props, s:State): Seq[ReactElement] = {
+     def buildForm (p: Props, s:State): Seq[ReactElement] = {
         List(<.div(bss.formGroup,
           <.table(^.className := "table-responsive table-condensed", ^.tableLayout := "fixed",
             <.tbody(
-              <.tr(bss.formGroup,^.height := 20,
+              <.tr(bss.formGroup,^.height := 10.px,
                // <.div(bss.formGroup,
                    buildItem[String]("id", s.item.map(_.id),"id"),
-                   //buildIdItemString("id", s.item.map(_.id)),
-                   //buildWItemLong("oid", s.item.map(_.oid),updateOid),
                    buildWItem[Long]("oid", s.item.map(_.oid), 1L,updateOid),
                    buildWItem[String]("store", s.item.map(_.store.getOrElse("store")),"store",updateStore),
                    buildWItem[String]("account", s.item.map(_.account.getOrElse("account")),"account",updateAccount)
                 )
                )
             ),
-          LinePurchaseOrderList(p.proxy, s.item.getOrElse(PurchaseOrder[LinePurchaseOrder]()), AddNewLine,editLine, saveLine)
+          LinePurchaseOrderList(p.proxy, s.item.getOrElse(PurchaseOrder[LinePurchaseOrder]()), AddNewLine,editLine, saveLine,deleteLine)
         )
         )
       }

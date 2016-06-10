@@ -168,33 +168,39 @@ BusinessPartner (id: String, name: String , modelId:Int, street: String, city: S
 
 case class Vat(id:String ="",name:String ="", modelId:Int =5 ,description:String ="", percent:Amount =0) extends Masterfile
 case class LinePurchaseOrder  (tid:Long = 0L, transid:Long =0, modelId:Int = 102,item:Option[String] = None, unit:Option[String] = None, price: Amount = 0,
-                               quantity:Amount = 0,vat:Option[String] = None, duedate:Option[Date] = Some(new Date()),text:String ="") extends LineInventoryTransaction {
-  def eq (l:LinePurchaseOrder):Boolean = tid == l.tid
+                               quantity:Amount = 0,vat:Option[String] = None, duedate:Option[Date] = Some(new Date()),text:String ="txt",
+                               modified:Boolean= false, created:Boolean= false, deleted:Boolean= false) extends LineInventoryTransaction {
+  //def eq (l:LinePurchaseOrder):Boolean = tid == l.tid
   def eq (id:Long):Boolean = tid == id
   def eq0:Boolean = tid == 0L
   def eqId(id:Long):Boolean = tid == id
+  def canEqual(a: Any) = a.isInstanceOf[LinePurchaseOrder]
+  override def equals(that: Any): Boolean =
+    that match {
+      case that: LinePurchaseOrder => that.canEqual(this) && this.hashCode == that.hashCode
+      case _ => false
+    }
+  override def hashCode:Int = {
+    val prime = 31
+    var result = 1
+    result = prime * result + tid.toInt
+    //result = prime * result + (if (name == null) 0 else name.hashCode)
+     result
+  }
 }
-case class PurchaseOrder [LinePurchaseOrder] (tid:Long =0,oid:Long =0, modelId:Int = 101,store:Option[String]=None, account:Option[String]= None,
-                                              lines:Option[List[LinePurchaseOrder]]=Some(List.empty[LinePurchaseOrder])) extends Transaction [LinePurchaseOrder]{
+case class PurchaseOrder [LinePurchaseOrder] (tid:Long = 0L,oid:Long = 0L, modelId:Int = 101,store:Option[String]=None, account:Option[String]= None,
+                                              lines:Option[List[LinePurchaseOrder]]=Some(List.empty[LinePurchaseOrder]),
+                                              modified:Boolean =false, created:Boolean = false, deleted:Boolean = false) extends Transaction [LinePurchaseOrder]{
  def add(line:LinePurchaseOrder) = copy(lines = Some(lines.getOrElse(Nil) ++: List(line)))
  def remove(line:LinePurchaseOrder) = copy(lines = Some(lines.getOrElse(List.empty[LinePurchaseOrder]).filter(eq(_,line))) ) //Some(lines.getOrElse(List.empty[LinePurchaseOrder]) -- List(line)))
 
  def getLines = lines.getOrElse(List.empty[LinePurchaseOrder])
- def getLinesWithId(id:Long) = getLines.filter(eq(_,id))
+ def getLinesWithId(id:Long) = getLines.filter(equals(_,id))
   //def getLines0 = lines.getOrElse(List.empty[LinePurchaseOrder]).groupBy(_.id)
-  //def replace[T](pairs: (T, T)*) = Map(pairs: _*).withDefault(identity)
- // def m  (old:T, newr:T) = copy(lines = Some(lines.getOrElse(List.empty[T]) map replace((old,newr))))
+
   def replace[T](pairs: (T, T)*) = Map(pairs: _*).withDefault(identity)
-  def m  (old:LinePurchaseOrder, newLine:LinePurchaseOrder) = copy(lines = Some(lines.getOrElse(List.empty[LinePurchaseOrder]) map replace((old,newLine))))
+  def replaceLine(old:LinePurchaseOrder, newLine:LinePurchaseOrder) = copy(lines = Some(lines.getOrElse(List.empty[LinePurchaseOrder]) map replace((old,newLine))))
 }
-
-
-
-//case class Persona[T](serviceName:String,serviceId:String,sentMessages:Option[List[T]])
-// {def r( m:T) =copy(sentMessages=Some(sentMessages.getOrElse(List.empty[T])++List(m)));
-// def rr [T] (old:T, newr:T) = sentMessages map replace((old, newr));
-// def replace[T](pairs: (T, T)*) = Map(pairs: _*).withDefault(identity);
-// def m  (old:T, newr:T) =copy(sentMessages=Some(sentMessages.getOrElse(List.empty[T]) map replace((old,newr)))) }
 
 
 // Registre general des affaires  frappees d'appel

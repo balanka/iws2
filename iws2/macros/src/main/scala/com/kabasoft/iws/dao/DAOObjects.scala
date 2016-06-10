@@ -161,15 +161,16 @@ implicit def purchaseOrderDAO = new DAO[PurchaseOrder[LinePurchaseOrder]]{
      }
     def create = Queries.createPurchaseOrder1.run.transact(xa).run
     def update(model:PurchaseOrder[LinePurchaseOrder]) = {
-
-     // val t:(List[LinePurchaseOrder], List[LinePurchaseOrder]) = model.lines.map (l =>l.partition(prdicate));
-      //println(s" t ${t}  items");
-       val ret = Queries.purchaseOrderUpdateName(model).run.transact(xa).run;
+      val ret = Queries.purchaseOrderUpdateName(model).run.transact(xa).run;
       def prdicate (pred:LinePurchaseOrder) = pred.tid == 0L
       val t:(List[LinePurchaseOrder], List[LinePurchaseOrder]) = model.getLines.partition(prdicate)
       val t1 :List[LinePurchaseOrder] = t._1
       val t2 : List[LinePurchaseOrder]= t._2
 
+      val k1= model.getLines.partition(_.modified)._1.map (linePurchaseOrderDAO.update )
+      val k2 = model.getLines.partition(_.deleted)._1.map ( e =>linePurchaseOrderDAO.delete(e.id.toString) )
+
+      println(s" PO Line deleted K2 ${k2}   deleted");
       println(s" t1 ${t1}  items");
       println(s" t2 ${t2}  items");
       linePurchaseOrderDAO.insert (t1);

@@ -2,6 +2,7 @@ package com.kabasoft.iws.client.modules
 
 import com.kabasoft.iws.client.components.CustomerList
 import com.kabasoft.iws.gui.macros.IWSList.customerList
+import com.kabasoft.iws.gui.Utils._
 import com.kabasoft.iws.gui._
 import diode.react.ReactPot._
 import diode.react._
@@ -98,24 +99,6 @@ object CUSTOMER {
           <.span(item.zip ,^.paddingLeft:=5)
         )
 
-      def doIt(all:Seq[Customer]) : ReactElement  = {
-        all map  (e =>println( " xxxx"+e) )
-        <.ul(bss.listGroup.listGroup)
-          <.div(
-           all map renderItem )
-      }
-
-
-    def buildWItem(id:String , value:Option[String],evt:ReactEventI=> Callback) =
-      List( <.td(<.label(^.`for` := id, id)),
-        <.td(<.input.text(bss.formControl, ^.id := id, ^.value := value,
-          ^.placeholder := id),  ^.onChange ==> evt, ^.paddingLeft := 10))
-
-    def buildItem(id:String , value:Option[String]) =
-      List( <.td(<.label(^.`for` := id, id)),
-        <.td(<.input.text(bss.formControl, ^.id := id, ^.value := value,
-          ^.placeholder := id),^.paddingLeft := 1))
-
      def  m :(String , CUSTOMER.State) =>  CUSTOMER.State = (p, s) => s.copy(s.selectedItem.map( z => z.copy(id = p)))
 
       def buildForm(s:State): ReactElement =
@@ -123,14 +106,14 @@ object CUSTOMER {
           <.table(^.className := "table-responsive table-condensed", ^.tableLayout := "fixed",
             <.tbody(
               <.tr(^.height := 20,
-                   buildWItem("id", s.selectedItem.map(_.id),updateId),
-                   buildWItem("name", s.selectedItem.map(_.name),updateName),
-                   buildWItem("street", s.selectedItem.map(_.street),updateStreet)
+                   buildWItem[String]("id", s.selectedItem.map(_.id),"id",updateId),
+                   buildWItem[String]("name", s.selectedItem.map(_.name), "", updateName),
+                   buildWItem[String]("street", s.selectedItem.map(_.street), "", updateStreet)
                  ),
               <.tr(^.height := 20,
-                    buildWItem("city", s.selectedItem.map(_.city),updateCity),
-                    buildWItem("state", s.selectedItem.map(_.state),updateState),
-                    buildWItem("zip", s.selectedItem.map(_.zip),updateZip)   
+                    buildWItem[String]("city", s.selectedItem.map(_.city), "", updateCity),
+                    buildWItem[String]("state", s.selectedItem.map(_.state), "", updateState),
+                    buildWItem[String]("zip", s.selectedItem.map(_.zip), "", updateZip)
                  )
             )
           )

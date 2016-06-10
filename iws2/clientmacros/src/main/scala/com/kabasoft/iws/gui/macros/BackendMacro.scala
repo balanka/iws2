@@ -1,12 +1,13 @@
 package com.kabasoft.iws.gui.macros
 
+import com.kabasoft.iws.gui.Utils
 import com.kabasoft.iws.shared.IWS
-import com.kabasoft.iws.gui.macros.Utils
 import japgolly.scalajs.react._
 import diode.react.ReactPot._
 import diode.react._
 import diode.data.Pot
-import com.kabasoft.iws.gui.macros.Bootstrap.{Panel, CommonStyle, Modal, Button}
+import com.kabasoft.iws.gui.macros.Bootstrap.{Button, CommonStyle, Modal, Panel}
+
 import scala.language.experimental.macros
 import scala.reflect.macros.whitebox.Context
 

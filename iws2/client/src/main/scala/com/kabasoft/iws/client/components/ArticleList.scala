@@ -12,8 +12,7 @@ import scalacss.ScalaCssReact._
 object ArticleList {
   @inline private def bss = GlobalStyles.bootstrapStyles
   //val formater =NumberFormat.getIntegerInstance(new java.util.Locale("de", "DE"))
-  case class ArticleListProps(
-    items: Seq[IWS],
+  case class ArticleListProps(items: Seq[IWS],
     stateChange: IWS => Callback,
     editItem: IWS => Callback,
     deleteItem: IWS => Callback

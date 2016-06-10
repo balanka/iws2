@@ -26,7 +26,6 @@ object PurchaseOrderList {
     .render_P(p => {
       val style = bss.listGroup
       def renderHeader = {
-
         <.li(style.itemOpt(CommonStyle.info),^.fontSize:=12,^.fontWeight:=50,^.maxHeight:=30)(
           <.span("  "),
           <.span("ID"),
@@ -36,7 +35,6 @@ object PurchaseOrderList {
           <.span("Store"),
           <.span("    "),
           <.span("Account")
-
 
         )
       }
@@ -54,9 +52,7 @@ object PurchaseOrderList {
           <.span(trans.account),
           editButton,deleteButton
          // <.span("    "),
-         // <.span(item.quantity.toDouble),
-          //Button(Button.Props(p.editItem(trans), addStyles = Seq(bss.pullRight, bss.buttonXS, bss.buttonOpt(CommonStyle.success))), "Edit"),
-          //Button(Button.Props(p.deleteItem(trans), addStyles = Seq(bss.pullRight, bss.buttonXS, bss.buttonOpt(CommonStyle.danger))), "Delete")
+         // <.span(item.quantity.toDouble)
         )
       }
       <.ul(style.listGroup)(renderHeader)(p.items.sortBy(_.tid)(Ordering[Long].reverse) map renderItem)
@@ -66,7 +62,6 @@ object PurchaseOrderList {
     .render_P(p => {
       val style = bss.listGroup
       def renderHeader = {
-
         <.li(style.itemOpt(CommonStyle.warning))(
           <.span("  "),
           <.span("ID"),
@@ -76,8 +71,6 @@ object PurchaseOrderList {
           <.span("Store"),
           <.span("    "),
           <.span("Account")
-
-
         )
       }
       def renderItem(trans:PurchaseOrder[LinePurchaseOrder]) = {
@@ -91,9 +84,7 @@ object PurchaseOrderList {
           <.span("    "),
           <.span(trans.account)
           // <.span("    "),
-          // <.span(item.quantity.toDouble),
-         // Button(Button.Props(p.editItem(trans), addStyles = Seq(bss.pullRight, bss.buttonXS)), "Edit"),
-         // Button(Button.Props(p.deleteItem(trans), addStyles = Seq(bss.pullRight, bss.buttonXS)), "Delete")
+          // <.span(item.quantity.toDouble)
         )
       }
       <.ul(style.listGroup)(renderHeader)(p.items map renderItem)

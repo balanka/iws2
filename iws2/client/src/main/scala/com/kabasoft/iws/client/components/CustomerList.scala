@@ -1,7 +1,7 @@
 package com.kabasoft.iws.client.components
 
 import com.kabasoft.iws.gui.macros.Bootstrap.{Button, CommonStyle}
-import com.kabasoft.iws.gui.macros.{GlobalStyles, Icon, Utils}
+import com.kabasoft.iws.gui.macros.{GlobalStyles, Icon}
 import com.kabasoft.iws.shared.{Account, _}
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.prefix_<^._
@@ -28,8 +28,6 @@ object CustomerList {
           <.span(item.state ,^.paddingLeft:=10),
           <.span(item.zip ,^.paddingLeft:=10),
           editButton,deleteButton
-          //Button(Button.Props(p.editItem(item), addStyles = Seq(bss.pullRight, bss.buttonXS)), "Edit"),
-          //Button(Button.Props(p.deleteItem(item), addStyles = Seq(bss.pullRight, bss.buttonXS)), "Delete")
           )
       }
       <.ul(style.listGroup)(p.items.asInstanceOf[Seq[Customer]].sortBy(_.id) map renderItem)

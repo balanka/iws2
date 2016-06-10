@@ -5,7 +5,7 @@ import com.kabasoft.iws.shared._
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.prefix_<^._
 import com.kabasoft.iws.gui.macros.Bootstrap.{Button, CommonStyle}
-import com.kabasoft.iws.gui.macros.{Utils, GlobalStyles,Icon}
+import com.kabasoft.iws.gui.macros.{GlobalStyles,Icon}
 import scalacss.ScalaCssReact._
 
 
@@ -46,8 +46,6 @@ object AccountList {
           //<.span(Utils.format(item.dateOfOpen.get),^.paddingLeft:=10),
           <.span("%06.2f".format(item.balance.amount.toDouble),^.paddingLeft:=10),
           editButton,deleteButton
-          //Button(Button.Props(p.editItem(item), addStyles = Seq(bss.pullRight, bss.buttonXS)), "Edit"),
-          //Button(Button.Props(p.deleteItem(item), addStyles = Seq(bss.pullRight, bss.buttonXS)), "Delete")
           )
         //)
        //)
