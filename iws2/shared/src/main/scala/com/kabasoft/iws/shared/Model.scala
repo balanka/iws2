@@ -188,10 +188,31 @@ case class LinePurchaseOrder  (tid:Long = 0L, transid:Long =0, modelId:Int = 102
      result
   }
 }
+case class LineGoodreceiving  (tid:Long = 0L, transid:Long =0, modelId:Int = 102,item:Option[String] = None, unit:Option[String] = None, price: Amount = 0,
+                               quantity:Amount = 0,vat:Option[String] = None, duedate:Option[Date] = Some(new Date()),text:String ="txt",
+                               modified:Boolean= false, created:Boolean= false, deleted:Boolean= false) extends LineInventoryTransaction {
+  //def eq (l:LinePurchaseOrder):Boolean = tid == l.tid
+  def eq (id:Long):Boolean = tid == id
+  def eq0:Boolean = tid == 0L
+  def eqId(id:Long):Boolean = tid == id
+  def canEqual(a: Any) = a.isInstanceOf[LineGoodreceiving]
+  override def equals(that: Any): Boolean =
+    that match {
+      case that: LineGoodreceiving => that.canEqual(this) && this.hashCode == that.hashCode
+      case _ => false
+    }
+  override def hashCode:Int = {
+    val prime = 31
+    var result = 1
+    result = prime * result + tid.toInt
+    //result = prime * result + (if (name == null) 0 else name.hashCode)
+    result
+  }
+}
 case class PurchaseOrder [LinePurchaseOrder] (tid:Long = 0L,oid:Long = 0L, modelId:Int = 101,store:Option[String]=None, account:Option[String]= None,
                                               lines:Option[List[LinePurchaseOrder]]=Some(List.empty[LinePurchaseOrder]),
                                               modified:Boolean =false, created:Boolean = false, deleted:Boolean = false) extends Transaction [LinePurchaseOrder]{
- def add(line:LinePurchaseOrder) = copy(lines = Some(lines.getOrElse(Nil) ++: List(line)))
+ def add(line:LinePurchaseOrder) = copy(lines = Some(lines.getOrElse(List.empty[LinePurchaseOrder]) ++: List(line)))
  def remove(line:LinePurchaseOrder) = copy(lines = Some(lines.getOrElse(List.empty[LinePurchaseOrder]).filter(eq(_,line))) ) //Some(lines.getOrElse(List.empty[LinePurchaseOrder]) -- List(line)))
 
  def getLines = lines.getOrElse(List.empty[LinePurchaseOrder])
@@ -200,6 +221,19 @@ case class PurchaseOrder [LinePurchaseOrder] (tid:Long = 0L,oid:Long = 0L, model
 
   def replace[T](pairs: (T, T)*) = Map(pairs: _*).withDefault(identity)
   def replaceLine(old:LinePurchaseOrder, newLine:LinePurchaseOrder) = copy(lines = Some(lines.getOrElse(List.empty[LinePurchaseOrder]) map replace((old,newLine))))
+}
+case class Goodreceiving [LineGoodreceiving] (tid:Long = 0L,oid:Long = 0L, modelId:Int = 104,store:Option[String]=None, account:Option[String]= None,
+                                              lines:Option[List[LineGoodreceiving]]=Some(List.empty[LineGoodreceiving]),
+                                              modified:Boolean =false, created:Boolean = false, deleted:Boolean = false) extends Transaction [LineGoodreceiving]{
+  def add(line:LineGoodreceiving) = copy(lines = Some(lines.getOrElse(List.empty[LineGoodreceiving]) ++: List(line)))
+  def remove(line:LineGoodreceiving) = copy(lines = Some(lines.getOrElse(List.empty[LineGoodreceiving]).filter(eq(_,line))) ) //Some(lines.getOrElse(List.empty[LinePurchaseOrder]) -- List(line)))
+
+  def getLines = lines.getOrElse(List.empty[LineGoodreceiving])
+  def getLinesWithId(id:Long) = getLines.filter(equals(_,id))
+  //def getLines0 = lines.getOrElse(List.empty[LinePurchaseOrder]).groupBy(_.id)
+
+  def replace[T](pairs: (T, T)*) = Map(pairs: _*).withDefault(identity)
+  def replaceLine(old:LinePurchaseOrder, newLine:LineGoodreceiving) = copy(lines = Some(lines.getOrElse(List.empty[LineGoodreceiving]) map replace((old,newLine))))
 }
 
 

@@ -8,7 +8,7 @@ import diode.data.Pot
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.prefix_<^._
 import com.kabasoft.iws.gui.macros.Bootstrap._
-import com.kabasoft.iws.client.logger._
+import com.kabasoft.iws.gui.logger._
 import com.kabasoft.iws.shared._
 import com.kabasoft.iws.gui.macros._
 

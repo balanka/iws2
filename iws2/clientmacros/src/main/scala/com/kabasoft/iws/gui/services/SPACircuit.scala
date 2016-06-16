@@ -1,18 +1,16 @@
-package com.kabasoft.iws.client.services
-
+package com.kabasoft.iws.gui.services
 
 import autowire._
+import com.kabasoft.iws.gui.logger._
+import com.kabasoft.iws.gui.macros._
+import com.kabasoft.iws.shared.{Store => MStore, _}
 import diode._
-import diode.util._
 import diode.data._
 import diode.react.ReactConnector
-import com.kabasoft.iws.client.logger._
-import com.kabasoft.iws.shared.{Store => MStore, _}
-import com.kabasoft.iws.shared.Model._
+import diode.util._
 import boopickle.Default._
 
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
-import com.kabasoft.iws.gui.macros._
 
 case class UpdateMotd(potResult: Pot[String] = Empty) extends PotAction[String, UpdateMotd] {
   override def next(value: Pot[String]) = UpdateMotd(value)
@@ -45,7 +43,7 @@ case class DStore [+A<:IWS,-B<:IWS](models: Map[Int, Pot[ContainerT[A,B]]]) {
 
 class IWSHandler[M](modelRW: ModelRW[M, Pot[DStore[IWS,IWS]]]) extends ActionHandler(modelRW) {
   import boopickle.Default._
-   import com.kabasoft.iws.shared.{Store => MStore}
+  import com.kabasoft.iws.shared.{Store => MStore}
 
    implicit val amountPickler = transformPickler[BigDecimal,String](b=> String.valueOf(b.doubleValue()),
      t =>  scala.math.BigDecimal(t))
@@ -64,22 +62,26 @@ class IWSHandler[M](modelRW: ModelRW[M, Pot[DStore[IWS,IWS]]]) extends ActionHan
    pickler.addConcreteType[PurchaseOrder[LinePurchaseOrder]].addConcreteType[LinePurchaseOrder]
    pickler.addConcreteType[Vat]
    pickler.addConcreteType[MStore]
+   //pickler.addConcreteType[String]
 
   override def handle = {
     case Refresh (item:IWS) =>
-      val x=Map(item.modelId ->Ready(Data(Seq(item))))
+      val x = Map(item.modelId ->Ready(Data(Seq(item))))
       log.info("+>>>>>>>>Refresh++++++"+x)
       updated(Ready(value.get.updatedAll(x)))
     case UpdateAll(all:Seq[IWS]) =>
-      val xx=all.seq.headOption.get
-      //log.info("+++++++++>>>>>>>>XXX"+xx)
-      val  a=all.filter(_.modelId==xx.modelId)
+      val xx = all.seq.headOption.get
+      log.info("+++++++++>>>>>>>>XXX"+xx)
+      val  a = all.filter(_.modelId == xx.modelId)
       //log.info("+++++++++<<<<<<<<<<<"+a)
-      val x=Map(xx.modelId ->Ready(Data(a)))
+      val x = Map(xx.modelId ->Ready(Data(a)))
       updated(Ready(value.get.updatedAll(x)))
     case Update(item:IWS) =>
       log.info("+++++++++<<<<<<<<<<< UpdateTodo: "+item)
       updated(Ready(value.get.updated(item)), Effect(AjaxClient[Api].update(item).call().map(UpdateAll[IWS])))
+    case FindAll(item:IWS) =>
+      log.info("+++++++++<<<<<<<<<<< FindAll : "+item)
+      updated(Ready(value.get.updated(item)), Effect(AjaxClient[Api].all(item).call().map(UpdateAll[IWS])))
     case Delete(item:IWS) =>
       log.info("+++++++++<<<<<<<<<<< Delete Item: "+item)
       //ActionResult.NoChange
@@ -102,7 +104,7 @@ class MotdHandler[M](modelRW: ModelRW[M, Pot[String]]) extends ActionHandler(mod
   implicit val runner = new RunAfterJS
   override def handle = {
     case action: UpdateMotd =>
-      val updateF = action.effect(AjaxClient[Api].welcome("User X").call())(identity)
+      val updateF = action.effect(AjaxClient[Api].welcome("User X").call())(identity(_))
       action.handleWith(this, updateF)(PotAction.handler())
   }
 }
@@ -132,4 +134,6 @@ object SPACircuit extends Circuit[RootModel[IWS,IWS]] with ReactConnector[RootMo
     RootModel(store, Empty)
 
   }
+
+  def getModel (modelId:Int) = { initialModel.store.get.models.get(modelId)}
 }

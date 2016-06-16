@@ -8,7 +8,7 @@ import diode.data.Pot
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.prefix_<^._
 import com.kabasoft.iws.gui.macros.Bootstrap._
-import com.kabasoft.iws.client.services.UpdateMotd
+import com.kabasoft.iws.gui.services.UpdateMotd
 
 /**
   * This is a simple component demonstrating how to display async data coming from the server

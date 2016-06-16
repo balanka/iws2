@@ -1,4 +1,4 @@
-package com.kabasoft.iws.client.logger
+package com.kabasoft.iws.gui.logger
 
 import scala.scalajs.js
 import scala.scalajs.js.annotation.JSName

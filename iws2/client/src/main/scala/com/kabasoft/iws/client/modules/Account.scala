@@ -12,6 +12,7 @@ import japgolly.scalajs.react.vdom.prefix_<^._
 import com.kabasoft.iws.gui.macros.Bootstrap._
 import com.kabasoft.iws.shared._
 import com.kabasoft.iws.gui.macros._
+import com.kabasoft.iws.gui.logger._
 import scalacss.ScalaCssReact._
 
 object ACCOUNT {

@@ -1,10 +1,11 @@
 package com.kabasoft.iws.client.components
 
 import com.kabasoft.iws.gui.macros.GlobalStyles
-import com.kabasoft.iws.shared.{IWS,Article}
+import com.kabasoft.iws.shared.{Article, IWS}
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.prefix_<^._
 import com.kabasoft.iws.gui.macros.Bootstrap.{Button, CommonStyle}
+
 import scala.scalajs.js
 import scalacss.ScalaCssReact._
 
@@ -40,7 +41,13 @@ object ArticleList {
       <.ul(style.listGroup)(p.items.asInstanceOf[Seq[Article]].sortBy(_.id) map renderItem)
     })
     .build
-
-  def apply(items: Seq[IWS], stateChange: IWS => Callback, editItem: IWS => Callback, deleteItem: IWS => Callback) =
+  var  itemsI = List.empty[IWS]
+  def add(itemsx:Seq[IWS]) = {itemsI++itemsx;ArticleList }
+  def  ITEMS = itemsI
+  def apply(items: Seq[IWS], stateChange: IWS => Callback, editItem: IWS => Callback, deleteItem: IWS => Callback) = {
     ArticleList(ArticleListProps(items, stateChange, editItem, deleteItem))
+
+    //itemsI=itemsI++items
+   // ArticleList
+  }
 }

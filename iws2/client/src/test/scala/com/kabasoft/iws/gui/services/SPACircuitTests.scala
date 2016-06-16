@@ -1,4 +1,4 @@
-package com.kabasoft.iws.client.services
+package com.kabasoft.iws.gui.services
 
 import com.kabasoft.iws.gui.macros._
 import com.kabasoft.iws.shared.{Store => MStore}

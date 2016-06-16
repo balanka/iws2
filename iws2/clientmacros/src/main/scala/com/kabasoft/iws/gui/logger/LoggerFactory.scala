@@ -1,4 +1,4 @@
-package com.kabasoft.iws.client.logger
+package com.kabasoft.iws.gui.logger
 
 import scala.annotation.elidable
 import scala.annotation.elidable._

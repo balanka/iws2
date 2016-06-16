@@ -162,22 +162,30 @@ implicit def purchaseOrderDAO = new DAO[PurchaseOrder[LinePurchaseOrder]]{
     def create = Queries.createPurchaseOrder1.run.transact(xa).run
     def update(model:PurchaseOrder[LinePurchaseOrder]) = {
       val ret = Queries.purchaseOrderUpdateName(model).run.transact(xa).run;
-      def prdicate (pred:LinePurchaseOrder) = pred.tid == 0L
-      val t:(List[LinePurchaseOrder], List[LinePurchaseOrder]) = model.getLines.partition(prdicate)
-      val t1 :List[LinePurchaseOrder] = t._1
-      val t2 : List[LinePurchaseOrder]= t._2
-
+      def prdicate (pred:LinePurchaseOrder) = pred.tid == 0L && pred.created == true
+     // val t:(List[LinePurchaseOrder], List[LinePurchaseOrder]) = model.getLines.partition(prdicate)
+      //val t1 :List[LinePurchaseOrder] = t._1
+      //val t2 : List[LinePurchaseOrder]= t._2
+      val newLines = model.getLines.partition(prdicate)._1
+      val k0 = linePurchaseOrderDAO.insert(newLines)
+      //val k0 = linePurchaseOrderDAO.insert(model.getLines.partition(_.tid ==0L && _.created == true)._1)
       val k1= model.getLines.partition(_.modified)._1.map (linePurchaseOrderDAO.update )
       val k2 = model.getLines.partition(_.deleted)._1.map ( e =>linePurchaseOrderDAO.delete(e.id.toString) )
 
-      println(s" PO Line deleted K2 ${k2}   deleted");
-      println(s" t1 ${t1}  items");
-      println(s" t2 ${t2}  items");
-      linePurchaseOrderDAO.insert (t1);
-      t2.map (linePurchaseOrderDAO.update );
+      println(s" PO Line inserted K0 ${k0}   ${newLines}");
+      println(s" PO Line updated K2 ${k1}   ");
+      println(s" PO Line deleted K2 ${k2}   ");
+      //println(s" t1 ${t1}  items");
+      //println(s" t2 ${t2}  items");
+    //  linePurchaseOrderDAO.insert (t1);
+    //  t2.map (linePurchaseOrderDAO.update );
       ret
     }
-    def delete(id:String):Int = Queries.purchaseOrderDelete(id.toLong).run.transact(xa).run
+    def delete(id:String):Int = {
+
+      val r = find(id).map(p =>(p.getLines.map(l =>(linePurchaseOrderDAO.delete(l.id)))))
+      Queries.purchaseOrderDelete(id.toLong).run.transact(xa).run
+    }
     def all:List[PurchaseOrder[LinePurchaseOrder]] = Queries.purchaseOrderSelect.process.list.transact(xa).run.map(
                        x => PurchaseOrder(x._1,x._2, x._3, Some(x._4),Some(x._5)).copy(lines = Some(f(x._1))))
     def find(id:String)  : List[PurchaseOrder[LinePurchaseOrder]] =

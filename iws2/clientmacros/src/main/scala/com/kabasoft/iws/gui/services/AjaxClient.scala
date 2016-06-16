@@ -1,4 +1,4 @@
-package com.kabasoft.iws.client.services
+package com.kabasoft.iws.gui.services
 
 import java.nio.ByteBuffer
 

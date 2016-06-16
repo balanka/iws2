@@ -13,7 +13,7 @@ import java.io.File
 
 
 object AssetsController extends Controller {
-
+/*
   val AbsolutePath = """^(/|[a-zA-Z]:\\).*""".r
 
   /**
@@ -35,5 +35,5 @@ object AssetsController extends Controller {
       NotFound
     }
   }
-
+ */
 }

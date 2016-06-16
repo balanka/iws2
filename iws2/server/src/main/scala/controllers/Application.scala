@@ -50,7 +50,7 @@ object Application extends Controller {
      // println("Rparse.raw:"+parse.raw)
       // get the request body as Array[Byte]
       val b = request.body.asBytes(parse.UNLIMITED).get
-      //println(s"Request path: $path "+path.split("/").mkString)
+       println(s"Request path: $path "+path.split("/").mkString)
       // call Autowire route
       Router.route[Api](apiService)(
         autowire.Core.Request(path.split("/"), Unpickle[Map[String, ByteBuffer]].fromBytes(ByteBuffer.wrap(b)))

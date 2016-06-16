@@ -9,8 +9,8 @@ import japgolly.scalajs.react.vdom.prefix_<^._
 import com.kabasoft.iws.gui.macros.Bootstrap._
 import com.kabasoft.iws.gui.macros.{BootstrapStyles,GlobalStyles,Icon}
 import com.kabasoft.iws.client.components._
-import com.kabasoft.iws.client.logger._
-import com.kabasoft.iws.client.services._
+import com.kabasoft.iws.gui.logger._
+import com.kabasoft.iws.gui.services._
 import com.kabasoft.iws.shared.Model._
 import com.kabasoft.iws.shared._
 

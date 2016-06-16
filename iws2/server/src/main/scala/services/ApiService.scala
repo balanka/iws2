@@ -44,7 +44,7 @@ class ApiService extends Api {
      case _: ArticleGroup => MakeService.make[ArticleGroup].insert(List(item.asInstanceOf[ArticleGroup]))
      case _: PurchaseOrder[LinePurchaseOrder] => MakeService.make[PurchaseOrder[LinePurchaseOrder]].insert(List(item.asInstanceOf[PurchaseOrder[LinePurchaseOrder]]))
      case _: LinePurchaseOrder => MakeService.makeTransaction[LinePurchaseOrder].insert(List(item.asInstanceOf[LinePurchaseOrder]))
-     //case _: TodoItem => todoService.all()
+     case _: TodoItem => todoService.update(item).size
    }
  }
   def find(item:IWS) ={
@@ -80,7 +80,7 @@ class ApiService extends Api {
     }
   }
    def all(item:IWS) ={
-   println(s"Sending ${item}  items")
+   println(s"got  ${item}  as request")
     item match {
       case _: Account => MakeService.make[Account].all
       case _: Supplier => MakeService.make[Supplier].all
@@ -99,17 +99,17 @@ class ApiService extends Api {
    def update(item:IWS) = {
     println(s"get ${item} items")
     item match {
-      case _: Account  => {MakeService.make[Account].update(item.asInstanceOf[Account]); all(item)}
-      case _: Supplier => {MakeService.make[Supplier].update(item.asInstanceOf[Supplier]); all(item)}
-      case _: Customer => {MakeService.make[Customer].update(item.asInstanceOf[Customer]); all(item)}
-      case _: Store => {MakeService.make[Store].update(item.asInstanceOf[Store]); all(item)}
-      case _: QuantityUnit => {MakeService.make[QuantityUnit].update(item.asInstanceOf[QuantityUnit]); all(item)}
+      case _: Account  => {MakeService.make[Account].update(item.asInstanceOf[Account]); find(item)}
+      case _: Supplier => {MakeService.make[Supplier].update(item.asInstanceOf[Supplier]); find(item)}
+      case _: Customer => {MakeService.make[Customer].update(item.asInstanceOf[Customer]); find(item)}
+      case _: Store => {MakeService.make[Store].update(item.asInstanceOf[Store]); find(item)}
+      case _: QuantityUnit => {MakeService.make[QuantityUnit].update(item.asInstanceOf[QuantityUnit]); find(item)}
       case _: Vat => {MakeService.make[Vat].update(item.asInstanceOf[Vat]); all(item)}
-      case _: CostCenter  => {MakeService.make[CostCenter].update(item.asInstanceOf[CostCenter]); all(item)}
+      case _: CostCenter  => {MakeService.make[CostCenter].update(item.asInstanceOf[CostCenter]); find(item)}
       case _: Article => {MakeService.make[Article].update(item.asInstanceOf[Article]); all(item)}
-      case _: ArticleGroup => {MakeService.make[ArticleGroup].update(item.asInstanceOf[ArticleGroup]); all(item)}
-      case _: PurchaseOrder[LinePurchaseOrder] => { println(s"get  before ${item} items"); MakeService.makeTransaction[PurchaseOrder[LinePurchaseOrder]].update(item.asInstanceOf[PurchaseOrder[LinePurchaseOrder]]); all(item)}
-      case _: LinePurchaseOrder => {  println(s"get  before ${item} items"); MakeService.makeTransaction[LinePurchaseOrder].update(item.asInstanceOf[LinePurchaseOrder]); println(s"get  after ${item} items"); all(item)}
+      case _: ArticleGroup => {MakeService.make[ArticleGroup].update(item.asInstanceOf[ArticleGroup]); find(item)}
+      case _: PurchaseOrder[LinePurchaseOrder] => {  MakeService.makeTransaction[PurchaseOrder[LinePurchaseOrder]].update(item.asInstanceOf[PurchaseOrder[LinePurchaseOrder]]); find(item)}
+      case _: LinePurchaseOrder => {  MakeService.makeTransaction[LinePurchaseOrder].update(item.asInstanceOf[LinePurchaseOrder]); find(item)}
       case _: TodoItem => todoService.update(item)
     }
   }

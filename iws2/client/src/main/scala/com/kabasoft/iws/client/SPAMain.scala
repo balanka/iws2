@@ -1,6 +1,6 @@
 package com.kabasoft.iws.client
 
-
+import com.kabasoft.iws.gui.logger._
 import com.kabasoft.iws.gui.AppRouter._
 import com.kabasoft.iws.gui.macros.IWSList.{customerList, supplierList}
 import com.kabasoft.iws.gui.macros._
@@ -11,8 +11,8 @@ import com.kabasoft.iws.gui.macros.BackendMacro
 import com.kabasoft.iws.shared.Model._
 import com.kabasoft.iws.client.modules._
 import com.kabasoft.iws.shared._
-import com.kabasoft.iws.client.logger._
-import com.kabasoft.iws.client.services.SPACircuit
+import com.kabasoft.iws.gui.logger._
+import com.kabasoft.iws.gui.services.SPACircuit
 import com.kabasoft.iws.gui.macros._
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.ReactDOM
@@ -54,6 +54,7 @@ object SPAMain extends js.JSApp {
 
     )
   val vm=MenuItem("000","IWS", "#IWS" ,List(v1,v2,v3))
+  val CIRCUIT=SPACircuit.zoom(_.store.get).zoom(_.models(6))
 
   // configure the router
   val routerConfig = RouterConfigDsl[Page].buildConfig { dsl =>
@@ -76,14 +77,21 @@ object SPAMain extends js.JSApp {
     //val bb = SPACircuit.connect(SPACircuit.store.get.models.get(8).get.asInstanceOf[Pot[Data]])
     //log.info("/////////////////////////////////////"+SPACircuit.store.get.models.get(4))
     (staticRoute(root, DashboardPage$) ~> renderR(ctl => SPACircuit.wrap(_.motd)(proxy => Dashboard(ctl, proxy,QuantityUnitPage$)))
+      | staticRoute("#art", ArticlePage$) ~> renderR(ctl => SPACircuit.connect(_.store.get.models.getOrElse(7,Ready(Data(List(Article())))).asInstanceOf[Pot[Data]])(ARTICLE(_)))
+
+      |staticRoute("#ord", POrderPage$) ~> renderR(ctl => SPACircuit.wrap(_.store.get.models.getOrElse(101,Ready(Data(List(PurchaseOrder[LinePurchaseOrder]())))).asInstanceOf[Pot[Data]])
+          ( proxy => (
+                 SPACircuit.wrap(_.store.get.models.getOrElse(7,Ready(Data(List(Article())))).asInstanceOf[Pot[Data]])
+                 //( proxy1 => ( ARTICLE(proxy1)))
+                   ( proxy1 => (PURCHASEORDER(proxy,proxy1))))))
+
 
       | staticRoute("#qty", QuantityUnitPage$) ~> renderR(ctl => SPACircuit.connect(_.store.get.models.getOrElse(4,Ready(Data(List(QuantityUnit())))).asInstanceOf[Pot[Data]])(z1(_)))
       | staticRoute("#acc", AccountPage$) ~> renderR(ctl => SPACircuit.connect(_.store.get.models.getOrElse(9,Ready(Data(List(Account())))).asInstanceOf[Pot[Data]])(ACCOUNT(_)))
       | staticRoute("#todo", TodoPage$) ~> renderR(ctl => SPACircuit.connect(_.store.get.models.getOrElse(4711,Ready(Data(List(TodoItem())))).asInstanceOf[Pot[Data]])(Todo(_)))
       | staticRoute("#cust", CustomerPage$) ~> renderR(ctl => SPACircuit.connect(_.store.get.models.getOrElse(3,Ready(Data(List(Customer())))).asInstanceOf[Pot[Data]])(CUSTOMER(_)))
-      | staticRoute("#art", ArticlePage$) ~> renderR(ctl => SPACircuit.connect(_.store.get.models.getOrElse(7,Ready(Data(List(Article())))).asInstanceOf[Pot[Data]])(ARTICLE(_)))
-      | staticRoute("#cat", CategoryPage$) ~> renderR(ctl => SPACircuit.connect(_.store.get.models.getOrElse(8,Ready(Data(List(ArticleGroup())))).asInstanceOf[Pot[Data]])(z0(_)))
-      | staticRoute("#ord", POrderPage$) ~> renderR(ctl => SPACircuit.connect(_.store.get.models.getOrElse(101,Ready(Data(List(PurchaseOrder[LinePurchaseOrder]())))).asInstanceOf[Pot[Data]])(PURCHASEORDER(_)))
+       | staticRoute("#cat", CategoryPage$) ~> renderR(ctl => SPACircuit.connect(_.store.get.models.getOrElse(8,Ready(Data(List(ArticleGroup())))).asInstanceOf[Pot[Data]])(z0(_)))
+     // | staticRoute("#ord", POrderPage$) ~> renderR(ctl => SPACircuit.connect(_.store.get.models.getOrElse(101,Ready(Data(List(PurchaseOrder[LinePurchaseOrder]())))).asInstanceOf[Pot[Data]])(PURCHASEORDER(_)))
       | staticRoute("#sup", SupplierPage$) ~> renderR(ctl => SPACircuit.connect(_.store.get.models.getOrElse(1,Ready(Data(List(Supplier())))).asInstanceOf[Pot[Data]])(z4(_)))
 
       | staticRoute("#cost", CostCenterPage$) ~> renderR(ctl => SPACircuit.connect(_.store.get.models.getOrElse(6,Ready(Data(List(CostCenter())))).asInstanceOf[Pot[Data]])(z2(_)))
@@ -132,8 +140,13 @@ object SPAMain extends js.JSApp {
              SPACircuit.connect(_.store.get.models.getOrElse(4711,Ready(Data(List(TodoItem())))).map(_.asInstanceOf[Data].items.count(!_.id.isEmpty)).toOption)(proxy => MainMenu(c, r.page,1,"Todo", proxy,TodoPage$,TodoItem())),
              SPACircuit.connect(_.store.get.models.getOrElse(7,Ready(Data(List(Article())))).map(_.asInstanceOf[Data].items.count(!_.id.isEmpty)).toOption)(proxy => MainMenu(c, r.page,4,"Article", proxy,ArticlePage$,Article())),
              SPACircuit.connect(_.store.get.models.getOrElse(8,Ready(Data(List(ArticleGroup())))).map(_.asInstanceOf[Data].items.count(!_.id.isEmpty)).toOption)(proxy => MainMenu(c, r.page,5,"Category", proxy,CategoryPage$,ArticleGroup())),
-             SPACircuit.connect(_.store.get.models.getOrElse(101,Ready(Data(List(PurchaseOrder[LinePurchaseOrder]())))).map(_.asInstanceOf[Data].items.count(!_.id.isEmpty)).toOption)(proxy => MainMenu(c, r.page,6,"PurchaseOrder", proxy,POrderPage$,PurchaseOrder[LinePurchaseOrder]())),
-
+             //SPACircuit.connect(_.store.get.models.getOrElse(101,Ready(Data(List(PurchaseOrder[LinePurchaseOrder]())))).map(_.asInstanceOf[Data].items.count(!_.id.isEmpty)).toOption)(proxy => MainMenu(c, r.page,6,"PurchaseOrder", proxy,POrderPage$,PurchaseOrder[LinePurchaseOrder]())),
+            /* SPACircuit.connect(_.store.get.models.getOrElse(101,Ready(Data(List(PurchaseOrder[LinePurchaseOrder]())))).map(_.asInstanceOf[Data].items.count(!_.id.isEmpty)).toOption)
+             (proxy =>
+               SPACircuit.connect(_.store.get.models.getOrElse(7,Ready(Data(List(Article())))).map(_.asInstanceOf[Data].items.count(!_.id.isEmpty)).toOption)
+               (proxy1 =>  PURCHASEORDER(proxy,proxy1))
+             ),
+             */
              SPACircuit.connect(_.store.get.models.getOrElse(6,Ready(Data(List(CostCenter())))).map(_.asInstanceOf[Data].items.count(!_.id.isEmpty)).toOption)(proxy => MainMenu(c, r.page,7,"CostCenter", proxy,CostCenterPage$,CostCenter()))
 
           )
