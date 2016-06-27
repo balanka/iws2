@@ -27,6 +27,7 @@ import diode.react.ReactPot._
 import diode.react.ModelProxy
 import com.kabasoft.iws.gui.macros.Bootstrap._
 import scala.scalajs.js.Dynamic.{global => g}
+import com.kabasoft.iws.client.components.Motd
 
 
 
@@ -35,6 +36,8 @@ import scala.language.reflectiveCalls
 
 //@JSExport("SPAMain")
 object SPAMain extends js.JSApp {
+
+  //just do val x = SPACircuit.connect(_.messages) and then renderR(r => x(p => SignIn(r, p)))
 
   val v1=  MenuItem("001","Masterfile", "#Masterfile" ,
              List(MenuItem("002","Account","#acc"),
@@ -61,10 +64,11 @@ object SPAMain extends js.JSApp {
     import dsl._
 
     val z0 = BackendMacro.makeBackend(ArticleGroup())
-    val z1 = BackendMacro.makeBackend(QuantityUnit())
-    val z2 = BackendMacro.makeBackend(CostCenter())
+    val z1 = BusinessPartnerUIMacro.makeUI(Supplier())
+    val z6 = BackendMacro.makeBackend(CostCenter())
     //val z3 = BusinessPartnerUIMacro.makeUI(Customer())
-    val z4 = BusinessPartnerUIMacro.makeUI(Supplier())
+    val z4 = BackendMacro.makeBackend(QuantityUnit())
+   // val z8 = BackendMacro.makeBackend(ArticleGroup())
     //val z5 =  BackendMacro.makeBackend(Account())
     /*var t1=  TabItem("Masterfile","Masterfile","#Masterfile", true,<.div(),
       List(TabItem("acc","Account","#acc",true, <.div(Components2())),
@@ -76,31 +80,47 @@ object SPAMain extends js.JSApp {
      //   .pmap[Page](MuiPages) { case MuiPages(p) => p }
     //val bb = SPACircuit.connect(SPACircuit.store.get.models.get(8).get.asInstanceOf[Pot[Data]])
     //log.info("/////////////////////////////////////"+SPACircuit.store.get.models.get(4))
-    (staticRoute(root, DashboardPage$) ~> renderR(ctl => SPACircuit.wrap(_.motd)(proxy => Dashboard(ctl, proxy,QuantityUnitPage$)))
-      | staticRoute("#art", ArticlePage$) ~> renderR(ctl => SPACircuit.connect(_.store.get.models.getOrElse(7,Ready(Data(List(Article())))).asInstanceOf[Pot[Data]])(ARTICLE(_)))
+    val x0 = SPACircuit.connect(_.motd)
+    val x1 =  SPACircuit.connect(_.store.get.models.getOrElse(1,Ready(Data(List(Supplier())))).asInstanceOf[Pot[Data]])
+    //val x2 =  SPACircuit.connect(_.store.get.models.getOrElse(2,Ready(Data(List(Article())))).asInstanceOf[Pot[Data]])
+    val x3 =  SPACircuit.connect(_.store.get.models.getOrElse(3,Ready(Data(List(Customer())))).asInstanceOf[Pot[Data]])
+    val x4 =  SPACircuit.connect(_.store.get.models.getOrElse(4,Ready(Data(List(QuantityUnit())))).asInstanceOf[Pot[Data]])
+    val x6 =  SPACircuit.connect(_.store.get.models.getOrElse(6,Ready(Data(List(CostCenter())))).asInstanceOf[Pot[Data]])
+    val x7 =  SPACircuit.connect(_.store.get.models.getOrElse(7,Ready(Data(List(Article())))).asInstanceOf[Pot[Data]])
+    val x71 =  SPACircuit.connect(_.store.get.models.getOrElse(7,Ready(Data(List(Article())))).asInstanceOf[Pot[Data]])
+    val x8 =  SPACircuit.connect(_.store.get.models.getOrElse(8,Ready(Data(List(ArticleGroup())))).asInstanceOf[Pot[Data]])
+    val x9 =  SPACircuit.connect(_.store.get.models.getOrElse(9,Ready(Data(List(Account())))).asInstanceOf[Pot[Data]])
+    val x101 =  SPACircuit.connect(_.store.get.models.getOrElse(101,Ready(Data(List(PurchaseOrder[LinePurchaseOrder]())))).asInstanceOf[Pot[Data]])
+    val x4711 =  SPACircuit.connect(_.store.get.models.getOrElse(4711,Ready(Data(List(Article())))).asInstanceOf[Pot[Data]])
+    (staticRoute(root, DashboardPage$) ~> renderR(ctl => x0(proxy => Dashboard(ctl, proxy,QuantityUnitPage$)))
+    | staticRoute("#art", ArticlePage$) ~> renderR(ctl =>x71(p71 =>(ARTICLE(p71))))
 
-      |staticRoute("#ord", POrderPage$) ~> renderR(ctl => SPACircuit.wrap(_.store.get.models.getOrElse(101,Ready(Data(List(PurchaseOrder[LinePurchaseOrder]())))).asInstanceOf[Pot[Data]])
-          ( proxy => (
-                 SPACircuit.wrap(_.store.get.models.getOrElse(7,Ready(Data(List(Article())))).asInstanceOf[Pot[Data]])
-                 //( proxy1 => ( ARTICLE(proxy1)))
-                   ( proxy1 => (PURCHASEORDER(proxy,proxy1))))))
+     // | staticRoute("#art", ArticlePage$) ~> renderR(ctl => SPACircuit.connect(_.store.get.models.getOrElse(7,Ready(Data(List(Article())))).asInstanceOf[Pot[Data]])(ARTICLE(_:ModelProxy[Pot[Data]])))
+
+      |staticRoute("#ord", POrderPage$) ~> renderR(ctl => x101 ( proxy101 => (x7 ( proxy7=> (PURCHASEORDER(proxy101,proxy7))))))
 
 
-      | staticRoute("#qty", QuantityUnitPage$) ~> renderR(ctl => SPACircuit.connect(_.store.get.models.getOrElse(4,Ready(Data(List(QuantityUnit())))).asInstanceOf[Pot[Data]])(z1(_)))
-      | staticRoute("#acc", AccountPage$) ~> renderR(ctl => SPACircuit.connect(_.store.get.models.getOrElse(9,Ready(Data(List(Account())))).asInstanceOf[Pot[Data]])(ACCOUNT(_)))
-      | staticRoute("#todo", TodoPage$) ~> renderR(ctl => SPACircuit.connect(_.store.get.models.getOrElse(4711,Ready(Data(List(TodoItem())))).asInstanceOf[Pot[Data]])(Todo(_)))
-      | staticRoute("#cust", CustomerPage$) ~> renderR(ctl => SPACircuit.connect(_.store.get.models.getOrElse(3,Ready(Data(List(Customer())))).asInstanceOf[Pot[Data]])(CUSTOMER(_)))
-       | staticRoute("#cat", CategoryPage$) ~> renderR(ctl => SPACircuit.connect(_.store.get.models.getOrElse(8,Ready(Data(List(ArticleGroup())))).asInstanceOf[Pot[Data]])(z0(_)))
+      | staticRoute("#qty", QuantityUnitPage$) ~> renderR(ctl => x4(p4=>(z4(p4))))
+     // | staticRoute("#acc", AccountPage$) ~> renderR(ctl => SPACircuit.connect(_.store.get.models.getOrElse(9,Ready(Data(List(Account())))).asInstanceOf[Pot[Data]])(ACCOUNT(_)))
+
+      | staticRoute("#acc", AccountPage$) ~> renderR(ctl => x9(p9 =>(ACCOUNT(p9))))
+      | staticRoute("#todo", TodoPage$) ~> renderR(ctl => x4711(p4711 =>(Todo(p4711))))
+      | staticRoute("#cust", CustomerPage$) ~> renderR(ctl => x3(p3 =>(CUSTOMER(p3))))
+
+      //| staticRoute("#cust", CustomerPage$) ~> renderR(ctl => SPACircuit.connect(_.store.get.models.getOrElse(3,Ready(Data(List(Customer())))).asInstanceOf[Pot[Data]])(CUSTOMER(_)))
+      | staticRoute("#cat", CategoryPage$) ~> renderR(ctl => x8(p8 => (z0(p8))))
      // | staticRoute("#ord", POrderPage$) ~> renderR(ctl => SPACircuit.connect(_.store.get.models.getOrElse(101,Ready(Data(List(PurchaseOrder[LinePurchaseOrder]())))).asInstanceOf[Pot[Data]])(PURCHASEORDER(_)))
-      | staticRoute("#sup", SupplierPage$) ~> renderR(ctl => SPACircuit.connect(_.store.get.models.getOrElse(1,Ready(Data(List(Supplier())))).asInstanceOf[Pot[Data]])(z4(_)))
+      | staticRoute("#sup", SupplierPage$) ~> renderR(ctl => x1(p1 =>(z1(p1))))
 
-      | staticRoute("#cost", CostCenterPage$) ~> renderR(ctl => SPACircuit.connect(_.store.get.models.getOrElse(6,Ready(Data(List(CostCenter())))).asInstanceOf[Pot[Data]])(z2(_)))
+      | staticRoute("#cost", CostCenterPage$) ~> renderR(ctl => x6(p6 =>(z6(p6))))
       ).notFound(redirectToPage(DashboardPage$)(Redirect.Replace))
    // ).notFound(redirectToPage(Home)(Redirect.Replace))
   }.renderWith(layout)
 
   // base layout for all pages
     def layout(c: RouterCtl[Page], r: Resolution[Page]) = {
+   // val x4 =  SPACircuit.connect(_.store.get.models.getOrElse(4,
+    //                 Ready(Data(List(QuantityUnit())))).map(_.asInstanceOf[Data].items.count(!_.id.isEmpty)).toOption)(_)
     /*
     <.div(
             SPACircuit.connect(_.store.get.models.getOrElse(1,Ready(Data(List(Supplier())))))(proxy => {
@@ -125,14 +145,19 @@ object SPAMain extends js.JSApp {
              })
         ) */
       <.div(
-      <.nav(^.className := "navbar navbar-inverse navbar-fixed-bottom",
+     /* <.nav(^.className := "navbar navbar-inverse navbar-fixed-bottom",
         <.div(^.className := "container-fluid",
           //<.div(^.className := "navbar-header", <.span(^.className := "navbar-brand", "SPA Tutorial")),
            <.div(^.className := "collapse navbar-collapse",
            //<.div(^.className := "nav nav-tabs",
             // connect menu to model, because it needs to update when the number of open todos changes
+             //val x = SPACircuit.connect(_.messages) and then renderR(r => x(p => SignIn(r, p)))
+
+             //x4(proxy => MainMenu(c, r.page,2,"QuantityUnit", proxy,QuantityUnitPage$,QuantityUnit())),
+            // SPACircuit.connect(_.store.get.models.getOrElse(4,Ready(Data(List(QuantityUnit())))).map(_.asInstanceOf[Data].items.count(!_.id.isEmpty)).toOption)(proxy => MainMenu(c, r.page,2,"QuantityUnit", proxy,QuantityUnitPage$,QuantityUnit())),
 
              SPACircuit.connect(_.store.get.models.getOrElse(4,Ready(Data(List(QuantityUnit())))).map(_.asInstanceOf[Data].items.count(!_.id.isEmpty)).toOption)(proxy => MainMenu(c, r.page,2,"QuantityUnit", proxy,QuantityUnitPage$,QuantityUnit())),
+
              SPACircuit.connect(_.store.get.models.getOrElse(9,Ready(Data(List(Account())))).map(_.asInstanceOf[Data].items.count(!_.id.isEmpty)).toOption)(proxy => MainMenu(c, r.page,3,"Account", proxy,AccountPage$,Account())),
 
              SPACircuit.connect(_.store.get.models.getOrElse(3,Ready(Data(List(Customer())))).map(_.asInstanceOf[Data].items.count(!_.id.isEmpty)).toOption)(proxy => MainMenu(c, r.page,8,"Customer", proxy,CustomerPage$,Customer())),
@@ -151,7 +176,7 @@ object SPAMain extends js.JSApp {
 
           )
         )
-     ),
+     ), */
 
       <.div(^.className := "navbar navbar navbar-fixed-right",
          <.div(^.className := "collapse navbar-collapse",
