@@ -32,15 +32,15 @@ object IWSMain extends js.JSApp {
   val v1=  MenuItem("001","Masterfile", "#Masterfile" ,
              List(MenuItem("002","Account","#acc"),
                   MenuItem("003","Article","#art"),
-                  MenuItem("004","Customer","#cust")
-                 // MenuItem("005","Supplier","#sup"),
-                 // MenuItem("006","Article group","#cat"),
-                 // MenuItem("007","Quantity unit","#qty")
+                  MenuItem("004","Customer","#cust"),
+                  MenuItem("005","Supplier","#sup"),
+                  MenuItem("006","Article group","#cat"),
+                  MenuItem("007","Quantity unit","#qty")
   ))
 
   val v2=MenuItem("008","Purchasing", "#Purchasing" ,
-          List(MenuItem("009","Purchase order","#ord")
-              // MenuItem("010","Cost center","#cost")
+          List(MenuItem("009","Purchase order","#ord"),
+               MenuItem("010","Cost center","#cost")
     ))
   val v3=MenuItem("020","Dashboard", "#Dashboard" ,
     List(MenuItem("021","Dashboard","#scalacss"))
@@ -65,7 +65,6 @@ object IWSMain extends js.JSApp {
     val x5 =  SPACircuit.connect(_.store.get.models.get(5).get)
     val x6 =  SPACircuit.connect(_.store.get.models.get(6).get)
     val x7 =  SPACircuit.connect(_.store.get.models.get(7).get,"Article")
-    val x71 = SPACircuit.connect(_.store.get.models.get(7).get,"Article1")
     val x8 =  SPACircuit.connect(_.store.get.models.get(8).get)
     val x9 =  SPACircuit.connect(_.store.get.models.get(9).get)
     val x101 = SPACircuit.connect(_.store.get.models.get(101).get, "Order")
@@ -74,7 +73,7 @@ object IWSMain extends js.JSApp {
 
     //val x2 =  SPACircuit.connect(_.store.get.models.getOrElse(2,Ready(Data(List(Article())))).asInstanceOf[Pot[Data]])
      (staticRoute(root, DashboardPage$) ~> renderR(ctl => x4(proxy => Dashboard(ctl, proxy.asInstanceOf[ModelProxy[Pot[Data]]],QuantityUnitPage$)))
-      | staticRoute("#art", ArticlePage$) ~> renderR(ctl => x71(p71 => ARTICLE(p71.asInstanceOf[ModelProxy[Pot[Data]]])))
+      | staticRoute("#art", ArticlePage$) ~> renderR(ctl => x7(p7 => ARTICLE(p7.asInstanceOf[ModelProxy[Pot[Data]]])))
       |staticRoute("#ord", POrderPage$) ~> renderR(ctl => x101(proxy101 =>PURCHASEORDER(proxy101.asInstanceOf[ModelProxy[Pot[Data]]])))
       | staticRoute("#qty", QuantityUnitPage$) ~> renderR(ctl => x4(p4=>(z4(p4.asInstanceOf[ModelProxy[Pot[Data]]]))))
       | staticRoute("#vat", VatPage$) ~> renderR(ctl => x5(p5=>(z5(p5.asInstanceOf[ModelProxy[Pot[Data]]]))))
