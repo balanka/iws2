@@ -13,6 +13,8 @@ import com.kabasoft.iws.gui.macros.Bootstrap._
 import com.kabasoft.iws.shared._
 import com.kabasoft.iws.gui.macros._
 import com.kabasoft.iws.gui.logger._
+
+
 import scalacss.ScalaCssReact._
 
 object ACCOUNT {
@@ -28,17 +30,21 @@ object ACCOUNT {
       Callback.ifTrue(props.proxy().isEmpty, props.proxy.dispatch(Refresh[Account](Account())))
 
     def edit(item:Option[Account]) = {
+      log.debug(s" KKKKKKKKKKKKKKKKKK1 ${item.map(_.name)}")
       $.modState(s => s.copy(selectedItem = item))
+
     }
     def edited(item:Account) = {
-      Callback.log("Account edited>>>>> " +item)  >>
+      log.debug(s" SSSSSSSSSSSSSSSS ${item.name}")
+      //Callback.log("Account edited>>>>> " +item)  >>
       $.props >>= (_.proxy.dispatch(Update[Account](item)))
      }
 
     def delete(item:Account) = {
-      val cb = Callback.log("Account deleted>>>>> " +item)  >>
+      log.debug(s" OOOOOOOOOOOOOOO ${item.name}")
+     // val cb = Callback.log("Account deleted>>>>> " +item)  >>
         $.props >>= (_.proxy.dispatch(Delete(item)))
-      cb >> $.modState(s => s.copy(name = "Account"))
+      //cb >> $.modState(s => s.copy(name = "Account"))
     }
 
     def updateId(e: ReactEventI) = {

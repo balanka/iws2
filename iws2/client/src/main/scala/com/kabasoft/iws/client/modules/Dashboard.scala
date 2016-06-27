@@ -8,11 +8,13 @@ import japgolly.scalajs.react.ReactComponentB
 import japgolly.scalajs.react.extra.router.RouterCtl
 import japgolly.scalajs.react.vdom.prefix_<^._
 import com.kabasoft.iws.client.components._
+import com.kabasoft.iws.shared.Data
+
 
 
 object Dashboard {
 
-  case class Props(router: RouterCtl[Page], proxy: ModelProxy[Pot[String]], loc:Page)
+  case class Props(router: RouterCtl[Page], proxy: ModelProxy[Pot[Data]], loc:Page)
 
   // create dummy data for the chart
  // val cp = Chart.ChartProps("Test chart", Chart.BarChart, ChartData(Seq("A", "B", "C"), Seq(ChartDataset(Seq(1, 2, 3), "Data1"))))
@@ -30,7 +32,8 @@ object Dashboard {
         // header, MessageOfTheDay and chart components
         <.h2("Dashboard"),
         // use connect from ModelProxy to give Motd only partial view to the model
-        proxy.connect(m => m)(Motd(_)),
+       // proxy.connect(m => m)(Motd(proxy.asInstanceOf[ModelProxy[Pot[String]]])),
+        //proxy.connect(_.motd)(p)
         Chart(cp),
         Chart(cp1),
         Chart(cp2),
@@ -40,5 +43,5 @@ object Dashboard {
       )
     }.build
 
-  def apply(router: RouterCtl[Page], proxy: ModelProxy[Pot[String]], loc:Page) = component(Props(router, proxy,loc))
+  def apply(router: RouterCtl[Page], proxy: ModelProxy[Pot[Data]], loc:Page) = component(Props(router, proxy,loc))
 }

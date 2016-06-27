@@ -12,6 +12,7 @@ import japgolly.scalajs.react.vdom.prefix_<^._
 import com.kabasoft.iws.gui.macros.Bootstrap._
 import com.kabasoft.iws.gui.logger._
 import com.kabasoft.iws.gui.macros.IWSList
+
 //import com.kabasoft.iws.gui.macros.MasterDetails
 import com.kabasoft.iws.shared._
 //import com.kabasoft.iws.shared.Lenses._
@@ -147,17 +148,6 @@ object CUSTOMER {
        ))
      }
 
-
-
-   /* def render(p: Props, s: State) = {
-      type T = (Boolean, String, String)
-
-    val accItem = AccordionTabItem[T]("tab1", "Customer", "#tab1", true, MasterDetails.customerComponent.buildTabContent, IWSList.customerList.buildLines, p.proxy)
-    val menu1x = AccordionMenuItem("collapseOne", "Content", "#collapseOne", true, Seq(accItem))
-      MasterDetails.customerComponent(menu1x)
-     //MasterDetails.customerComponent(menu1x, customerList.buildLines, p.proxy)
-  } */
- 
   }
 
   val component = ReactComponentB[Props]("Customer")

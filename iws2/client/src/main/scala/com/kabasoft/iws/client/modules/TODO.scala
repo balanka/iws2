@@ -11,12 +11,13 @@ import com.kabasoft.iws.gui.macros.Bootstrap._
 import com.kabasoft.iws.gui.macros._
 import com.kabasoft.iws.client.components.TodoList
 import com.kabasoft.iws.gui.logger._
-
 import com.kabasoft.iws.shared._
+
 import scala.scalajs.js
 import scala.scalajs.js.UndefOr
 import scalacss.ScalaCssReact._
 import com.kabasoft.iws.gui.macros._
+
 //import com.kabasoft.iws.gui.macros.macros._
 
 object Todo {

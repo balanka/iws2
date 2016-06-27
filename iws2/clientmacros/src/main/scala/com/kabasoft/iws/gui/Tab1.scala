@@ -8,6 +8,7 @@ import scala.language.implicitConversions
 
 object Tab {
 
+
   case class TabItem(id: String, name: String, route:String, active:Boolean,content: ReactNode, tabItems:TabItem*)
   //case class TabItem(id: String, name: String, route:String, active:Boolean,content: ReactNode, tabItems:Seq[TabItem]=List.empty[TabItem])
   case class Props(tabs:TabItem)

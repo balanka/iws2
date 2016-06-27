@@ -12,6 +12,7 @@ import com.kabasoft.iws.gui.logger._
 import com.kabasoft.iws.shared._
 import com.kabasoft.iws.gui.macros._
 
+
 import scalacss.ScalaCssReact._
 
 object ARTICLE {

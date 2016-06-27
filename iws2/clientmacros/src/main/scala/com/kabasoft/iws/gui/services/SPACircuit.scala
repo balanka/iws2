@@ -20,20 +20,22 @@ case class UpdateMotd(potResult: Pot[String] = Empty) extends PotAction[String, 
 case class RootModel [+A<:IWS,-B<:IWS](store:Pot[DStore[A,B]], motd:Pot[String])
 case class DStore [+A<:IWS,-B<:IWS](models: Map[Int, Pot[ContainerT[A,B]]]) {
   def updated (newItem: B) = {
-      val x= models.get(newItem.modelId).get.map(_.updated(newItem))
+      val x= models.get(newItem.modelId).get.map(_.update(newItem))
       DStore (models+ (newItem.modelId -> x))
   }
 
-   def updatedAll(newModels: Map[Int, Pot[ContainerT[B,A]]])  = DStore[A,B](newModels.asInstanceOf[Map[Int, Pot[ContainerT[A,B]]]])
-  //def updatedAll(newModels: Map[Int, Pot[ContainerT[B,A]]])  = DStore[A,B](models.asInstanceOf[Map[Int, Pot[ContainerT[A,B]]]]++
-  //  newModels.asInstanceOf[Map[Int, Pot[ContainerT[A,B]]]])
+   //def updatedAll(newModels: Map[Int, Pot[ContainerT[B,A]]])  = DStore[A,B](newModels.asInstanceOf[Map[Int, Pot[ContainerT[A,B]]]])
+  def updatedAll(newModels: Map[Int, Pot[ContainerT[B,A]]])  = { DStore[A,B]( models.asInstanceOf[Map[Int, Pot[ContainerT[A,B]]]]++
+    newModels.asInstanceOf[Map[Int, Pot[ContainerT[A,B]]]])}
   def remove(item:B) = {
+    //log.info("+>>>>>>>>Item to Delete++++++ ${item}")
     val x= models.get(item.modelId).get.map(_.remove(item))
-    log.info("+>>>>>>>>Delete++++++"+x)
+    //log.info("+>>>>>>>>Delete++++++${x}")
     DStore( Map(item.modelId ->x))
   }
  }
-
+//case class Store2(models:Map[Int, List[IWS]])
+//case class RootModel2(store:Store2)
 
  /**
   * Handles actions related to todos
@@ -67,14 +69,19 @@ class IWSHandler[M](modelRW: ModelRW[M, Pot[DStore[IWS,IWS]]]) extends ActionHan
   override def handle = {
     case Refresh (item:IWS) =>
       val x = Map(item.modelId ->Ready(Data(Seq(item))))
-      log.info("+>>>>>>>>Refresh++++++"+x)
-      updated(Ready(value.get.updatedAll(x)))
+      log.info(s"+>>>>>>>>Refresh+++++ RefreshRefresh ===== ${item} ====RefreshRefreshRefreshRefresh+"+x)
+      //updated(Ready(value.get.updatedAll(x)))
+      updated(Ready(value.get.updated(item)), Effect(AjaxClient[Api].all(item).call().map(UpdateAll[IWS])))
     case UpdateAll(all:Seq[IWS]) =>
       val xx = all.seq.headOption.get
+      //log.info("+++++++++>>>>>>>>ZZZZZZZZZ"+all)
       log.info("+++++++++>>>>>>>>XXX"+xx)
       val  a = all.filter(_.modelId == xx.modelId)
-      //log.info("+++++++++<<<<<<<<<<<"+a)
-      val x = Map(xx.modelId ->Ready(Data(a)))
+     // val r =value.get.models.get(xx.modelId).get.get
+      val r =value.get.models.get(xx.modelId).get.get.asInstanceOf[Data].items
+      log.info("+++++++++aaaa ${a}<<<<<<<<<<< ${r}")
+
+      val x = Map(xx.modelId ->Ready(Data(a++r)))
       updated(Ready(value.get.updatedAll(x)))
     case Update(item:IWS) =>
       log.info("+++++++++<<<<<<<<<<< UpdateTodo: "+item)
@@ -109,10 +116,12 @@ class MotdHandler[M](modelRW: ModelRW[M, Pot[String]]) extends ActionHandler(mod
   }
 }
 
+
 // Application circuit
 object SPACircuit extends Circuit[RootModel[IWS,IWS]] with ReactConnector[RootModel[IWS,IWS]] {
 
   protected val actionHandler = combineHandlers(
+  //protected val actionHandler = composeHandlers(
     new IWSHandler(zoomRW(_.store)((m, v) => m.copy(store = v))),
     new MotdHandler(zoomRW(_.motd)((m, v) => m.copy(motd = v)))
   )
@@ -134,6 +143,63 @@ object SPACircuit extends Circuit[RootModel[IWS,IWS]] with ReactConnector[RootMo
     RootModel(store, Empty)
 
   }
+  def getRootModel = initialModel
 
   def getModel (modelId:Int) = { initialModel.store.get.models.get(modelId)}
+
+  def getEModel (modelId:Int) = { initialModel.store.get.models.get(modelId)}
 }
+/*
+scala -cp ~/Downloads/scalatest_2.11-2.2.6.jar:~/Downloads/scalacheck_2.11-1.12.5.jar:/Users/batemady/.ivy2/cache/me.chrons/diode-data_sjs0.6_2.11/jars/diode-data_sjs0.6_2.11-1.0.0.jar:/Users/batemady/.ivy2/cache/me.chrons/diode_sjs0.6_2.11/jars/diode_sjs0.6_2.11-1.0.0.jar
+
+scala> import diode._
+scala> import diode.data._
+scala> case class Article ( id:String,name:String,modelId:Int=1, description:String ="") extends Masterfile
+defined class Article
+
+scala> case class Account ( id:String,name:String,modelId:Int=2, description:String ="") extends Masterfile
+defined class Account
+
+scala> val l1 = List(Article("001","article01"), Article("002","article02"))
+l1: List[Article] = List(Article(001,article01,1,), Article(002,article02,1,))
+
+scala> val l2 = List(Account("ac001","account01"), Account("ac002","account02"))
+l2: List[Account] = List(Account(ac001,account01,2,), Account(ac002,account02,2,))
+
+
+
+
+scala> import util.{ Try, Success, Failure }
+import util.{Try, Success, Failure}
+
+scala> val d1 =DStore(Map(1->Ready(Data(l1)),2 ->Ready(Data(l2))))
+d1: DStore[IWS,IWS] = DStore(Map(1 -> Ready(Data(List(Article(001,article01,1,), Article(002,article02,1,)))), 2 -> Ready(Data(List(Account(ac001,account01,2,), Account(ac002,account02,2,))))))
+
+scala> val d2 =d1.upatedAll(Map(3 ->Ready(Data(List(Account("acc03","account03"))))))
+<console>:37: error: value upatedAll is not a member of DStore[IWS,IWS]
+val d2 =d1.upatedAll(Map(3 ->Ready(Data(List(Account("acc03","account03"))))))
+^
+
+scala> val d2 =d1.updatedAll(Map(3 ->Ready(Data(List(Account("acc03","account03"))))))
+d2: DStore[IWS,IWS] = DStore(Map(1 -> Ready(Data(List(Article(001,article01,1,), Article(002,article02,1,)))), 2 -> Ready(Data(List(Account(ac001,account01,2,), Account(ac002,account02,2,)))), 3 -> Ready(Data(List(Account(acc03,account03,2,))))))
+
+scala> val d2 =d1.updatedAll(Map(2 ->Ready(Data(List(Account("acc03","account03"))))))
+d2: DStore[IWS,IWS] = DStore(Map(1 -> Ready(Data(List(Article(001,article01,1,), Article(002,article02,1,)))), 2 -> Ready(Data(List(Account(acc03,account03,2,))))))
+
+
+
+scala> val d3 =d1.updatedAll(Map(1 -> Ready(Data(d1.models.get(1).get.get.items++List(Article("003","Article003"))))))
+d3: DStore[IWS,IWS] = DStore(Map(1 -> Ready(Data(List(Article(001,article01,1,), Article(002,article02,1,), Article(003,Article003,1,)))), 2 -> Ready(Data(List(Account(ac001,account01,2,), Account(ac002,account02,2,))))))
+
+scala> val d3 =d1.updatedAll(Map(1 -> Ready(Data(d1.models.get(1).get.get.items++List(Article("003","Article003"))))))
+d3: DStore[IWS,IWS] = DStore(Map(1 -> Ready(Data(List(Article(001,article01,1,), Article(002,article02,1,), Article(003,Article003,1,)))), 2 -> Ready(Data(List(Account(ac001,account01,2,), Account(ac002,account02,2,))))))
+
+scala> val d4 =d3.updatedAll(Map(1 -> Ready(Data(d1.models.get(1).get.get.items++List(Article("004","Article004"))))))
+d4: DStore[IWS,IWS] = DStore(Map(1 -> Ready(Data(List(Article(001,article01,1,), Article(002,article02,1,), Article(004,Article004,1,)))), 2 -> Ready(Data(List(Account(ac001,account01,2,), Account(ac002,account02,2,))))))
+scala> val d5 =d4.updatedAll(Map(1 -> Ready(Data(d1.models.get(1).get.get.items++List(Article("005","Article005"), Article("006","article06"))))))
+d5: DStore[IWS,IWS] = DStore(Map(1 -> Ready(Data(List(Article(001,article01,1,), Article(002,article02,1,), Article(005,Article005,1,), Article(006,article06,1,)))), 2 -> Ready(Data(List(Account(ac001,account01,2,), Account(ac002,account02,2,))))))
+
+scala> val d6 =d5.updatedAll(Map(2 -> Ready(Data(d5.models.get(2).get.get.items++List(Account("acc003","Account003"), Account("acc004","account004"))))))
+d6: DStore[IWS,IWS] = DStore(Map(1 -> Ready(Data(List(Article(001,article01,1,), Article(002,article02,1,), Article(005,Article005,1,), Article(006,article06,1,)))), 2 -> Ready(Data(List(Account(ac001,account01,2,), Account(ac002,account02,2,), Account(acc003,Account003,2,), Account(acc004,account004,2,))))))
+
+*/

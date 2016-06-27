@@ -21,15 +21,36 @@ sealed trait IWS {
 }
 
 trait ContainerT [+A<:IWS,-B<:IWS] {
-  def updated(newItem: B): ContainerT [A,B]
+  def update(newItem: B): ContainerT [A,B]
   def remove (item: B): ContainerT  [A,B]
   def size = items.size
   def items : Seq[A]
   def add(newItem: B): ContainerT [A,B]
+  //def updatedAll( newItems:Seq[B]): ContainerT [A,B]
 }
 
+/*
+case class Datax  [+A<:IWS,-B<:IWS](store: Map[Int,Seq[A]]) extends ContainerT [A,B]{
+  def getStoreForModel(item:B) = store.getOrElse(item.modelId,Seq.empty[A])
+  private def upsert(newItem: B) = {
+    val temp = getStoreForModel(newItem)
+    temp.indexWhere(_.id == newItem.id) match {
+      case -1 =>
+        temp :+ newItem
+      case idx =>
+        temp.updated(idx, newItem)
+    }
+  }
+  override def update(item: B) = Datax( Map(item.modelId -> upsert(item.asInstanceOf[B]).asInstanceOf[List[A]]))
+  override def remove (item: B) = Datax( Map(item.modelId -> getStoreForModel(item).filterNot(_.id==item.id)))
+  override def updatedAll( newItems:Seq[B])= Datax(Map(newItems.head.modelId -> {
+    newItems.map ( item =>upsert(item)).asInstanceOf[List[A]]
+  }))
+}
+*/
+
 case class Data  (items: Seq[IWS]) extends ContainerT [IWS,IWS]{
-  override def updated(newItem: IWS) = {
+  override def update(newItem: IWS) = {
     items.indexWhere((_.id == newItem.id)) match {
       case -1 =>
         Data(items :+ newItem)
@@ -38,11 +59,7 @@ case class Data  (items: Seq[IWS]) extends ContainerT [IWS,IWS]{
     }
   }
   override def add(newItem: IWS)= Data(items :+ newItem)
-  override def remove (item: IWS) = {
-      println( s"  REMOVE Call ${item}", item)
-     Data(items.filterNot(_.id==item.id))
-   }
-
+  override def remove (item: IWS) = Data(items.filterNot(_.id==item.id))
 }
 
 sealed trait  Masterfile extends IWS {
@@ -54,7 +71,7 @@ sealed trait Transaction [L] extends Trans {
     def id = tid.toString
     def tid:Long
     def oid:Long
-    //y8def modelId:Int
+    //def modelId:Int
     def store:Option[String]
     def account:Option[String]
     def lines:Option[List[L]]

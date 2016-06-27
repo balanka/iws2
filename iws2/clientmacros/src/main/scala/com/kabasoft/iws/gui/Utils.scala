@@ -31,7 +31,7 @@ object Utils{
     val m = value getOrElse defValue
     List(<.td(<.label(^.`for` := id, id), ^.maxHeight:=2.px),
       <.td(<.input.text(bss.formControl, ^.id := id, ^.value := m.toString,
-        ^.placeholder := id), ^.onChange ==> evt, ^.maxHeight:=2.px, ^.paddingLeft := 10.px))
+        ^.placeholder := id), ^.onChange ==> evt, ^.maxHeight:=2.px, ^.paddingLeft := 10.px,  ^.autoFocus := true))
   }
 
   def buildItem[A](id:String , value:Option[A], defValue:A) = {
@@ -41,12 +41,11 @@ object Utils{
         ^.placeholder := id), ^.maxHeight:=2.px,  ^.paddingLeft := 10.px))
   }
 
-  def buildSItem[A](id:String,  optValue:Option[ List[A]], defValue:A, evt:String => Callback, proxy1:ModelProxy[Pot[Data]],
-                   instance1:Masterfile) =
+  def buildSItem[A](id:String,  itemsx:List[A], defValue:A, evt:String => Callback) =
     List(
      <.td(<.label(^.`for` := id, id), ^.maxHeight:=10.px),
      <.td(
-         IWSSelect(label = id, value = defValue.asInstanceOf[String], onChange = evt,proxy = proxy1, instance = instance1, defaultList = optValue.getOrElse(List(defValue.asInstanceOf[String])).asInstanceOf[List[String]])
+         IWSSelect(label = id, value = defValue.asInstanceOf[String], onChange = evt, items = itemsx.asInstanceOf[List[String]])
          //  ^.maxHeight:=10.px,  ^.paddingLeft := 5.px)
        )
     )
