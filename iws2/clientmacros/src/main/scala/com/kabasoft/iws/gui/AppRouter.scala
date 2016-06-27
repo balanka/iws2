@@ -13,6 +13,8 @@ object AppRouter {
   case object CategoryPage$ extends Page
   case object POrderPage$ extends Page
   case object CustomerPage$ extends Page
+  case object VatPage$ extends Page
+
   case object SupplierPage$ extends Page
   case object ScalaCSSDoc extends Page
   case object Components2Doc  extends Page

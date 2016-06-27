@@ -27,6 +27,7 @@ object BusinessPartnerUIMacro {
     val a = c.weakTypeOf[T].typeSymbol.name.toTypeName
 
     import c.universe._
+    import com.kabasoft.iws.gui.macros.Bootstrap._
 
     q"""
     object CustomerList {

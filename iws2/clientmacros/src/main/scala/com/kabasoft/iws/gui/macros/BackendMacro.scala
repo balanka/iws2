@@ -6,7 +6,7 @@ import japgolly.scalajs.react._
 import diode.react.ReactPot._
 import diode.react._
 import diode.data.Pot
-import com.kabasoft.iws.gui.macros.Bootstrap.{Button, CommonStyle, Modal, Panel}
+
 
 import scala.language.experimental.macros
 import scala.reflect.macros.whitebox.Context
@@ -28,7 +28,8 @@ object BackendMacro {
     import japgolly.scalajs.react._
     import japgolly.scalajs.react.vdom.prefix_<^._
     import scalacss.ScalaCssReact._
-    import com.kabasoft.iws.gui.macros.Bootstrap.{Panel, CommonStyle, Modal, Button}
+    import com.kabasoft.iws.gui.macros.Bootstrap._
+    import com.kabasoft.iws.gui.macros.Bootstrap.{Button, CommonStyle, Modal, Panel}
 
     q"""
     object IWSMasterfileForm  {

@@ -6,11 +6,7 @@ import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.prefix_<^._
 
 import scala.scalajs.js
-import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
-class Select[A] {
-  case class Props(label: String, value: A, onChange: A => Callback, items:List[A])
-}
 
 object IWSSelect {
 
@@ -30,7 +26,6 @@ object IWSSelect {
          <.select(^.paddingLeft := "5px", ^.id := "reactselect", ^.value := P.value,
            ^.onChange ==> onChange(P))(
            P.items.map(item => (<.option(item)))
-           //buildIdNames(all.items.asInstanceOf[List[Masterfile]]).map(item => (<.option(item)))
          )
    )
  }
@@ -38,10 +33,8 @@ object IWSSelect {
 
   val component = ReactComponentB[Props]("Select")
     .stateless
-   //.renderBackend[Backend]
-      //.componentDidMount(scope => scope.backend.mounted(scope.props))
-      .render_P (P =>render(P))
-      .build
+    .render_P (P =>render(P))
+    .build
 
   def apply(ref: js.UndefOr[String] = "", key: js.Any = {}, label: String,
             value: String, onChange: String => Callback,

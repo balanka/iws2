@@ -116,12 +116,9 @@ class MotdHandler[M](modelRW: ModelRW[M, Pot[String]]) extends ActionHandler(mod
   }
 }
 
-
-// Application circuit
 object SPACircuit extends Circuit[RootModel[IWS,IWS]] with ReactConnector[RootModel[IWS,IWS]] {
 
-  protected val actionHandler = combineHandlers(
-  //protected val actionHandler = composeHandlers(
+  protected val actionHandler = composeHandlers(
     new IWSHandler(zoomRW(_.store)((m, v) => m.copy(store = v))),
     new MotdHandler(zoomRW(_.motd)((m, v) => m.copy(motd = v)))
   )
@@ -130,8 +127,8 @@ object SPACircuit extends Circuit[RootModel[IWS,IWS]] with ReactConnector[RootMo
     val store: Pot[DStore[IWS, IWS]] = Ready(DStore(Map(
       1 -> Ready(Data(Seq(Supplier()))),
       3 -> Ready(Data(Seq(Customer()))),
-      //3 -> Ready(Data(Seq.empty[Customer])),
       4 -> Ready(Data(Seq(QuantityUnit("1", "QuantityUnit", 4, "QuantityUnit")))),
+      5 -> Ready(Data(Seq(Vat()))),
       6 -> Ready(Data(Seq(CostCenter("1", "CostCenter", 6, "CostCenter")))),
       7 -> Ready(Data(Seq(Article()))),
       9 -> Ready(Data(Seq.empty[Account])),
