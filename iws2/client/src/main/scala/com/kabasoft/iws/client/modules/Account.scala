@@ -13,7 +13,7 @@ import com.kabasoft.iws.gui.macros.Bootstrap._
 import com.kabasoft.iws.shared._
 import com.kabasoft.iws.gui.macros._
 import com.kabasoft.iws.gui.logger._
-
+import com.kabasoft.iws.gui.services.SPACircuit
 
 import scalacss.ScalaCssReact._
 
@@ -27,10 +27,13 @@ object ACCOUNT {
 
   class Backend($: BackendScope[Props, State]) {
     def mounted(props: Props) =
-      Callback.ifTrue(props.proxy().isEmpty, props.proxy.dispatch(Refresh[Account](Account())))
+      Callback {
+        SPACircuit.dispatch(Refresh(Account()))
+      }
+     // Callback.ifTrue(props.proxy().isEmpty, props.proxy.dispatch(Refresh[Account](Account())))
 
     def edit(item:Option[Account]) = {
-      log.debug(s" KKKKKKKKKKKKKKKKKK1 ${item.map(_.name)}")
+//      log.debug(s" KKKKKKKKKKKKKKKKKK1 ${item.map(_.name)}")
       $.modState(s => s.copy(selectedItem = item))
 
     }
@@ -133,21 +136,22 @@ object ACCOUNT {
             <.td(<.input.text(bss.formControl, ^.id := id, ^.value := value,
                                ^.placeholder := id),^.paddingLeft := 1))
 
-    def render(p: Props, s: State) =
+    def render(p: Props, s: State) ={
+    val items =  SPACircuit.zoom(_.store.get.models.get(9)).eval(SPACircuit.getRootModel).get.get.items.asInstanceOf[List[Account]]
       Panel(Panel.Props("Account"), <.div(^.className := "panel-heading",^.padding :=0), <.div(^.padding :=0,
         p.proxy().renderFailed(ex => "Error loading"),
         p.proxy().renderPending(_ > 500, _ => "Loading..."),
-        p.proxy().render(_ => AccordionPanel("Edit", buildForm(s),
+        AccordionPanel("Edit", buildForm(s),
                         List(Button(Button.Props(edited(s.selectedItem.getOrElse(Account())),
                              addStyles = Seq(bss.pullRight, bss.buttonXS, bss.buttonOpt(CommonStyle.success))), Icon.circleO, " Save"),
-                             Button(Button.Props(edit(Some(Account())), addStyles = Seq(bss.pullRight, bss.buttonXS)), Icon.plusSquare, " New")))),
-          p.proxy().render(
-          all => AccountList(all.items.asInstanceOf[List[Account]],
-          item => p.proxy.dispatch(Update(item)),
-          item => edit(Some(item)), item => p.proxy.dispatch(Delete[Account](item)))),
+                             Button(Button.Props(edit(Some(Account())), addStyles = Seq(bss.pullRight, bss.buttonXS)), Icon.plusSquare, " New"))),
+
+          AccountList(items, item => p.proxy.dispatch(Update(item)),
+                             item => edit(Some(item)),
+                             item => p.proxy.dispatch(Delete[Account](item))),
         buildAddressTab
       ))
-        //,<.div(^.className := "panel-footer","panel-footer"))
+  }
   }
 
   // create the React component for To Do management
