@@ -86,7 +86,7 @@ object Queries  {
   def vatSelectSome  = { id:String =>sql"SELECT * FROM vat where id =$id".query[Vat]}
   def vatUpdateName= {(model:Vat) =>sql"Update vat set  name =${model.name}, description=${model.description} where id =${model.id}".update}
   def vatDelete = {id:String =>sql"Delete FROM vat where id =$id".update}
-  type LinePurchaseOrder_TYPE = (Long,Long,Int, String,String,BigDecimal,BigDecimal,String, Date, String)
+   type LinePurchaseOrder_TYPE = (Long,Long,Int, String,String,BigDecimal,BigDecimal,String, Date, String)
   def linePurchaseOrderInsertSQL = "INSERT INTO LinePurchaseOrder ( id, transid, modelId, item, unit,price, quantity, vat, duedate, text)  VALUES (?, ?, ?,?,?,?,?,?,?,?)"
   def linePurchaseOrderSelect = sql"SELECT * FROM LinePurchaseOrder".query[LinePurchaseOrder_TYPE]
   def linePurchaseOrderIdSelect1(id:String) = sql"SELECT * FROM LinePurchaseOrder  where id =$id".query[LinePurchaseOrder_TYPE]
@@ -94,7 +94,7 @@ object Queries  {
   def linePurchaseOrderSelectSome = { id:String =>sql"SELECT * FROM LinePurchaseOrder where id =$id".query[LinePurchaseOrder_TYPE]}
   def linePurchaseOrderUpdateName = {(model:LinePurchaseOrder) =>
     sql"Update LinePurchaseOrder set transid=${model.transid}, item=${model.item.get}, modelId=${model.modelId}, unit=${model.unit.get},quantity = ${model.quantity}, price=${model.price},vat=${model.vat.get},duedate=${model.duedate.get}, text =${model.text} where id =${model.tid}".update}
-  def linePurchaseOrderDelete = {(id:Long) =>sql"Delete FROM LinePurchaseOrder where id =$id".update}
+  def linePurchaseOrderDelete = {(id:Long) =>sql"Delete FROM LinePurchasGoodreceivingeOrder where id =$id".update}
   //INSERT INTO PurchaseOrder ( oid, modelId, store, account) VALUES (0,101,'200','1000');
   def purchaseOrderInsertSQL = "INSERT INTO PurchaseOrder (id, oid, modelId, store, account) VALUES (?, ?, ?,?,?)"
   def purchaseOrderSelect = sql"SELECT * FROM PurchaseOrder".query[(Long,Long, Int, String,String)]
@@ -104,8 +104,70 @@ object Queries  {
   def purchaseOrderUpdateName= {(model:PurchaseOrder[LinePurchaseOrder]) =>
     sql"Update PurchaseOrder set oid =${model.oid}, store=${model.store.get}, account=${model.account.get} where id =${model.tid}".update}
   def purchaseOrderDelete = {id:Long =>sql"Delete FROM PurchaseOrder where id =$id".update}
+
+  type LineGoodreceiving_TYPE = (Long,Long,Int, String,String,BigDecimal,BigDecimal,String, Date, String)
+  def lineGoodreceivingInsertSQL = "INSERT INTO LineGoodreceiving ( id, transid, modelId, item, unit,price, quantity, vat, duedate, text)  VALUES (?, ?, ?,?,?,?,?,?,?,?)"
+  def lineGoodreceivingSelect = sql"SELECT * FROM LineGoodreceiving".query[LineGoodreceiving_TYPE]
+  def lineGoodreceivingIdSelect1(id:String) = sql"SELECT * FROM LineGoodreceiving  where id =$id".query[LineGoodreceiving_TYPE]
+  def lineGoodreceivingIdSelect(id:Long) = sql"SELECT * FROM LineGoodreceiving  where transid =$id".query[LineGoodreceiving_TYPE]
+  def lineGoodreceivingSelectSome = { id:String =>sql"SELECT * FROM LineGoodreceiving where id =$id".query[LineGoodreceiving_TYPE]}
+  def lineGoodreceivingUpdateName = {(model:LineGoodreceiving) =>
+    sql"Update LineGoodreceiving set transid=${model.transid}, item=${model.item.get}, modelId=${model.modelId}, unit=${model.unit.get},quantity = ${model.quantity}, price=${model.price},vat=${model.vat.get},duedate=${model.duedate.get}, text =${model.text} where id =${model.tid}".update}
+  def lineGoodreceivingDelete = {(id:Long) =>sql"Delete FROM LineGoodreceiving where id =$id".update}
+
+  def goodreceivingInsertSQL = "INSERT INTO Goodreceiving (id, oid, modelId, store, account) VALUES (?, ?, ?,?,?)"
+  def goodreceivingSelect = sql"SELECT * FROM Goodreceiving".query[(Long,Long, Int, String,String)]
+  def goodreceivingIdSelect1(id:String) = sql"SELECT * FROM Goodreceiving  where id =$id.toLong".query[(Long,Long,Int, String,String)]
+  def goodreceivingIdSelect(id:Long) = sql"SELECT * FROM Goodreceiving  where id =$id".query[(Long,Long,Int, String,String)]
+  def goodreceivingSelectSome = { id:String =>sql"SELECT * FROM Goodreceiving where id =$id".query[(Long,Long, Int, String,String)]}
+  def goodreceivingUpdateName= {(model:Goodreceiving[LineGoodreceiving]) =>
+    sql"Update Goodreceiving set oid =${model.oid}, store=${model.store.get}, account=${model.account.get} where id =${model.tid}".update}
+  def goodreceivingDelete = {id:Long =>sql"Delete FROM Goodreceiving where id =$id".update}
+
+
+
   def getSequence (tablename:String,columnname:String) = sql"SELECT nextval(pg_get_serial_sequence( ${tablename}, ${columnname}))".query[Long]
 
+
+  val createGoodreceiving=sql"""
+           DROP SEQUENCE IF EXISTS GoodreceivingId_seq;
+           CREATE SEQUENCE GoodreceivingId_seq
+             INCREMENT 1
+             MINVALUE 1
+             MAXVALUE 9223372036854775807
+             START 1
+             CACHE 1;
+           DROP TABLE IF EXISTS Goodreceiving;
+           CREATE TABLE Goodreceiving(
+                id bigserial NOT NULL PRIMARY KEY,
+                oid bigint NOT NULL ,
+                modelId int NOT NULL,
+                store   VARCHAR NOT NULL,
+                account   VARCHAR NOT NULL
+
+                );""".update
+  val createLineGoodreceiving=sql"""
+           DROP SEQUENCE IF EXISTS LineGoodreceivingId_seq;
+           CREATE SEQUENCE LinePurchaseOrderId_seq
+             INCREMENT 1
+             MINVALUE 1
+             MAXVALUE 9223372036854775807
+             START 1
+             CACHE 1;
+           DROP TABLE IF EXISTS LineGoodreceiving;
+           CREATE TABLE LineGoodreceiving(
+                id bigserial NOT NULL PRIMARY KEY,
+                transid     bigint  NOT NULL ,
+                modelId int NOT NULL,
+                item   VARCHAR NOT NULL,
+                unit   VARCHAR NOT NULL,
+                price  DECIMAL(20,2) NOT NULL,
+                quantity    DECIMAL(20,2) NOT NULL,
+                vat    VARCHAR NOT NULL,
+                duedate      DATE NOT NULL,
+                text  VARCHAR
+
+                );""".update
  val createPurchaseOrder1=sql"""
            DROP SEQUENCE IF EXISTS PurchaseOrderId_seq;
            CREATE SEQUENCE PurchaseOrderId_seq

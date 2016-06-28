@@ -163,9 +163,6 @@ implicit def purchaseOrderDAO = new DAO[PurchaseOrder[LinePurchaseOrder]]{
     def update(model:PurchaseOrder[LinePurchaseOrder]) = {
       val ret = Queries.purchaseOrderUpdateName(model).run.transact(xa).run;
       def prdicate (pred:LinePurchaseOrder) = pred.tid == 0L && pred.created == true
-     // val t:(List[LinePurchaseOrder], List[LinePurchaseOrder]) = model.getLines.partition(prdicate)
-      //val t1 :List[LinePurchaseOrder] = t._1
-      //val t2 : List[LinePurchaseOrder]= t._2
       val newLines = model.getLines.partition(prdicate)._1
       val k0 = linePurchaseOrderDAO.insert(newLines)
       //val k0 = linePurchaseOrderDAO.insert(model.getLines.partition(_.tid ==0L && _.created == true)._1)
@@ -175,10 +172,6 @@ implicit def purchaseOrderDAO = new DAO[PurchaseOrder[LinePurchaseOrder]]{
       println(s" PO Line inserted K0 ${k0}   ${newLines}");
       println(s" PO Line updated K2 ${k1}   ");
       println(s" PO Line deleted K2 ${k2}   ");
-      //println(s" t1 ${t1}  items");
-      //println(s" t2 ${t2}  items");
-    //  linePurchaseOrderDAO.insert (t1);
-    //  t2.map (linePurchaseOrderDAO.update );
       ret
     }
     def delete(id:String):Int = {
@@ -197,6 +190,69 @@ implicit def purchaseOrderDAO = new DAO[PurchaseOrder[LinePurchaseOrder]]{
     def findSome1(id:Long) =Queries.purchaseOrderIdSelect(id).process.list.transact(xa).run.map(
                      x=> PurchaseOrder(x._1,x._2, x._3, Some(x._4), Some(x._5)).copy(lines = Some(f(x._1))))
     def  updateLineId(id:Long,line:LinePurchaseOrder):LinePurchaseOrder = line.copy(transid=id)
+  }
+
+  implicit def lineGoodreceivingDAO = new DAO[LineGoodreceiving]{
+    def insert(model: List[LineGoodreceiving]) :Int = {
+      println(s" inserting ${model}  items")
+      val tid:Long = Queries.getSequence ("LineGoodreceiving", "id").unique.transact(xa).run;
+      println(s"  getSequence ${tid} ")
+      val ret= doobie.imports.Update[(Long, Long, Int,String,String,BigDecimal,BigDecimal,String,Date,String)](Queries.lineGoodreceivingInsertSQL).
+        updateMany(model.filter(_.item != None).map( x=>(tid, x.transid, x.modelId,x.item.get, x.unit.get, x.price, x.quantity,x.vat.get,x.duedate.get,x.text))).transact(xa).run
+      ret
+    }
+    def create = Queries.createLineGoodreceiving.run.transact(xa).run
+    def update(model:LineGoodreceiving) = { println(s" updating ${model}  items"); Queries.lineGoodreceivingUpdateName(model).run.transact(xa).run}
+    def delete(id:String):Int = Queries.lineGoodreceivingDelete(id.toLong).run.transact(xa).run
+    def all:List[LineGoodreceiving] =  Queries.lineGoodreceivingSelect.process.list.transact(xa).run.map(x =>
+      LineGoodreceiving(x._1,x._2, x._3, Some(x._4),Some(x._5), x._6, x._7,  Some(x._8), Some(x._9), x._10))
+    def  find(id:String):List[LineGoodreceiving] = Queries.lineGoodreceivingIdSelect(id.toLong).process.list.transact(xa).run.map(x =>
+      LineGoodreceiving(x._1,x._2, x._3, Some(x._4),Some(x._5), x._6, x._7,  Some(x._8), Some(x._9), x._10))
+    def findSome(id:String) = Queries.lineGoodreceivingSelectSome(id).process.list.transact(xa).run.map(x =>
+      LineGoodreceiving(x._1,x._2, x._3, Some(x._4),Some(x._5), x._6, x._7,  Some(x._8), Some(x._9), x._10))
+    def findSome1(id:Long) = Queries.lineGoodreceivingIdSelect(id).process.list.transact(xa).run.map(x => LineGoodreceiving(x._1,x._2, x._3, Some(x._4),
+      Some(x._5), x._6, x._7,  Some(x._8), Some(x._9), x._10))
+  }
+
+  implicit def GoodreceivingDAO = new DAO[Goodreceiving[LineGoodreceiving]]{
+    def predicate(p:LineGoodreceiving) = p.id==0
+    def insert(model: List[Goodreceiving[LineGoodreceiving]]) :Int = {
+      val tid:Long = Queries.getSequence ("goodreceiving", "id").unique.transact(xa).run;
+      val ret= doobie.imports.Update[(Long,Long, Int, String,String)](Queries.goodreceivingInsertSQL).updateMany(model.map(
+        x=>(tid, x.oid, x.modelId, x.store.get,x.account.get))).transact(xa).run;
+      model.map( x=>implicitly[DAO[LineGoodreceiving]].insert(x.lines.getOrElse(List[LineGoodreceiving]()).map( z => z.copy(transid=tid))))
+      ret
+
+    }
+    def create = Queries.createGoodreceiving.run.transact(xa).run
+    def update(model:Goodreceiving[LineGoodreceiving]) = {
+      val ret = Queries.goodreceivingUpdateName(model).run.transact(xa).run;
+      def prdicate (pred:LineGoodreceiving) = pred.tid == 0L && pred.created == true
+      val newLines = model.getLines.partition(prdicate)._1
+      val k0 = lineGoodreceivingDAO.insert(newLines)
+      val k1= model.getLines.partition(_.modified)._1.map (lineGoodreceivingDAO.update )
+      val k2 = model.getLines.partition(_.deleted)._1.map ( e =>lineGoodreceivingDAO.delete(e.id.toString) )
+
+      println(s" PO Line inserted K0 ${k0}   ${newLines}");
+      println(s" PO Line updated K2 ${k1}   ");
+      println(s" PO Line deleted K2 ${k2}   ");
+      ret
+    }
+    def delete(id:String):Int = {
+      val r = find(id).map(p =>(p.getLines.map(l =>(lineGoodreceivingDAO.delete(l.id)))))
+      Queries.goodreceivingDelete(id.toLong).run.transact(xa).run
+    }
+    def all:List[Goodreceiving[LineGoodreceiving]] = Queries.goodreceivingSelect.process.list.transact(xa).run.map(
+      x => Goodreceiving(x._1,x._2, x._3, Some(x._4),Some(x._5)).copy(lines = Some(f(x._1))))
+    def find(id:String)  : List[Goodreceiving[LineGoodreceiving]] =
+      Queries.goodreceivingIdSelect(id.toLong).process.list.transact(xa).run.map(
+        x=> Goodreceiving(x._1,x._2, x._3, Some(x._4), Some(x._5)).copy(lines = Some(f(x._1))))
+    def findSome(id:String) = Queries.goodreceivingSelectSome(id).process.list.transact(xa).run.map(
+      x=> Goodreceiving(x._1, x._2, x._3, Some(x._4), Some(x._5)).copy(lines = Some(f(x._1))))
+    def f (a:Long) = implicitly[DAO[LineGoodreceiving]].findSome1(a)
+    def findSome1(id:Long) =Queries.goodreceivingIdSelect(id).process.list.transact(xa).run.map(
+      x=> Goodreceiving(x._1,x._2, x._3, Some(x._4), Some(x._5)).copy(lines = Some(f(x._1))))
+    def  updateLineId(id:Long,line:LineGoodreceiving):LineGoodreceiving = line.copy(transid=id)
   }
 
   def create: ConnectionIO[Int] = Queries.create.run

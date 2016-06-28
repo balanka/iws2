@@ -27,6 +27,7 @@ class ApiService extends Api {
      case _: CostCenter => MakeService.make[CostCenter].create
      case _: ArticleGroup => MakeService.make[ArticleGroup].create
      case _: PurchaseOrder[LinePurchaseOrder] => MakeService.make[PurchaseOrder[LinePurchaseOrder]].create
+     case _: Goodreceiving[LineGoodreceiving] => MakeService.make[Goodreceiving[LineGoodreceiving]].create
      case _: TodoItem => todoService.create(item)
    }
  }
@@ -44,6 +45,8 @@ class ApiService extends Api {
      case _: ArticleGroup => MakeService.make[ArticleGroup].insert(List(item.asInstanceOf[ArticleGroup]))
      case _: PurchaseOrder[LinePurchaseOrder] => MakeService.make[PurchaseOrder[LinePurchaseOrder]].insert(List(item.asInstanceOf[PurchaseOrder[LinePurchaseOrder]]))
      case _: LinePurchaseOrder => MakeService.makeTransaction[LinePurchaseOrder].insert(List(item.asInstanceOf[LinePurchaseOrder]))
+     case _: Goodreceiving[LineGoodreceiving] => MakeService.make[Goodreceiving[LineGoodreceiving]].insert(List(item.asInstanceOf[Goodreceiving[LineGoodreceiving]]))
+     case _: LineGoodreceiving => MakeService.makeTransaction[LineGoodreceiving].insert(List(item.asInstanceOf[LineGoodreceiving]))
      case _: TodoItem => todoService.update(item).size
    }
  }
@@ -60,6 +63,8 @@ class ApiService extends Api {
      case _: ArticleGroup => MakeService.make[ArticleGroup].find(item.id)
      case _: PurchaseOrder[LinePurchaseOrder] => MakeService.make[PurchaseOrder[LinePurchaseOrder]].find(item.id)
      case _: LinePurchaseOrder => MakeService.makeTransaction[LinePurchaseOrder].find(item.id)
+     case _: Goodreceiving[LineGoodreceiving] => MakeService.make[Goodreceiving[LineGoodreceiving]].find(item.id)
+     case _: LineGoodreceiving => MakeService.makeTransaction[LineGoodreceiving].find(item.id)
      case _: TodoItem => todoService.find(item)
    }
  }
@@ -76,6 +81,8 @@ class ApiService extends Api {
     case _: ArticleGroup => MakeService.make[ArticleGroup].findSome(item.id)
     case _: PurchaseOrder[LinePurchaseOrder] => MakeService.make[PurchaseOrder[LinePurchaseOrder]].findSome(item.id)
     case _: LinePurchaseOrder => MakeService.makeTransaction[LinePurchaseOrder].findSome(item.id)
+    case _: Goodreceiving[LineGoodreceiving] => MakeService.make[Goodreceiving[LineGoodreceiving]].findSome(item.id)
+    case _: LineGoodreceiving => MakeService.makeTransaction[LineGoodreceiving].findSome(item.id)
     case _: TodoItem => todoService.findSome(item)
     }
   }
@@ -93,6 +100,8 @@ class ApiService extends Api {
       case _: ArticleGroup => MakeService.make[ArticleGroup].all
       case _: PurchaseOrder[LinePurchaseOrder] => MakeService.make[PurchaseOrder[LinePurchaseOrder]].all
       case _: LinePurchaseOrder => MakeService.makeTransaction[LinePurchaseOrder].all
+      case _: Goodreceiving[LineGoodreceiving] => MakeService.make[Goodreceiving[LineGoodreceiving]].all
+      case _: LineGoodreceiving => MakeService.makeTransaction[LineGoodreceiving].all
       case _: TodoItem => todoService.all(item)
     }
   }
@@ -110,6 +119,8 @@ class ApiService extends Api {
       case _: ArticleGroup => {MakeService.make[ArticleGroup].update(item.asInstanceOf[ArticleGroup]); find(item)}
       case _: PurchaseOrder[LinePurchaseOrder] => {  MakeService.makeTransaction[PurchaseOrder[LinePurchaseOrder]].update(item.asInstanceOf[PurchaseOrder[LinePurchaseOrder]]); find(item)}
       case _: LinePurchaseOrder => {  MakeService.makeTransaction[LinePurchaseOrder].update(item.asInstanceOf[LinePurchaseOrder]); find(item)}
+      case _: Goodreceiving[LineGoodreceiving] => {MakeService.make[Goodreceiving[LineGoodreceiving]].update(item.asInstanceOf[Goodreceiving[LineGoodreceiving]]); find(item)}
+      case _: LineGoodreceiving => { MakeService.makeTransaction[LineGoodreceiving].update(item.asInstanceOf[LineGoodreceiving]); find(item)}
       case _: TodoItem => todoService.update(item)
     }
   }
@@ -128,6 +139,8 @@ class ApiService extends Api {
       case _: ArticleGroup  => {MakeService.make[ArticleGroup].delete(item.id); all(item)}
       case _: PurchaseOrder[LinePurchaseOrder] => {MakeService.make[PurchaseOrder[LinePurchaseOrder]].delete(item.id); all(item)}
       case _: LinePurchaseOrder => {MakeService.makeTransaction[LinePurchaseOrder].delete(item.id); all(item)}
+      case _: Goodreceiving[LineGoodreceiving] => { MakeService.make[Goodreceiving[LineGoodreceiving]].delete(item.id); all(item)}
+      case _: LineGoodreceiving => { MakeService.makeTransaction[LineGoodreceiving].delete(item.id); all(item)}
       case _: TodoItem =>   todoService.delete(item)
     }
   }
