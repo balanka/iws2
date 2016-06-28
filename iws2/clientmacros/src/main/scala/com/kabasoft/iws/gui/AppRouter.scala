@@ -12,6 +12,7 @@ object AppRouter {
   case object QuantityUnitPage$ extends Page
   case object CategoryPage$ extends Page
   case object POrderPage$ extends Page
+  case object GoodreceivingPage$ extends Page
   case object CustomerPage$ extends Page
   case object VatPage$ extends Page
 
