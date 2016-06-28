@@ -3,7 +3,7 @@ package com.kabasoft.iws.gui.services
 import autowire._
 import com.kabasoft.iws.gui.logger._
 import com.kabasoft.iws.gui.macros._
-import com.kabasoft.iws.shared.{Store => MStore, _}
+import com.kabasoft.iws.shared._
 import diode._
 import diode.data._
 import diode.react.ReactConnector
@@ -127,6 +127,7 @@ object SPACircuit extends Circuit[RootModel[IWS,IWS]] with ReactConnector[RootMo
 
     val store: Pot[DStore[IWS, IWS]] = Ready(DStore(Map(
       1 -> Ready(Data(Seq(Supplier()))),
+      2 -> Ready(Data(Seq(Store()))),
       3 -> Ready(Data(Seq(Customer()))),
       4 -> Ready(Data(Seq(QuantityUnit("1", "QuantityUnit", 4, "QuantityUnit")))),
       5 -> Ready(Data(Seq(Vat()))),

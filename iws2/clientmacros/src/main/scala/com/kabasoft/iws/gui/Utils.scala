@@ -41,11 +41,12 @@ object Utils{
         ^.placeholder := id), ^.maxHeight:=2.px,  ^.paddingLeft := 10.px))
   }
 
-  def buildSItem[A](id:String,  itemsx:List[A], defValue:A, evt:String => Callback) =
+  //def buildIdNameList (list: List[Masterfile]): List[String]= list map (iws =>(iws.id+" "+iws.name))
+  def buildSItem(id:String,  itemsx:List[String], defValue:String, evt:String => Callback) =
     List(
      <.td(<.label(^.`for` := id, id), ^.maxHeight:=20.px),
      <.td(
-         IWSSelect(label = id, value = defValue.asInstanceOf[String], onChange = evt, items = itemsx.asInstanceOf[List[String]])
+         IWSSelect(label = id, value = defValue, onChange = evt, items = itemsx)
        )
     )
 

@@ -130,13 +130,13 @@ object LinePurchaseOrderList {
       def buildIdNameList (list: List[Masterfile]): List[String]= list map (iws =>(iws.id+" "+iws.name))
       def editFormLine : Seq [TagMod]=List(
               //buildWItem[String]("item", s.item.map(_.item.getOrElse("item")), "item", updateItem(_, s)),
-              buildSItem[String]("item", itemsx = buildIdNameList(items), defValue = "0001", evt = updateItem1),
+              buildSItem("item", itemsx = buildIdNameList(items), defValue = "0001", evt = updateItem1),
               buildWItem[BigDecimal]("price", s.item.map(_.price), 0.0, updatePrice(_, s)),
               buildWItem[BigDecimal]("quantity", s.item.map(_.quantity), 0.0, updateQuantity),
               //buildWItem[String]("unit", s.item.map(_.unit.getOrElse("unit")), "unit", updateUnit),
               //buildWItem[String]("vat", s.item.map(_.vat.getOrElse("vat")), "19", updateVat),
-              buildSItem[String]("q.unit", itemsx = buildIdNameList(qttyUnit), defValue = "KG", evt = updateUnit1),
-              buildSItem[String]("Vat", itemsx = buildIdNameList(vat), defValue = "7", evt = updateVat1),
+              buildSItem("q.unit", itemsx = buildIdNameList(qttyUnit), defValue = "KG", evt = updateUnit1),
+              buildSItem("Vat", itemsx = buildIdNameList(vat), defValue = "7", evt = updateVat1),
               buildWItem[Date]("duedate", s.item.map(_.duedate.getOrElse(new Date())), new Date(),
                 updateDuedate), saveButton, newButton)
       <.div(bss.formGroup,

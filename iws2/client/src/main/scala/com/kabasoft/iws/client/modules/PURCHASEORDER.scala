@@ -27,11 +27,10 @@ object PURCHASEORDER {
   class Backend($: BackendScope[Props, State]) {
     def mounted(props: Props) =
       Callback {
+        SPACircuit.dispatch(Refresh(Store()))
+        SPACircuit.dispatch(Refresh(Supplier()))
         SPACircuit.dispatch(Refresh(PurchaseOrder[LinePurchaseOrder]()))
       }
-
-
-
 
     def edit(item:Option[PurchaseOrder[LinePurchaseOrder]]) = {
       val d =item.getOrElse(PurchaseOrder[LinePurchaseOrder]())
@@ -47,16 +46,27 @@ object PURCHASEORDER {
       $.modState(s => s.copy(item = s.item.map(_.copy(oid = l))))
     }
 
-    def updateStore(e: ReactEventI) = {
-      val r = Some(e.target.value)
-      log.debug(s"store is "+r)
-      $.modState(s => s.copy(item = s.item.map(_.copy(store =r ))))
-    }
+//    def updateStore(e: ReactEventI) = {
+//      val r = Some(e.target.value)
+//      log.debug(s"store is "+r)
+//      $.modState(s => s.copy(item = s.item.map(_.copy(store =r ))))
+//    }
 
     def updateAccount(e: ReactEventI) = {
       val currentValue = Some(e.target.value)
       log.debug(s"purchaseOrder is zzzzzzzzz"+currentValue)
       $.modState(s => s.copy(item = s.item.map(_.copy(account = currentValue))))
+    }
+    def updateStore(storeId:String) = {
+      //val accountId = Some(e.target.value)
+      log.debug(s"accountId is "+storeId)
+      $.modState(s => s.copy(item = s.item.map(_.copy(store = Some(storeId)))))
+    }
+
+    def updateSupplier(accountId:String) = {
+      //val accountId = Some(e.target.value)
+      log.debug(s"accountId is "+accountId)
+      $.modState(s => s.copy(item = s.item.map(_.copy(account = Some(accountId)))))
     }
 
 
@@ -124,16 +134,23 @@ object PURCHASEORDER {
     }
 
     def buildForm (p: Props, s:State): Seq[ReactElement] = {
-
+      //val supplier =  SPACircuit.zoom(_.store.get.models.get(1)).eval(SPACircuit.getEModel(1))
+      val supplier =  SPACircuit.zoom(_.store.get.models.get(1)).eval(SPACircuit.getRootModel).get.get.items.asInstanceOf[List[Supplier]]
+      val store =  SPACircuit.zoom(_.store.get.models.get(2)).eval(SPACircuit.getRootModel).get.get.items.asInstanceOf[List[Store]]
+      log.debug(s"Supplier>>>>${supplier}")
       val porder = s.item.getOrElse(PurchaseOrder[LinePurchaseOrder]().add(LinePurchaseOrder(item = Some("4711"))))
+      val  storeList=store map (iws =>(iws.id+" "+iws.name))
+      val  supplierList=supplier map (iws =>(iws.id+" "+iws.name))
       List(<.div(bss.formGroup,
         <.table(^.className := "table-responsive table-condensed", ^.tableLayout := "fixed",
           <.tbody(
             <.tr(bss.formGroup, ^.height := 10.px,
               buildItem[String]("id", s.item.map(_.id), "id"),
               buildWItem[Long]("oid", s.item.map(_.oid), 1L, updateOid),
-              buildWItem[String]("store", s.item.map(_.store.getOrElse("store")), "store", updateStore),
-              buildWItem[String]("account", s.item.map(_.account.getOrElse("account")), "account", updateAccount)
+              //buildWItem[String]("store", s.item.map(_.store.getOrElse("store")), "store", updateStore),
+              //buildWItem[String]("account", s.item.map(_.account.getOrElse("account")), "account", updateAccount)
+              buildSItem("store", itemsx = storeList.toList , defValue = "001", evt = updateStore),
+              buildSItem("supplier", itemsx = supplierList.toList , defValue = "KG", evt = updateSupplier)
             )
           )
         ),
