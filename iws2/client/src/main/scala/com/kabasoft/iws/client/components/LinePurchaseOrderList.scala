@@ -31,14 +31,14 @@ object LinePurchaseOrderList {
   class Backend($: BackendScope[Props, State]) {
 
 
-    def mounted(props: Props) = {
+    def mounted(props: Props) =
       Callback {
         SPACircuit.dispatch(Refresh(Article()))
         SPACircuit.dispatch(Refresh(QuantityUnit()))
         SPACircuit.dispatch(Refresh(Vat()))
       }
       // props.proxy1.dispatch(Refresh (Article()))>> props.proxy1.dispatch(Refresh (Account()))
-    }
+
 
     def edit(line:LinePurchaseOrder) = {
       log.debug(s" order to edit Line is ${line}")
