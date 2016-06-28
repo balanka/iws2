@@ -15,15 +15,10 @@ object PurchaseOrderList {
   @inline private def bss = GlobalStyles.bootstrapStyles
 
 
-  case class PurchaseOrderListProps(
-                                     items: Seq[PurchaseOrder[LinePurchaseOrder]],
-                                     //change: PurchaseOrder[LinePurchaseOrder] => Callback,
-                                     edit: PurchaseOrder[LinePurchaseOrder] => Callback,
-                                     delete: PurchaseOrder[LinePurchaseOrder] => Callback
-                                   )
-  case class PurchaseOrderListProps1(items: Seq[PurchaseOrder[LinePurchaseOrder]])
-
-  private val PurchaseOrderList = ReactComponentB[PurchaseOrderListProps]("PurchaseOrderList")
+  case class Props(items: Seq[PurchaseOrder[LinePurchaseOrder]],
+                   edit: PurchaseOrder[LinePurchaseOrder] => Callback,
+                   delete: PurchaseOrder[LinePurchaseOrder] => Callback)
+  private val purchaseOrderList = ReactComponentB[Props]("PurchaseOrderList")
     .render_P(p => {
       val style = bss.listGroup
       log.debug(s" Order list items >>>>>>>>>>>>>>>>>>>>>>>> ${p.items}")
@@ -37,7 +32,6 @@ object PurchaseOrderList {
           <.span("Store"),
           <.span("    "),
           <.span("Account")
-
         )
       }
       def renderItem(trans:PurchaseOrder[LinePurchaseOrder]) = {
@@ -57,49 +51,13 @@ object PurchaseOrderList {
           // <.span(item.quantity.toDouble)
         )
       }
-      log.debug(s" FFFFFFFFFFFFFFFFFFF ${p.items}")
-      //<.ul(style.listGroup)(renderHeader)
       // <.ul(style.listGroup)(renderHeader)( p.items.filter(_.tid >=52).sortBy(_.tid)(Ordering[Long].reverse) map renderItem)
       <.ul(style.listGroup)(renderHeader)(p.items.sortBy(_.tid)(Ordering[Long].reverse) map renderItem)
     })
     .build
-  private val PurchaseOrderList1 = ReactComponentB[PurchaseOrderListProps1]("PurchaseOrderList")
-    .render_P(p => {
-      val style = bss.listGroup
-      def renderHeader = {
-        <.li(style.itemOpt(CommonStyle.warning))(
-          <.span("  "),
-          <.span("ID"),
-          <.span(" "),
-          <.span("Transid"),
-          <.span("    "),
-          <.span("Store"),
-          <.span("    "),
-          <.span("Account")
-        )
-      }
-      def renderItem(trans:PurchaseOrder[LinePurchaseOrder]) = {
-        <.li(style.itemOpt(CommonStyle.warning))(
-          <.span("  "),
-          <.span(trans.id),
-          <.span(" "),
-          <.s(trans.oid),
-          <.span("    "),
-          <.span(trans.store),
-          <.span("    "),
-          <.span(trans.account)
-          // <.span("    "),
-          // <.span(item.quantity.toDouble)
-        )
-      }
-      <.ul(style.listGroup)(renderHeader)(p.items map renderItem)
-    })
-    .build
-  //def apply(items: Seq[PurchaseOrder[LinePurchaseOrder]],
-  def apply(items: Seq[PurchaseOrder[LinePurchaseOrder]],
-            edit:PurchaseOrder[LinePurchaseOrder] => Callback,
-            delete:PurchaseOrder[LinePurchaseOrder] => Callback) =
-    PurchaseOrderList(PurchaseOrderListProps(items,  edit, delete))
 
-  def apply(items: Seq[PurchaseOrder[LinePurchaseOrder]]) = PurchaseOrderList1(PurchaseOrderListProps1(items))
+  def apply(items: Seq[PurchaseOrder[LinePurchaseOrder]],
+            edit: PurchaseOrder[LinePurchaseOrder] => Callback,
+            delete: PurchaseOrder[LinePurchaseOrder] => Callback) = purchaseOrderList(Props(items,edit,delete))
+
 }

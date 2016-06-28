@@ -1,40 +1,34 @@
 package com.kabasoft.iws.client.modules
 
-
-import com.kabasoft.iws.client.components.{LinePurchaseOrderList, PurchaseOrderList}
+import com.kabasoft.iws.client.components.{GoodreceivingList, LineGoodreceivingList}
 import com.kabasoft.iws.gui.AccordionPanel
-import diode.react.ReactPot._
-import diode.react._
-import diode.data.Pot
-import japgolly.scalajs.react._
-import japgolly.scalajs.react.vdom.prefix_<^._
-import com.kabasoft.iws.gui.macros.Bootstrap._
-import com.kabasoft.iws.gui.logger._
-import com.kabasoft.iws.shared._
 import com.kabasoft.iws.gui.Utils._
+import com.kabasoft.iws.gui.logger._
+import com.kabasoft.iws.gui.macros.Bootstrap._
 import com.kabasoft.iws.gui.macros._
 import com.kabasoft.iws.gui.services.SPACircuit
+import com.kabasoft.iws.shared._
+import diode.data.Pot
+import diode.react.ReactPot._
+import diode.react._
+import japgolly.scalajs.react._
+import japgolly.scalajs.react.vdom.prefix_<^._
 
-import scala.scalajs.js
 import scalacss.ScalaCssReact._
 
-object PURCHASEORDER {
+object GOODRECEIVING {
 
   @inline private def bss = GlobalStyles.bootstrapStyles
   case class Props(proxy: ModelProxy[Pot[Data]])
-  case class State(item: Option[PurchaseOrder[LinePurchaseOrder]] = None)
+  case class State(item: Option[Goodreceiving[LineGoodreceiving]] = None)
 
   class Backend($: BackendScope[Props, State]) {
     def mounted(props: Props) =
       Callback {
-        SPACircuit.dispatch(Refresh(PurchaseOrder[LinePurchaseOrder]()))
+        SPACircuit.dispatch(Refresh(Goodreceiving[LineGoodreceiving]()))
       }
-
-
-
-
-    def edit(item:Option[PurchaseOrder[LinePurchaseOrder]]) = {
-      val d =item.getOrElse(PurchaseOrder[LinePurchaseOrder]())
+   def edit(item:Option[Goodreceiving[LineGoodreceiving]]) = {
+      val d =item.getOrElse(Goodreceiving[LineGoodreceiving]())
 
       //log.debug(s"purchaseOrder is xxxxxx ${d}")
       $.modState(s => s.copy(item = Some(d)))
@@ -60,19 +54,19 @@ object PURCHASEORDER {
     }
 
 
-    def edited(order:PurchaseOrder[LinePurchaseOrder]) = {
+    def edited(order:Goodreceiving[LineGoodreceiving]) = {
       //$.modState(s => s.copy(item =Some(order)))
       $.props >>= (_.proxy.dispatch(Update(order)))
       //LinePurchaseOrderList.apply($.props.runNow().proxy, item, AddNewLine, editLine, saveLine, deleteLine)
       // $.modState(s => s.copy(item =Some(order)))
     }
 
-    def saveLine(line:LinePurchaseOrder) = {
-      log.debug(s"purchaseOrder is yyyyyyyyyy"+line)
-      val k =$.state.runNow().item.getOrElse(PurchaseOrder[LinePurchaseOrder]())
-      def cond(line1:LinePurchaseOrder, line2:LinePurchaseOrder ) =(line.tid == line2.tid)  &&(line1.created ==true)
-      val k2 = k.replaceLine(k.getLines.filter(cond(_,line)).headOption.getOrElse(LinePurchaseOrder()), line.copy(transid = k.tid))
-      log.debug(s"purchaseOrder k2 is ${k2} ")
+    def saveLine(line:LineGoodreceiving) = {
+      log.debug(s"LineGoodreceiving is yyyyyyyyyy"+line)
+      val k:Goodreceiving[LineGoodreceiving] = $.state.runNow().item.getOrElse(Goodreceiving[LineGoodreceiving]())
+      def cond(line1:LineGoodreceiving, line2:LineGoodreceiving ) =(line.tid == line2.tid)  &&(line1.created ==true)
+      val k2 = k.replaceLine(k.getLines.filter(cond(_,line)).headOption.getOrElse(LineGoodreceiving()), line.copy(transid = k.tid))
+      log.debug(s"Goodreceiving k2 is ${k2} ")
       //$.modState(s => s.copy(item =Some(k2)))>> edited(k2)
       edited(k2)
       //val k3 = k.replaceLine(k.getLines.filter(cond(_,line)).headOption.getOrElse(LinePurchaseOrder()), line.copy(created = false))
@@ -81,42 +75,40 @@ object PURCHASEORDER {
 
     }
 
-    def delete(item:PurchaseOrder[LinePurchaseOrder]) = {
+    def delete(item:Goodreceiving[LineGoodreceiving]) = {
       // val s = $.state.runNow().item
       Callback.log("PurchaseOrder deleted>>>>> ${item}  ${s}")
       $.props >>= (_.proxy.dispatch(Delete(item)))
       //$.modState(s => s.copy(item = None)).runNow()
     }
-    def deleteLine(line1:LinePurchaseOrder) = {
+    def deleteLine(line1:LineGoodreceiving) = {
       val  deleted =line1.copy(deleted = true)
-      val k =$.state.runNow().item.getOrElse(PurchaseOrder[LinePurchaseOrder]())
-      val k2 = k.replaceLine(k.getLines.filter(_.tid == deleted.tid).headOption.getOrElse(LinePurchaseOrder()), deleted)
+      val k =$.state.runNow().item.getOrElse(Goodreceiving[LineGoodreceiving]())
+      val k2 = k.replaceLine(k.getLines.filter(_.tid == deleted.tid).headOption.getOrElse(LineGoodreceiving()), deleted)
       edited(k2)
     }
-    def AddNewLine(line:LinePurchaseOrder) = {
+    def AddNewLine(line:LineGoodreceiving) = {
       val  created =line.copy(created = true)
       log.debug(s"New Line Purchase order before  edit>>>>>  ${line}")
-      $.modState(s => s.copy(item = s.item.map(_.add(line.copy(transid=s.item.getOrElse(PurchaseOrder[LinePurchaseOrder]()).tid)))))
+      $.modState(s => s.copy(item = s.item.map(_.add(line.copy(transid=s.item.getOrElse(Goodreceiving[LineGoodreceiving]()).tid)))))
       //editLine()
     }
 
-    def filterWith(line:LinePurchaseOrder, search:String) =
+    def filterWith(line:LineGoodreceiving, search:String) =
       line.item.getOrElse("").contains(search)
 
     def render(p: Props, s: State) = {
-      def saveButton = Button(Button.Props(edited(s.item.getOrElse(PurchaseOrder[LinePurchaseOrder]())),
+      def saveButton = Button(Button.Props(edited(s.item.getOrElse(Goodreceiving[LineGoodreceiving]())),
         addStyles = Seq(bss.pullRight, bss.buttonXS, bss.buttonOpt(CommonStyle.success))), Icon.circleO, " Save")
-      def newButton = Button(Button.Props(edit(Some(PurchaseOrder[LinePurchaseOrder]())),
+      def newButton = Button(Button.Props(edit(Some(Goodreceiving[LineGoodreceiving]())),
         addStyles = Seq(bss.pullRight, bss.buttonXS)), Icon.plusSquare, " New")
-      Panel(Panel.Props("Purchase Order"), <.div(^.className := "panel-heading"),
+      Panel(Panel.Props("Goodreceiving"), <.div(^.className := "panel-heading"),
         <.div(^.padding := 0,
           p.proxy().renderFailed(ex => "Error loading"),
           p.proxy().renderPending(_ > 500, _ => "Loading..."),
           AccordionPanel("Edit", buildForm(p, s), List(saveButton, newButton)),
-          p.proxy().render( all  => AccordionPanel("Display",
-            List(PurchaseOrderList(all.items.asInstanceOf[Seq[PurchaseOrder[LinePurchaseOrder]]],
-            item => edit(Some(item)),
-            item => p.proxy.dispatch(Delete(item))))))
+          p.proxy().render( all  => AccordionPanel("Display", List(GoodreceivingList(all.items.asInstanceOf[Seq[Goodreceiving[LineGoodreceiving]]],
+            item => edit(Some(item)), item => p.proxy.dispatch(Delete(item))))))
         )
       )
 
@@ -125,7 +117,7 @@ object PURCHASEORDER {
 
     def buildForm (p: Props, s:State): Seq[ReactElement] = {
 
-      val porder = s.item.getOrElse(PurchaseOrder[LinePurchaseOrder]().add(LinePurchaseOrder(item = Some("4711"))))
+      val porder = s.item.getOrElse(Goodreceiving[LineGoodreceiving]().add(LineGoodreceiving(item = Some("4711"))))
       List(<.div(bss.formGroup,
         <.table(^.className := "table-responsive table-condensed", ^.tableLayout := "fixed",
           <.tbody(
@@ -137,7 +129,7 @@ object PURCHASEORDER {
             )
           )
         ),
-        LinePurchaseOrderList(porder, AddNewLine, saveLine, deleteLine)
+        LineGoodreceivingList(porder, AddNewLine, saveLine, deleteLine)
       )
       )
     }

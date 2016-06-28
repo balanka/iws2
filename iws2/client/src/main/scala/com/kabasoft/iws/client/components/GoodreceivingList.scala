@@ -31,7 +31,6 @@ object GoodreceivingList {
           <.span("Store"),
           <.span("    "),
           <.span("Account")
-
         )
       }
       def renderItem(trans:Goodreceiving[LineGoodreceiving]) = {
@@ -51,8 +50,8 @@ object GoodreceivingList {
           // <.span(item.quantity.toDouble)
         )
       }
-      log.debug(s" FFFFFFFFFFFFFFFFFFF ${p.items}")
-      //<.ul(style.listGroup)(renderHeader)
+      log.debug(s" GGGGGGGGGG ${p.items}")
+
       // <.ul(style.listGroup)(renderHeader)( p.items.filter(_.tid >=52).sortBy(_.tid)(Ordering[Long].reverse) map renderItem)
       <.ul(style.listGroup)(renderHeader)(p.items.sortBy(_.tid)(Ordering[Long].reverse) map renderItem)
     })
@@ -60,6 +59,6 @@ object GoodreceivingList {
 
   def apply(items: Seq[Goodreceiving[LineGoodreceiving]],
             edit:Goodreceiving[LineGoodreceiving] => Callback,
-            delete:Goodreceiving[LineGoodreceiving] => Callback) = GoodreceivingList(Props(items, edit, delete))
+            delete:Goodreceiving[LineGoodreceiving] => Callback) = goodreceivingList(Props(items, edit, delete))
 
 }

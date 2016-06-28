@@ -35,12 +35,13 @@ object IWSMain extends js.JSApp {
                   MenuItem("004","Customer","#cust"),
                   MenuItem("005","Supplier","#sup"),
                   MenuItem("006","Article group","#cat"),
-                  MenuItem("007","Quantity unit","#qty")
+                  MenuItem("007","Quantity unit","#qty"),
+                  MenuItem("010","Cost center","#cost")
   ))
 
   val v2=MenuItem("008","Purchasing", "#Purchasing" ,
           List(MenuItem("009","Purchase order","#ord"),
-               MenuItem("010","Cost center","#cost")
+               MenuItem("030","CGoodreceiving","#good")
     ))
   val v3=MenuItem("020","Dashboard", "#Dashboard" ,
     List(MenuItem("021","Dashboard","#scalacss"))
@@ -67,14 +68,16 @@ object IWSMain extends js.JSApp {
     val x7 =  SPACircuit.connect(_.store.get.models.get(7).get,"Article")
     val x8 =  SPACircuit.connect(_.store.get.models.get(8).get)
     val x9 =  SPACircuit.connect(_.store.get.models.get(9).get)
-    val x101 = SPACircuit.connect(_.store.get.models.get(101).get, "Order")
+    val x101 = SPACircuit.connect(_.store.get.models.get(101).get, "POrder")
+    val x104 = SPACircuit.connect(_.store.get.models.get(104).get, "Goodreceiving")
     val x4711 = SPACircuit.connect(_.store.get.models.get(4711).get)
 
 
     //val x2 =  SPACircuit.connect(_.store.get.models.getOrElse(2,Ready(Data(List(Article())))).asInstanceOf[Pot[Data]])
      (staticRoute(root, DashboardPage$) ~> renderR(ctl => x4(proxy => Dashboard(ctl, proxy.asInstanceOf[ModelProxy[Pot[Data]]],QuantityUnitPage$)))
       | staticRoute("#art", ArticlePage$) ~> renderR(ctl => x7(p7 => ARTICLE(p7.asInstanceOf[ModelProxy[Pot[Data]]])))
-      |staticRoute("#ord", POrderPage$) ~> renderR(ctl => x101(proxy101 =>PURCHASEORDER(proxy101.asInstanceOf[ModelProxy[Pot[Data]]])))
+      |staticRoute("#ord", POrderPage$) ~> renderR(ctl => x101(proxy101 => PURCHASEORDER(proxy101.asInstanceOf[ModelProxy[Pot[Data]]])))
+       |staticRoute("#good", GoodreceivingPage$) ~> renderR(ctl => x104(proxy104 => GOODRECEIVING(proxy104.asInstanceOf[ModelProxy[Pot[Data]]])))
       | staticRoute("#qty", QuantityUnitPage$) ~> renderR(ctl => x4(p4=>(z4(p4.asInstanceOf[ModelProxy[Pot[Data]]]))))
       | staticRoute("#vat", VatPage$) ~> renderR(ctl => x5(p5=>(z5(p5.asInstanceOf[ModelProxy[Pot[Data]]]))))
       | staticRoute("#acc", AccountPage$) ~> renderR(ctl => x9(p9 =>(ACCOUNT(p9.asInstanceOf[ModelProxy[Pot[Data]]]))))

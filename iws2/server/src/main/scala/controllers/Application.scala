@@ -35,6 +35,7 @@ object Application extends Controller {
    pickler.addConcreteType[ArticleGroup]
    pickler.addConcreteType[LinePurchaseOrder]
    pickler.addConcreteType[PurchaseOrder[LinePurchaseOrder]].addConcreteType[LinePurchaseOrder]
+  pickler.addConcreteType[Goodreceiving[LineGoodreceiving]].addConcreteType[LineGoodreceiving]
    pickler.addConcreteType[Vat]
    pickler.addConcreteType[MStore]
 

@@ -62,6 +62,7 @@ class IWSHandler[M](modelRW: ModelRW[M, Pot[DStore[IWS,IWS]]]) extends ActionHan
    pickler.addConcreteType[ArticleGroup]
    pickler.addConcreteType[LinePurchaseOrder]
    pickler.addConcreteType[PurchaseOrder[LinePurchaseOrder]].addConcreteType[LinePurchaseOrder]
+   pickler.addConcreteType[Goodreceiving[LineGoodreceiving]].addConcreteType[LineGoodreceiving]
    pickler.addConcreteType[Vat]
    pickler.addConcreteType[MStore]
    //pickler.addConcreteType[String]
@@ -119,8 +120,8 @@ class MotdHandler[M](modelRW: ModelRW[M, Pot[String]]) extends ActionHandler(mod
 object SPACircuit extends Circuit[RootModel[IWS,IWS]] with ReactConnector[RootModel[IWS,IWS]] {
 
   protected val actionHandler = composeHandlers(
-    new IWSHandler(zoomRW(_.store)((m, v) => m.copy(store = v))),
-    new MotdHandler(zoomRW(_.motd)((m, v) => m.copy(motd = v)))
+    new IWSHandler(zoomRW(_.store)((m, v) => m.copy(store = v)))
+    //,new MotdHandler(zoomRW(_.motd)((m, v) => m.copy(motd = v)))
   )
   override protected def initialModel = {
 
@@ -134,7 +135,8 @@ object SPACircuit extends Circuit[RootModel[IWS,IWS]] with ReactConnector[RootMo
       9 -> Ready(Data(Seq.empty[Account])),
       8 -> Ready(Data(Seq(ArticleGroup()))),
      101 -> Ready(Data(Seq(PurchaseOrder[LinePurchaseOrder]()))),
-      4711 -> Ready(Data(Seq(TodoItem())))
+     104 -> Ready(Data(Seq(Goodreceiving[LineGoodreceiving]()))),
+     4711 -> Ready(Data(Seq(TodoItem())))
     )))
 
     RootModel(store, Empty)

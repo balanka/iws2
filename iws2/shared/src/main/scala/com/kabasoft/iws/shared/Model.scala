@@ -29,26 +29,6 @@ trait ContainerT [+A<:IWS,-B<:IWS] {
   //def updatedAll( newItems:Seq[B]): ContainerT [A,B]
 }
 
-/*
-case class Datax  [+A<:IWS,-B<:IWS](store: Map[Int,Seq[A]]) extends ContainerT [A,B]{
-  def getStoreForModel(item:B) = store.getOrElse(item.modelId,Seq.empty[A])
-  private def upsert(newItem: B) = {
-    val temp = getStoreForModel(newItem)
-    temp.indexWhere(_.id == newItem.id) match {
-      case -1 =>
-        temp :+ newItem
-      case idx =>
-        temp.updated(idx, newItem)
-    }
-  }
-  override def update(item: B) = Datax( Map(item.modelId -> upsert(item.asInstanceOf[B]).asInstanceOf[List[A]]))
-  override def remove (item: B) = Datax( Map(item.modelId -> getStoreForModel(item).filterNot(_.id==item.id)))
-  override def updatedAll( newItems:Seq[B])= Datax(Map(newItems.head.modelId -> {
-    newItems.map ( item =>upsert(item)).asInstanceOf[List[A]]
-  }))
-}
-*/
-
 case class Data  (items: Seq[IWS]) extends ContainerT [IWS,IWS]{
   override def update(newItem: IWS) = {
     items.indexWhere((_.id == newItem.id)) match {
@@ -205,7 +185,7 @@ case class LinePurchaseOrder  (tid:Long = 0L, transid:Long =0, modelId:Int = 102
      result
   }
 }
-case class LineGoodreceiving  (tid:Long = 0L, transid:Long =0, modelId:Int = 102,item:Option[String] = None, unit:Option[String] = None, price: Amount = 0,
+case class LineGoodreceiving  (tid:Long = 0L, transid:Long =0, modelId:Int = 105,item:Option[String] = None, unit:Option[String] = None, price: Amount = 0,
                                quantity:Amount = 0,vat:Option[String] = None, duedate:Option[Date] = Some(new Date()),text:String ="txt",
                                modified:Boolean= false, created:Boolean= false, deleted:Boolean= false) extends LineInventoryTransaction {
   //def eq (l:LinePurchaseOrder):Boolean = tid == l.tid
@@ -243,14 +223,12 @@ case class Goodreceiving [LineGoodreceiving] (tid:Long = 0L,oid:Long = 0L, model
                                               lines:Option[List[LineGoodreceiving]]=Some(List.empty[LineGoodreceiving]),
                                               modified:Boolean =false, created:Boolean = false, deleted:Boolean = false) extends Transaction [LineGoodreceiving]{
   def add(line:LineGoodreceiving) = copy(lines = Some(lines.getOrElse(List.empty[LineGoodreceiving]) ++: List(line)))
-  def remove(line:LineGoodreceiving) = copy(lines = Some(lines.getOrElse(List.empty[LineGoodreceiving]).filter(eq(_,line))) ) //Some(lines.getOrElse(List.empty[LinePurchaseOrder]) -- List(line)))
-
   def getLines = lines.getOrElse(List.empty[LineGoodreceiving])
   def getLinesWithId(id:Long) = getLines.filter(equals(_,id))
   //def getLines0 = lines.getOrElse(List.empty[LinePurchaseOrder]).groupBy(_.id)
 
   def replace[T](pairs: (T, T)*) = Map(pairs: _*).withDefault(identity)
-  def replaceLine(old:LinePurchaseOrder, newLine:LineGoodreceiving) = copy(lines = Some(lines.getOrElse(List.empty[LineGoodreceiving]) map replace((old,newLine))))
+  def replaceLine(old:LineGoodreceiving, newLine:LineGoodreceiving) = copy(lines = Some(lines.getOrElse(List.empty[LineGoodreceiving]) map replace((old,newLine))))
 }
 
 
@@ -285,6 +263,8 @@ object  Article_{ def unapply (in:Article) =Some(in.id,in.name, in.modelId, in.d
 object  ArticleGroup_{ def unapply (in:ArticleGroup) =Some(in.id,in.name,in.modelId, in.description)}
 object  LinePurchaseOrder_{ def unapply (in:LinePurchaseOrder) = Some(in.tid,in.transid, in.modelId, in.item, in.unit, in.price, in.quantity, in.vat, in.duedate, in.text)}
 object  PurchaseOrder_{ def unapply (in:PurchaseOrder[LinePurchaseOrder]) = Some(in.tid,in.oid, in.modelId, in.store, in.account, in.lines)}
+object  LineGoodreceiving_{ def unapply (in:LineGoodreceiving) = Some(in.tid,in.transid, in.modelId, in.item, in.unit, in.price, in.quantity, in.vat, in.duedate, in.text)}
+object  Goodreceiving_{ def unapply (in:Goodreceiving[LineGoodreceiving]) = Some(in.tid,in.oid, in.modelId, in.store, in.account, in.lines)}
 object  GeneralRegister_{ def unapply (in:GeneralRegister) = Some(in.id, in.modelId, in.appelandId, in.intimeId, in.enterdate,in.reason,in.origin)}
 
 /*
