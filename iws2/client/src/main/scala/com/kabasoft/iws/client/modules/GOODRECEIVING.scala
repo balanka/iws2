@@ -27,13 +27,11 @@ object GOODRECEIVING {
       Callback {
         SPACircuit.dispatch(Refresh(Goodreceiving[LineGoodreceiving]()))
         SPACircuit.dispatch(Refresh(Supplier()))
+        SPACircuit.dispatch(Refresh(Store()))
       }
    def edit(item:Option[Goodreceiving[LineGoodreceiving]]) = {
       val d =item.getOrElse(Goodreceiving[LineGoodreceiving]())
-
-      //log.debug(s"purchaseOrder is xxxxxx ${d}")
       $.modState(s => s.copy(item = Some(d)))
-      // $.modState(s => s.copy(item = s.item))
     }
 
     def updateOid(e: ReactEventI) = {
@@ -42,10 +40,10 @@ object GOODRECEIVING {
       $.modState(s => s.copy(item = s.item.map(_.copy(oid = l))))
     }
 
-    def updateStore(e: ReactEventI) = {
-      val r = Some(e.target.value)
-      log.debug(s"store is "+r)
-      $.modState(s => s.copy(item = s.item.map(_.copy(store =r ))))
+    def updateStore(Id:String) = {
+      val storeId = Id.substring(0, Id.indexOf("|"))
+      log.debug(s"store is "+storeId)
+      $.modState(s => s.copy(item = s.item.map(_.copy(store = Some(storeId)))))
     }
 
     def updateAccount(e: ReactEventI) = {
@@ -54,20 +52,15 @@ object GOODRECEIVING {
       $.modState(s => s.copy(item = s.item.map(_.copy(account = currentValue))))
     }
 
-    def updateAccount1(supplierId: String) = {
-      // def updateItem1(e: ReactEventI) = {
-      // val l =Some(e.target.value)
+    def updateAccount1(Id: String) = {
+      val supplierId=Id.substring(0, Id.indexOf("|"))
       log.debug(s"ItemId Key is ${supplierId}  ")
-      //Callback.log(s"KEY pressed >>>>>>>>>>>>>>>>>>>>>>>> ${l}")>>
       $.modState(s => s.copy(item = s.item.map(_.copy(account = Some(supplierId)))))
-      //$.modState(s => s.copy(item =  s.item))
     }
 
     def edited(order:Goodreceiving[LineGoodreceiving]) = {
       //$.modState(s => s.copy(item =Some(order)))
       $.props >>= (_.proxy.dispatch(Update(order)))
-      //LinePurchaseOrderList.apply($.props.runNow().proxy, item, AddNewLine, editLine, saveLine, deleteLine)
-      // $.modState(s => s.copy(item =Some(order)))
     }
 
     def saveLine(line:LineGoodreceiving) = {
@@ -125,17 +118,19 @@ object GOODRECEIVING {
 
     def buildForm (p: Props, s:State): Seq[ReactElement] = {
       val supplier =  SPACircuit.zoom(_.store.get.models.get(1)).eval(SPACircuit.getRootModel).get.get.items.asInstanceOf[List[Supplier]]
+      val store =  SPACircuit.zoom(_.store.get.models.get(2)).eval(SPACircuit.getRootModel).get.get.items.asInstanceOf[List[Store]]
       val porder = s.item.getOrElse(Goodreceiving[LineGoodreceiving]().add(LineGoodreceiving(item = Some("4711"))))
-      val  buildIdNameList= supplier map (iws =>(iws.id+" "+iws.name))
+      val  storeList=store map (iws =>(iws.id+"|"+iws.name))
+      val  supplierList=supplier map (iws =>(iws.id+"|"+iws.name))
       List(<.div(bss.formGroup,
         <.table(^.className := "table-responsive table-condensed", ^.tableLayout := "fixed",
           <.tbody(
             <.tr(bss.formGroup, ^.height := 10.px,
               buildItem[String]("id", s.item.map(_.id), "id"),
               buildWItem[Long]("oid", s.item.map(_.oid), 1L, updateOid),
-              buildWItem[String]("store", s.item.map(_.store.getOrElse("store")), "store", updateStore),
+              buildSItem("store", itemsx=storeList.toList,defValue = "0001", evt = updateStore),
               //buildWItem[String]("account", s.item.map(_.account.getOrElse("account")), "account", updateAccount)
-              buildSItem("supplier", itemsx = buildIdNameList.toList, defValue = "KG", evt = updateAccount1)
+              buildSItem("supplier", itemsx = supplierList.toList, defValue = "KG", evt = updateAccount1)
             )
           )
         ),

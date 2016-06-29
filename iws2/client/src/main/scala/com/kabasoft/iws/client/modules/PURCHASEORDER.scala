@@ -34,10 +34,8 @@ object PURCHASEORDER {
 
     def edit(item:Option[PurchaseOrder[LinePurchaseOrder]]) = {
       val d =item.getOrElse(PurchaseOrder[LinePurchaseOrder]())
-
       //log.debug(s"purchaseOrder is xxxxxx ${d}")
       $.modState(s => s.copy(item = Some(d)))
-      // $.modState(s => s.copy(item = s.item))
     }
 
     def updateOid(e: ReactEventI) = {
@@ -45,12 +43,6 @@ object PURCHASEORDER {
       log.debug(s"Oid is "+l)
       $.modState(s => s.copy(item = s.item.map(_.copy(oid = l))))
     }
-
-//    def updateStore(e: ReactEventI) = {
-//      val r = Some(e.target.value)
-//      log.debug(s"store is "+r)
-//      $.modState(s => s.copy(item = s.item.map(_.copy(store =r ))))
-//    }
 
     def updateAccount(e: ReactEventI) = {
       val currentValue = Some(e.target.value)
