@@ -1,22 +1,14 @@
 package com.kabasoft.iws.client.components
 
 import com.kabasoft.iws.gui.logger._
-import com.kabasoft.iws.gui.services.{AjaxClient, RootModel, SPACircuit}
+import com.kabasoft.iws.gui.services.SPACircuit
 import com.kabasoft.iws.gui.Utils._
 import com.kabasoft.iws.gui.macros.Bootstrap.{Button, CommonStyle}
 import com.kabasoft.iws.gui.macros._
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.prefix_<^._
 import com.kabasoft.iws.shared._
-import diode.data.{Pot, Ready}
-import diode.react.ModelProxy
 import java.util.Date
-
-import autowire._
-import com.kabasoft.iws.shared.{Store => MStore, _}
-import diode.ModelR
-
-import scala.util.{Failure, Success}
 import scalacss.ScalaCssReact._
 
 object LinePurchaseOrderList {
@@ -45,43 +37,24 @@ object LinePurchaseOrderList {
        $.modState(s => s.copy(item = Some(line)))
     }
 
-    def updateItem1(l: String) = {
-     // def updateItem1(e: ReactEventI) = {
-     // val l =Some(e.target.value)
-      log.debug(s"ItemId Key is ${l}  ")
-      //Callback.log(s"KEY pressed >>>>>>>>>>>>>>>>>>>>>>>> ${l}")>>
-      $.modState(s => s.copy(item = s.item.map(_.copy(item = Some(l)))))
-      //$.modState(s => s.copy(item =  s.item))
+    def updateItem1(id: String) = {
+      val itemId = id.substring(0, id.indexOf("|"))
+      log.debug(s"ItemId Key is ${itemId}  ")
+      $.modState(s => s.copy(item = s.item.map(_.copy(item = Some(itemId)))))
     }
-    def updateVat1(vat1: String) = {
-      // def updateItem1(e: ReactEventI) = {
-      // val l =Some(e.target.value)
-      log.debug(s"ItemId Key is ${vat1}  ")
-      //Callback.log(s"KEY pressed >>>>>>>>>>>>>>>>>>>>>>>> ${l}")>>
-      $.modState(s => s.copy(item = s.item.map(_.copy(vat = Some(vat1)))))
-      //$.modState(s => s.copy(item =  s.item))
+
+    def updateVat1(id: String) = {
+      val vatId = id.substring(0, id.indexOf("|"))
+      log.debug(s"ItemId Key is ${vatId}  ")
+      $.modState(s => s.copy(item = s.item.map(_.copy(vat = Some(vatId)))))
     }
-    def updateItem(e: ReactEventI, s1:State) = {
-      val l =Some(e.target.value)
-     log.debug(s"ItemId is ${l}  State: ${s1}")
-      $.modState(s => s.copy(item = s.item.map(_.copy(item = l))))
-      //$.modState(s => s.copy(porder = Some(order)))>>
-    }
-    def updateUnit(e: ReactEventI) = {
-      val l =e.target.value
-       log.debug(s" Unit is ${l}")
-      $.modState(s => s.copy(item = s.item.map(_.copy(unit = Some(l)))))
-    }
-    def updateUnit1(qtyUnit: String) = {
-     // val l =e.target.value
+
+    def updateUnit1(id:String) = {
+      val qtyUnit = id.substring(0, id.indexOf("|"))
       log.debug(s" Unit is ${qtyUnit}")
       $.modState(s => s.copy(item = s.item.map(_.copy(unit = Some(qtyUnit)))))
     }
-    def updateVat(e: ReactEventI) = {
-      val l =e.target.value
-       log.debug(s"Vat is ${l}")
-      $.modState(s => s.copy(item = s.item.map(_.copy(vat = Some(l)))))
-    }
+
     def updateDuedate(e: ReactEventI) = {
       val l =e.target.value.toLong
       $.modState(s => s.copy(item = s.item.map(_.copy(duedate = Some(new Date(l))))))
@@ -107,7 +80,6 @@ object LinePurchaseOrderList {
     def save(line:LinePurchaseOrder, saveLineCallback:LinePurchaseOrder =>Callback) = {
       //log.debug(s" saved  Line order is ${line}")
       saveLineCallback(line)>>$.modState(s => s.copy(item = Some(line)))
-     // saveLineCallback(line)
 
     }
     def newLine(line:LinePurchaseOrder, newLineCallback:LinePurchaseOrder =>Callback) = {
@@ -121,13 +93,13 @@ object LinePurchaseOrderList {
       val items =  SPACircuit.zoom(_.store.get.models.get(7)).eval(SPACircuit.getRootModel).get.get.items.asInstanceOf[List[Article]]
       val qttyUnit =  SPACircuit.zoom(_.store.get.models.get(4)).eval(SPACircuit.getRootModel).get.get.items.asInstanceOf[List[QuantityUnit]]
       val vat =  SPACircuit.zoom(_.store.get.models.get(5)).eval(SPACircuit.getRootModel).get.get.items.asInstanceOf[List[Vat]]
-      //log.debug(s" KKKKKKKKKKKKKKKKKK ${p.items}")
-      log.debug(s" ARTICLESSSSS ${items} VAAAAAAAAT ${vat} QttyUnit ${qttyUnit}")
+
+     // log.debug(s" ARTICLESSSSS ${items} VAAAAAAAAT ${vat} QttyUnit ${qttyUnit}")
       def saveButton = Button(Button.Props(save(s.item.getOrElse(LinePurchaseOrder()),p.saveLine),
         addStyles = Seq(bss.pullRight, bss.buttonXS, bss.buttonOpt(CommonStyle.success))), Icon.circleO, "")
       def newButton = Button(Button.Props( newLine(LinePurchaseOrder( created = true),p.newLine),
         addStyles = Seq(bss.pullRight, bss.buttonXS)), Icon.plusSquare, "")
-      def buildIdNameList (list: List[Masterfile]): List[String]= list map (iws =>(iws.id+" "+iws.name))
+      def buildIdNameList (list: List[Masterfile]): List[String]= list map (iws =>(iws.id+"|"+iws.name))
       def editFormLine : Seq [TagMod]=List(
               //buildWItem[String]("item", s.item.map(_.item.getOrElse("item")), "item", updateItem(_, s)),
               buildSItem("item", itemsx = buildIdNameList(items), defValue = "0001", evt = updateItem1),
