@@ -42,7 +42,7 @@ object IWSMain extends js.JSApp {
 
   val v2=MenuItem("008","Purchasing", "#Purchasing" ,
           List(MenuItem("009","Purchase order","#ord"),
-               MenuItem("030","CGoodreceiving","#good")
+               MenuItem("030","Goodreceiving","#good")
     ))
   val v3=MenuItem("020","Dashboard", "#Dashboard" ,
     List(MenuItem("021","Dashboard","#scalacss"))
