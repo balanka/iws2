@@ -24,7 +24,6 @@ object Application extends Controller {
      t =>  scala.math.BigDecimal(t))
    implicit val datePickler = transformPickler[java.util.Date, Long](_.getTime,t => new java.util.Date(t))
    implicit val pickler = compositePickler[IWS]
-   pickler.addConcreteType[TodoItem]
    pickler.addConcreteType[CostCenter]
    pickler.addConcreteType[Balance]
    pickler.addConcreteType[Account]

@@ -72,11 +72,6 @@ sealed trait  LineInventoryTransaction extends LineTransaction {
    def quantity: Amount
    }
 
-sealed trait TodoPriority
-
-case object TodoLow extends TodoPriority
-case object TodoNormal extends TodoPriority
-case object TodoHigh extends TodoPriority
 object ModelID extends Enumeration {
   type ID = Value
   val CUSTOMER, ARTICLE, ACCOUNT, SUPPLIER, EMPLOYEE, COST_CENTER, STORE, ARTICLE_GROUP, VAT, QUANTITY_UNIT, RQF,SUPPLIER_CONTRACT,
@@ -141,12 +136,8 @@ object ModelID extends Enumeration {
 }
 case class Balance( amount: Amount = 0) extends IWS {
   def id =""
-  def modelId=0}
-case class TodoItem(id: String ="0", timeStamp: Int =0, content: String ="", modelId:Int =4711, priority: TodoPriority =TodoLow, completed: Boolean=false, name:String ="XX",description:String ="kk") extends IWS with Masterfile
-object TodoPriority {
-  implicit val todoPriorityPickler: Pickler[TodoPriority] = generatePickler[TodoPriority]
+  def modelId=0
 }
-object  TodoItem_{ def unapply (in:TodoItem) =Some(in.id, in.timeStamp, in.content,in.modelId, in.description, in.priority,in.completed, in.name,in.description)}
 case class CostCenter(id:String ="0",  name:String ="", modelId:Int = 6, description:String ="") extends IWS with Masterfile
 case class Account (id: String ="-1", name: String  ="", modelId:Int = 9,description:String  ="",
                     dateOfOpen: Option[Date] = Some(new Date()), dateOfClose: Option[Date] = Some(new Date()), balance: Balance = Balance()) extends Masterfile
@@ -349,11 +340,10 @@ object Model {
   import common._
   import boopickle.Default._
 
-  implicit val amountPickler = transformPickler[BigDecimal,String](b=> String.valueOf(b.doubleValue()),
+ /* implicit val amountPickler = transformPickler[BigDecimal,String](b=> String.valueOf(b.doubleValue()),
     t =>  scala.math.BigDecimal(t))
   implicit val datePickler = transformPickler[java.util.Date,Long](_.getTime,t => new java.util.Date(t))
   implicit val pickler = compositePickler[IWS]
-  pickler.addConcreteType[TodoItem]
   pickler.addConcreteType[CostCenter]
   pickler.addConcreteType[Balance]
   pickler.addConcreteType[Account]
@@ -366,6 +356,7 @@ object Model {
   pickler.addConcreteType[PurchaseOrder[LinePurchaseOrder]].addConcreteType[LinePurchaseOrder]
   pickler.addConcreteType[Vat]
   pickler.addConcreteType[Store]
+  */
 
 
 

@@ -53,7 +53,6 @@ class IWSHandler[M](modelRW: ModelRW[M, Pot[DStore[IWS,IWS]]]) extends ActionHan
      t =>  scala.math.BigDecimal(t))
    implicit val datePickler = transformPickler[java.util.Date, Long](_.getTime,t => new java.util.Date(t))
    implicit val pickler = compositePickler[IWS]
-   pickler.addConcreteType[TodoItem]
    pickler.addConcreteType[CostCenter]
    pickler.addConcreteType[Balance]
    pickler.addConcreteType[Account]
@@ -99,25 +98,10 @@ class IWSHandler[M](modelRW: ModelRW[M, Pot[DStore[IWS,IWS]]]) extends ActionHan
     }
 }
 
-/**
-  * Handles actions related to the Motd
-  * @param modelRW Reader/Writer to access the model
-  * @tparam M
-  */
-class MotdHandler[M](modelRW: ModelRW[M, Pot[String]]) extends ActionHandler(modelRW) {
-  implicit val runner = new RunAfterJS
-  override def handle = {
-    case action: UpdateMotd =>
-      val updateF = action.effect(AjaxClient[Api].welcome("User X").call())(identity(_))
-      action.handleWith(this, updateF)(PotAction.handler())
-  }
-}
-
 object SPACircuit extends Circuit[RootModel[IWS,IWS]] with ReactConnector[RootModel[IWS,IWS]] {
 
   protected val actionHandler = composeHandlers(
     new IWSHandler(zoomRW(_.store)((m, v) => m.copy(store = v)))
-    //,new MotdHandler(zoomRW(_.motd)((m, v) => m.copy(motd = v)))
   )
   override protected def initialModel = {
 
@@ -131,8 +115,8 @@ object SPACircuit extends Circuit[RootModel[IWS,IWS]] with ReactConnector[RootMo
       9 -> Ready(Data(Seq.empty[Account])),
       8 -> Ready(Data(Seq(ArticleGroup()))),
      101 -> Ready(Data(Seq(PurchaseOrder[LinePurchaseOrder]()))),
-     104 -> Ready(Data(Seq(Goodreceiving[LineGoodreceiving]()))),
-     4711 -> Ready(Data(Seq(TodoItem())))
+     104 -> Ready(Data(Seq(Goodreceiving[LineGoodreceiving]())))
+
     )))
 
     RootModel(store, Empty)

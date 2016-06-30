@@ -1,6 +1,6 @@
 package services
 
-import java.util.{UUID, Date}
+import java.util.Date
 
 import com.kabasoft.iws.shared._
 import com.kabasoft.iws.dao._
@@ -12,7 +12,6 @@ import com.kabasoft.iws.services.Request._
 
 class ApiService extends Api {
 
-   val todoService = new TodoService()
    def welcome(name: String): String = s"Welcome to SPA, $name! Time is now ${new Date}"
 
   def create(item:IWS) ={
@@ -28,7 +27,6 @@ class ApiService extends Api {
      case _: ArticleGroup => MakeService.make[ArticleGroup].create
      case _: PurchaseOrder[LinePurchaseOrder] => MakeService.make[PurchaseOrder[LinePurchaseOrder]].create
      case _: Goodreceiving[LineGoodreceiving] => MakeService.make[Goodreceiving[LineGoodreceiving]].create
-     case _: TodoItem => todoService.create(item)
    }
  }
   def insert(item:IWS) ={
@@ -47,7 +45,6 @@ class ApiService extends Api {
      case _: LinePurchaseOrder => MakeService.makeTransaction[LinePurchaseOrder].insert(List(item.asInstanceOf[LinePurchaseOrder]))
      case _: Goodreceiving[LineGoodreceiving] => MakeService.make[Goodreceiving[LineGoodreceiving]].insert(List(item.asInstanceOf[Goodreceiving[LineGoodreceiving]]))
      case _: LineGoodreceiving => MakeService.makeTransaction[LineGoodreceiving].insert(List(item.asInstanceOf[LineGoodreceiving]))
-     case _: TodoItem => todoService.update(item).size
    }
  }
   def find(item:IWS) ={
@@ -65,7 +62,6 @@ class ApiService extends Api {
      case _: LinePurchaseOrder => MakeService.makeTransaction[LinePurchaseOrder].find(item.id)
      case _: Goodreceiving[LineGoodreceiving] => MakeService.make[Goodreceiving[LineGoodreceiving]].find(item.id)
      case _: LineGoodreceiving => MakeService.makeTransaction[LineGoodreceiving].find(item.id)
-     case _: TodoItem => todoService.find(item)
    }
  }
    def findSome(item:IWS) = {
@@ -83,7 +79,6 @@ class ApiService extends Api {
     case _: LinePurchaseOrder => MakeService.makeTransaction[LinePurchaseOrder].findSome(item.id)
     case _: Goodreceiving[LineGoodreceiving] => MakeService.make[Goodreceiving[LineGoodreceiving]].findSome(item.id)
     case _: LineGoodreceiving => MakeService.makeTransaction[LineGoodreceiving].findSome(item.id)
-    case _: TodoItem => todoService.findSome(item)
     }
   }
    def all(item:IWS) ={
@@ -102,7 +97,6 @@ class ApiService extends Api {
       case _: LinePurchaseOrder => MakeService.makeTransaction[LinePurchaseOrder].all
       case _: Goodreceiving[LineGoodreceiving] => MakeService.make[Goodreceiving[LineGoodreceiving]].all
       case _: LineGoodreceiving => MakeService.makeTransaction[LineGoodreceiving].all
-      case _: TodoItem => todoService.all(item)
     }
   }
    def update(item:IWS) = {
@@ -121,7 +115,6 @@ class ApiService extends Api {
       case _: LinePurchaseOrder => {  MakeService.makeTransaction[LinePurchaseOrder].update(item.asInstanceOf[LinePurchaseOrder]); find(item)}
       case _: Goodreceiving[LineGoodreceiving] => {MakeService.make[Goodreceiving[LineGoodreceiving]].update(item.asInstanceOf[Goodreceiving[LineGoodreceiving]]); find(item)}
       case _: LineGoodreceiving => { MakeService.makeTransaction[LineGoodreceiving].update(item.asInstanceOf[LineGoodreceiving]); find(item)}
-      case _: TodoItem => todoService.update(item)
     }
   }
 
@@ -141,7 +134,6 @@ class ApiService extends Api {
       case _: LinePurchaseOrder => {MakeService.makeTransaction[LinePurchaseOrder].delete(item.id); all(item)}
       case _: Goodreceiving[LineGoodreceiving] => { MakeService.make[Goodreceiving[LineGoodreceiving]].delete(item.id); all(item)}
       case _: LineGoodreceiving => { MakeService.makeTransaction[LineGoodreceiving].delete(item.id); all(item)}
-      case _: TodoItem =>   todoService.delete(item)
     }
   }
 }
