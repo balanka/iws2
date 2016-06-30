@@ -8,7 +8,6 @@ import japgolly.scalajs.react.vdom.prefix_<^._
 
 import scalacss.ScalaCssReact._
 
-
 object StoreList {
   @inline private def bss = GlobalStyles.bootstrapStyles
 
@@ -34,6 +33,5 @@ object StoreList {
     })
     .build
 
-  def apply(items: Seq[IWS], editItem: IWS => Callback, deleteItem: IWS => Callback) =
-    storeList(Props(items, editItem, deleteItem))
+  def apply(items: Seq[IWS], editItem: IWS => Callback, deleteItem: IWS => Callback) = storeList(Props(items, editItem, deleteItem))
 }
