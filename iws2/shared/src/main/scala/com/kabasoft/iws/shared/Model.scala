@@ -215,21 +215,17 @@ case class PurchaseOrder [LinePurchaseOrder] (tid:Long = 0L,oid:Long = 0L, model
  def getLines = lines.getOrElse(List.empty[LinePurchaseOrder])
  def getLinesWithId(id:Long) = getLines.filter(equals(_,id))
   //def getLines0 = lines.getOrElse(List.empty[LinePurchaseOrder]).groupBy(_.id)
-
-  def replace[T](pairs: (T, T)*) = Map(pairs: _*).withDefault(identity)
-  def replaceLine(old:LinePurchaseOrder, newLine:LinePurchaseOrder) = copy(lines = Some(lines.getOrElse(List.empty[LinePurchaseOrder]) map replace((old,newLine))))
+  def replaceLine( newLine:LinePurchaseOrder) = copy(lines = Some( getLines map ( old => if (newLine.equals(old))  newLine else old )))
 }
 case class Goodreceiving [LineGoodreceiving] (tid:Long = 0L,oid:Long = 0L, modelId:Int = 104,store:Option[String]=None, account:Option[String]= None,
                                               lines:Option[List[LineGoodreceiving]]=Some(List.empty[LineGoodreceiving]),
                                               modified:Boolean =false, created:Boolean = false, deleted:Boolean = false) extends Transaction [LineGoodreceiving]{
   def add(line:LineGoodreceiving) = copy(lines = Some(lines.getOrElse(List.empty[LineGoodreceiving]) ++: List(line)))
-  def getLines = lines.getOrElse(List.empty[LineGoodreceiving])
+  def getLines:List[LineGoodreceiving] = lines.getOrElse(List.empty[LineGoodreceiving])
   def getLinesWithId(id:Long) = getLines.filter(equals(_,id))
-  //def getLines0 = lines.getOrElse(List.empty[LinePurchaseOrder]).groupBy(_.id)
-
-  def replace[T](pairs: (T, T)*) = Map(pairs: _*).withDefault(identity)
-  def replaceLine(old:LineGoodreceiving, newLine:LineGoodreceiving) = copy(lines = Some(lines.getOrElse(List.empty[LineGoodreceiving]) map replace((old,newLine))))
+  def replaceLine( newLine:LineGoodreceiving) = copy(lines = Some( getLines map ( old => if (newLine.equals(old))  newLine else old )))
 }
+
 
 
 // Registre general des affaires  frappees d'appel
