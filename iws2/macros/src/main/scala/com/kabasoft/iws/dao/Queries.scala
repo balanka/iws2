@@ -94,7 +94,7 @@ object Queries  {
   def linePurchaseOrderSelectSome = { id:String =>sql"SELECT * FROM LinePurchaseOrder where id =$id".query[LinePurchaseOrder_TYPE]}
   def linePurchaseOrderUpdateName = {(model:LinePurchaseOrder) =>
     sql"Update LinePurchaseOrder set transid=${model.transid}, item=${model.item.get}, modelId=${model.modelId}, unit=${model.unit.get},quantity = ${model.quantity}, price=${model.price},vat=${model.vat.get},duedate=${model.duedate.get}, text =${model.text} where id =${model.tid}".update}
-  def linePurchaseOrderDelete = {(id:Long) =>sql"Delete FROM LinePurchasGoodreceivingeOrder where id =$id".update}
+  def linePurchaseOrderDelete = {(id:Long) =>sql"Delete FROM LinePurchaseOrder where id =$id".update}
   //INSERT INTO PurchaseOrder ( oid, modelId, store, account) VALUES (0,101,'200','1000');
   def purchaseOrderInsertSQL = "INSERT INTO PurchaseOrder (id, oid, modelId, store, account) VALUES (?, ?, ?,?,?)"
   def purchaseOrderSelect = sql"SELECT * FROM PurchaseOrder".query[(Long,Long, Int, String,String)]
