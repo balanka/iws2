@@ -18,6 +18,7 @@ object Settings {
     "-unchecked",
     "-deprecation",
     "-feature"
+    //"-Xfatal-warnings"
 
   )
 
