@@ -3,7 +3,7 @@ package com.kabasoft.iws.gui.services
 import autowire._
 import com.kabasoft.iws.gui.logger._
 import com.kabasoft.iws.gui.macros._
-import com.kabasoft.iws.shared._
+import com.kabasoft.iws.shared.{Store => MStore, _}
 import diode._
 import diode.data._
 import diode.react.ReactConnector
@@ -20,8 +20,10 @@ case class UpdateMotd(potResult: Pot[String] = Empty) extends PotAction[String, 
 case class RootModel [+A<:IWS,-B<:IWS](store:Pot[DStore[A,B]], motd:Pot[String])
 case class DStore [+A<:IWS,-B<:IWS](models: Map[Int, Pot[ContainerT[A,B]]]) {
   def updated (newItem: B) = {
-      val x= models.get(newItem.modelId).get.map(_.update(newItem))
-      DStore (models+ (newItem.modelId -> x))
+     val mapx = models.get(newItem.modelId).getOrElse(Ready(Data(List.empty[Account]))).map(_.update(newItem))
+
+    //val x= models.get(newItem.modelId).get.map(_.update(newItem))
+      DStore (models+ (newItem.modelId -> mapx))
   }
 
    //def updatedAll(newModels: Map[Int, Pot[ContainerT[B,A]]])  = DStore[A,B](newModels.asInstanceOf[Map[Int, Pot[ContainerT[A,B]]]])
@@ -94,14 +96,8 @@ class IWSHandler[M](modelRW: ModelRW[M, Pot[DStore[IWS,IWS]]]) extends ActionHan
       log.info("+++++++++<<<<<<<<<<< Delete Item: "+item)
       //ActionResult.NoChange
       updated(Ready(value.get.remove(item)).asInstanceOf[Pot[DStore[IWS,IWS]]], Effect(AjaxClient[Api].delete(item).call().map(UpdateAll[IWS])))
-      //effectOnly(Effect(AjaxClient[Api].all(item).call().map(UpdateAll[IWS])))
-      //updated(Ready(value.get.updated(item)).asInstanceOf[Pot[DStore[IWS,IWS]]], Effect(AjaxClient[Api].all(item).call().map(UpdateAll[IWS])))
-                     //if(!item.id.isEmpty && !item.id.equals("-1")) {Effect(AjaxClient[Api].delete(item).call().map(UpdateAll[IWS]))}
-                     //else {  log.info("+++++++++<<<<<<<<<<< Delete Item with id: "+item); Effect(AjaxClient[Api].all(item).call().map(UpdateAll[IWS]))})
-  }
+    }
 }
-
-
 
 /**
   * Handles actions related to the Motd
@@ -127,7 +123,6 @@ object SPACircuit extends Circuit[RootModel[IWS,IWS]] with ReactConnector[RootMo
 
     val store: Pot[DStore[IWS, IWS]] = Ready(DStore(Map(
       1 -> Ready(Data(Seq(Supplier()))),
-      2 -> Ready(Data(Seq(Store()))),
       3 -> Ready(Data(Seq(Customer()))),
       4 -> Ready(Data(Seq(QuantityUnit("1", "QuantityUnit", 4, "QuantityUnit")))),
       5 -> Ready(Data(Seq(Vat()))),
