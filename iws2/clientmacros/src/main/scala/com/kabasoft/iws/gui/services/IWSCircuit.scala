@@ -98,7 +98,7 @@ class IWSHandler[M](modelRW: ModelRW[M, Pot[DStore[IWS,IWS]]]) extends ActionHan
     }
 }
 
-object SPACircuit extends Circuit[RootModel[IWS,IWS]] with ReactConnector[RootModel[IWS,IWS]] {
+object IWSCircuit extends Circuit[RootModel[IWS,IWS]] with ReactConnector[RootModel[IWS,IWS]] {
 
   protected val actionHandler = composeHandlers(
     new IWSHandler(zoomRW(_.store)((m, v) => m.copy(store = v)))

@@ -6,7 +6,7 @@ import com.kabasoft.iws.gui.Utils._
 import com.kabasoft.iws.gui.logger._
 import com.kabasoft.iws.gui.macros.Bootstrap._
 import com.kabasoft.iws.gui.macros._
-import com.kabasoft.iws.gui.services.SPACircuit
+import com.kabasoft.iws.gui.services.IWSCircuit
 import com.kabasoft.iws.shared._
 import diode.data.{Pot, Ready}
 import diode.react.ReactPot._
@@ -25,9 +25,9 @@ object GOODRECEIVING {
   class Backend($: BackendScope[Props, State]) {
     def mounted(props: Props) =
       Callback {
-        SPACircuit.dispatch(Refresh(Goodreceiving[LineGoodreceiving]()))
-        SPACircuit.dispatch(Refresh(Supplier()))
-        SPACircuit.dispatch(Refresh(Store()))
+        IWSCircuit.dispatch(Refresh(Goodreceiving[LineGoodreceiving]()))
+        IWSCircuit.dispatch(Refresh(Supplier()))
+        IWSCircuit.dispatch(Refresh(Store()))
       }
    def edit(item:Option[Goodreceiving[LineGoodreceiving]]) = {
       val d =item.getOrElse(Goodreceiving[LineGoodreceiving]())
@@ -113,8 +113,8 @@ object GOODRECEIVING {
     }
 
     def buildForm (p: Props, s:State): Seq[ReactElement] = {
-      val supplier =  SPACircuit.zoom(_.store.get.models.get(1)).eval(SPACircuit.getRootModel).getOrElse(Ready(Data(List.empty[Supplier]))).get.items.asInstanceOf[List[Supplier]]
-      val store =  SPACircuit.zoom(_.store.get.models.get(2)).eval(SPACircuit.getRootModel).getOrElse(Ready(Data(List.empty[Store]))).get.items.asInstanceOf[List[Store]]
+      val supplier =  IWSCircuit.zoom(_.store.get.models.get(1)).eval(IWSCircuit.getRootModel).getOrElse(Ready(Data(List.empty[Supplier]))).get.items.asInstanceOf[List[Supplier]]
+      val store =  IWSCircuit.zoom(_.store.get.models.get(2)).eval(IWSCircuit.getRootModel).getOrElse(Ready(Data(List.empty[Store]))).get.items.asInstanceOf[List[Store]]
       val porder = s.item.getOrElse(Goodreceiving[LineGoodreceiving]().add(LineGoodreceiving(item = Some("4711"))))
       val  storeList=store map (iws =>(iws.id+"|"+iws.name))
       val  supplierList=supplier map (iws =>(iws.id+"|"+iws.name))

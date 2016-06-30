@@ -13,7 +13,7 @@ import com.kabasoft.iws.gui.macros.Bootstrap._
 import com.kabasoft.iws.shared._
 import com.kabasoft.iws.gui.macros._
 import com.kabasoft.iws.gui.logger._
-import com.kabasoft.iws.gui.services.SPACircuit
+import com.kabasoft.iws.gui.services.IWSCircuit
 
 import scalacss.ScalaCssReact._
 
@@ -28,7 +28,7 @@ object ACCOUNT {
   class Backend($: BackendScope[Props, State]) {
     def mounted(props: Props) =
       Callback {
-        SPACircuit.dispatch(Refresh(Account()))
+        IWSCircuit.dispatch(Refresh(Account()))
       }
      // Callback.ifTrue(props.proxy().isEmpty, props.proxy.dispatch(Refresh[Account](Account())))
 
@@ -137,7 +137,7 @@ object ACCOUNT {
                                ^.placeholder := id),^.paddingLeft := 1))
 
     def render(p: Props, s: State) ={
-    val items =  SPACircuit.zoom(_.store.get.models.get(9)).eval(SPACircuit.getRootModel).get.get.items.asInstanceOf[List[Account]]
+    val items =  IWSCircuit.zoom(_.store.get.models.get(9)).eval(IWSCircuit.getRootModel).get.get.items.asInstanceOf[List[Account]]
       Panel(Panel.Props("Account"), <.div(^.className := "panel-heading",^.padding :=0), <.div(^.padding :=0,
         p.proxy().renderFailed(ex => "Error loading"),
         p.proxy().renderPending(_ > 500, _ => "Loading..."),

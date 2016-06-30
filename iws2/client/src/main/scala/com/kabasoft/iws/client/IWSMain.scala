@@ -1,7 +1,7 @@
 package com.kabasoft.iws.client
 
 import com.kabasoft.iws.gui.AppRouter._
-import com.kabasoft.iws.gui.services.{RootModel, SPACircuit}
+import com.kabasoft.iws.gui.services.{RootModel, IWSCircuit}
 import diode.ModelR
 import diode.react.ModelProxy
 
@@ -61,17 +61,17 @@ object IWSMain extends js.JSApp {
   val routerConfig = RouterConfigDsl[Page].buildConfig { dsl =>
     import dsl._
 
-    val x1 =  SPACircuit.connect(_.store.get.models.get(1).get)
-    val x2 =  SPACircuit.connect(_.store.get.models.get(2).get)
-    val x3 =  SPACircuit.connect(_.store.get.models.get(3).get)
-    val x4 =  SPACircuit.connect(_.store.get.models.get(4).get)
-    val x5 =  SPACircuit.connect(_.store.get.models.get(5).get)
-    val x6 =  SPACircuit.connect(_.store.get.models.get(6).get)
-    val x7 =  SPACircuit.connect(_.store.get.models.get(7).get,"Article")
-    val x8 =  SPACircuit.connect(_.store.get.models.get(8).get)
-    val x9 =  SPACircuit.connect(_.store.get.models.get(9).get)
-    val x101 = SPACircuit.connect(_.store.get.models.get(101).get, "POrder")
-    val x104 = SPACircuit.connect(_.store.get.models.get(104).get, "Goodreceiving")
+    val x1 =  IWSCircuit.connect(_.store.get.models.get(1).get)
+    val x2 =  IWSCircuit.connect(_.store.get.models.get(2).get)
+    val x3 =  IWSCircuit.connect(_.store.get.models.get(3).get)
+    val x4 =  IWSCircuit.connect(_.store.get.models.get(4).get)
+    val x5 =  IWSCircuit.connect(_.store.get.models.get(5).get)
+    val x6 =  IWSCircuit.connect(_.store.get.models.get(6).get)
+    val x7 =  IWSCircuit.connect(_.store.get.models.get(7).get,"Article")
+    val x8 =  IWSCircuit.connect(_.store.get.models.get(8).get)
+    val x9 =  IWSCircuit.connect(_.store.get.models.get(9).get)
+    val x101 = IWSCircuit.connect(_.store.get.models.get(101).get, "POrder")
+    val x104 = IWSCircuit.connect(_.store.get.models.get(104).get, "Goodreceiving")
 
 
     //val x2 =  SPACircuit.connect(_.store.get.models.getOrElse(2,Ready(Data(List(Article())))).asInstanceOf[Pot[Data]])

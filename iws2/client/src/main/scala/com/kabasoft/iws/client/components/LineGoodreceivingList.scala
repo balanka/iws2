@@ -6,7 +6,7 @@ import com.kabasoft.iws.gui.Utils._
 import com.kabasoft.iws.gui.logger._
 import com.kabasoft.iws.gui.macros.Bootstrap.{Button, CommonStyle}
 import com.kabasoft.iws.gui.macros._
-import com.kabasoft.iws.gui.services.SPACircuit
+import com.kabasoft.iws.gui.services.IWSCircuit
 import com.kabasoft.iws.shared.{Store => MStore, _}
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.prefix_<^._
@@ -27,9 +27,9 @@ object LineGoodreceivingList {
 
     def mounted(props: Props) =
       Callback {
-        SPACircuit.dispatch(Refresh(Article()))
-        SPACircuit.dispatch(Refresh(QuantityUnit()))
-        SPACircuit.dispatch(Refresh(Vat()))
+        IWSCircuit.dispatch(Refresh(Article()))
+        IWSCircuit.dispatch(Refresh(QuantityUnit()))
+        IWSCircuit.dispatch(Refresh(Vat()))
       }
       // props.proxy1.dispatch(Refresh (Article()))>> props.proxy1.dispatch(Refresh (Account()))
 
@@ -95,9 +95,9 @@ object LineGoodreceivingList {
     def render(p:Props, s: State) = {
       val style = bss.listGroup
       val its  = p.porder.lines.getOrElse(Seq.empty[LineGoodreceiving])
-      val items =  SPACircuit.zoom(_.store.get.models.get(7)).eval(SPACircuit.getRootModel).get.get.items.asInstanceOf[List[Article]]
-      val qttyUnit =  SPACircuit.zoom(_.store.get.models.get(4)).eval(SPACircuit.getRootModel).get.get.items.asInstanceOf[List[QuantityUnit]]
-      val vat =  SPACircuit.zoom(_.store.get.models.get(5)).eval(SPACircuit.getRootModel).get.get.items.asInstanceOf[List[Vat]]
+      val items =  IWSCircuit.zoom(_.store.get.models.get(7)).eval(IWSCircuit.getRootModel).get.get.items.asInstanceOf[List[Article]]
+      val qttyUnit =  IWSCircuit.zoom(_.store.get.models.get(4)).eval(IWSCircuit.getRootModel).get.get.items.asInstanceOf[List[QuantityUnit]]
+      val vat =  IWSCircuit.zoom(_.store.get.models.get(5)).eval(IWSCircuit.getRootModel).get.get.items.asInstanceOf[List[Vat]]
 
       //log.debug(s" ARTICLESSSSS ${items} VAAAAAAAAT ${vat} QttyUnit ${qttyUnit}")
       def saveButton = Button(Button.Props(save(s.item.getOrElse(LineGoodreceiving()),p.saveLine),

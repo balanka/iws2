@@ -1,7 +1,7 @@
 package com.kabasoft.iws.gui
 
 import com.kabasoft.iws.gui.logger._
-import com.kabasoft.iws.gui.services.SPACircuit
+import com.kabasoft.iws.gui.services.IWSCircuit
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.prefix_<^._
 
@@ -16,8 +16,8 @@ object IWSSelect {
       P.onChange(e.target.value)
 
  def render(P: Props) = {
-   log.debug(s" WWWWWWWWWWWWWWWWW ${SPACircuit.zoom(_.store.get.models.get(7).size)}")
-   val  m = SPACircuit.zoom(_.store.get.models.get(7).get.get.items.size)
+   log.debug(s" WWWWWWWWWWWWWWWWW ${IWSCircuit.zoom(_.store.get.models.get(7).size)}")
+   val  m = IWSCircuit.zoom(_.store.get.models.get(7).get.get.items.size)
 
    log.debug(s" WWWWWWWWWWWWWWWWW ${m}")
    log.debug(s" WWWWWWWWWWWWWWWWW ${P.items}")

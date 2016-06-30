@@ -13,7 +13,7 @@ import com.kabasoft.iws.gui.logger._
 import com.kabasoft.iws.shared._
 import com.kabasoft.iws.gui.Utils._
 import com.kabasoft.iws.gui.macros._
-import com.kabasoft.iws.gui.services.SPACircuit
+import com.kabasoft.iws.gui.services.IWSCircuit
 
 import scala.scalajs.js
 import scalacss.ScalaCssReact._
@@ -27,10 +27,10 @@ object PURCHASEORDER {
   class Backend($: BackendScope[Props, State]) {
     def mounted(props: Props) =
       Callback {
-         SPACircuit.dispatch(Refresh(Store()))
-         SPACircuit.dispatch(Refresh(Supplier()))
-        SPACircuit.dispatch(Refresh(Store()))
-        SPACircuit.dispatch(Refresh(PurchaseOrder[LinePurchaseOrder]()))
+         IWSCircuit.dispatch(Refresh(Store()))
+         IWSCircuit.dispatch(Refresh(Supplier()))
+        IWSCircuit.dispatch(Refresh(Store()))
+        IWSCircuit.dispatch(Refresh(PurchaseOrder[LinePurchaseOrder]()))
     }
 
 
@@ -69,7 +69,7 @@ object PURCHASEORDER {
       //$.modState(s => s.copy(item =Some(order)))
       //$.props >>= (_.proxy.dispatch(Update(order)))
       Callback {
-        SPACircuit.dispatch(Update(order))
+        IWSCircuit.dispatch(Update(order))
       }
       //LinePurchaseOrderList.apply($.props.runNow().proxy, item, AddNewLine, editLine, saveLine, deleteLine)
      // $.modState(s => s.copy(item = None))
@@ -123,8 +123,8 @@ object PURCHASEORDER {
     }
 
     def buildForm (p: Props, s:State): Seq[ReactElement] = {
-      val supplier =  SPACircuit.zoom(_.store.get.models.get(1)).eval(SPACircuit.getRootModel).getOrElse(Ready(Data(List.empty[Supplier]))).get.items.asInstanceOf[List[Supplier]]
-      val store =  SPACircuit.zoom(_.store.get.models.get(2)).eval(SPACircuit.getRootModel).getOrElse(Ready(Data(List.empty[Store]))).get.items.asInstanceOf[List[Store]]
+      val supplier =  IWSCircuit.zoom(_.store.get.models.get(1)).eval(IWSCircuit.getRootModel).getOrElse(Ready(Data(List.empty[Supplier]))).get.items.asInstanceOf[List[Supplier]]
+      val store =  IWSCircuit.zoom(_.store.get.models.get(2)).eval(IWSCircuit.getRootModel).getOrElse(Ready(Data(List.empty[Store]))).get.items.asInstanceOf[List[Store]]
       log.debug(s"Supplier>>>>${supplier}")
       val porder = s.item.getOrElse(PurchaseOrder[LinePurchaseOrder]().add(LinePurchaseOrder(item = Some("4711"))))
       val  storeList = store map (iws =>(iws.id+"|"+iws.name))
