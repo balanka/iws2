@@ -8,7 +8,7 @@ import com.kabasoft.iws.gui.macros.Bootstrap._
 import com.kabasoft.iws.gui.macros._
 import com.kabasoft.iws.gui.services.SPACircuit
 import com.kabasoft.iws.shared._
-import diode.data.Pot
+import diode.data.{Pot, Ready}
 import diode.react.ReactPot._
 import diode.react._
 import japgolly.scalajs.react._
@@ -40,8 +40,8 @@ object GOODRECEIVING {
       $.modState(s => s.copy(item = s.item.map(_.copy(oid = l))))
     }
 
-    def updateStore(Id:String) = {
-      val storeId = Id.substring(0, Id.indexOf("|"))
+    def updateStore(idx:String) = {
+      val storeId = idx.substring(0, idx.indexOf("|"))
       log.debug(s"store is "+storeId)
       $.modState(s => s.copy(item = s.item.map(_.copy(store = Some(storeId)))))
     }
@@ -52,8 +52,8 @@ object GOODRECEIVING {
       $.modState(s => s.copy(item = s.item.map(_.copy(account = currentValue))))
     }
 
-    def updateAccount1(Id: String) = {
-      val supplierId=Id.substring(0, Id.indexOf("|"))
+    def updateAccount1(idx: String) = {
+      val supplierId=idx.substring(0, idx.indexOf("|"))
       log.debug(s"ItemId Key is ${supplierId}  ")
       $.modState(s => s.copy(item = s.item.map(_.copy(account = Some(supplierId)))))
     }
@@ -62,20 +62,16 @@ object GOODRECEIVING {
       //$.modState(s => s.copy(item =Some(order)))
       $.props >>= (_.proxy.dispatch(Update(order)))
     }
-
-    def saveLine(line:LineGoodreceiving) = {
-      log.debug(s"LineGoodreceiving is yyyyyyyyyy"+line)
-      val k:Goodreceiving[LineGoodreceiving] = $.state.runNow().item.getOrElse(Goodreceiving[LineGoodreceiving]())
-      def cond(line1:LineGoodreceiving, line2:LineGoodreceiving ) =(line.tid == line2.tid)  &&(line1.created ==true)
-      val k2 = k.replaceLine(k.getLines.filter(cond(_,line)).headOption.getOrElse(LineGoodreceiving()), line.copy(transid = k.tid))
-      log.debug(s"Goodreceiving k2 is ${k2} ")
+    def saveLine(linex:LineGoodreceiving) = {
+      val line = linex.copy(modified=true)
+      log.debug(s"purchaseOrder is yyyyyyyyyy" + line)
+      val k = $.state.runNow().item.getOrElse(Goodreceiving[LineGoodreceiving]())
+      val k2 = k.replaceLine( line.copy(transid = k.tid))
+      log.debug(s"purchaseOrder k2 is ${k2} ")
       //$.modState(s => s.copy(item =Some(k2)))>> edited(k2)
       edited(k2)
-      //val k3 = k.replaceLine(k.getLines.filter(cond(_,line)).headOption.getOrElse(LinePurchaseOrder()), line.copy(created = false))
-      //log.debug(s"purchaseOrder K3 ${k3} ")
-      //$.modState(s => s.copy(item =Some(k3)))
-
     }
+
 
     def delete(item:Goodreceiving[LineGoodreceiving]) = {
       // val s = $.state.runNow().item
@@ -86,7 +82,7 @@ object GOODRECEIVING {
     def deleteLine(line1:LineGoodreceiving) = {
       val  deleted =line1.copy(deleted = true)
       val k =$.state.runNow().item.getOrElse(Goodreceiving[LineGoodreceiving]())
-      val k2 = k.replaceLine(k.getLines.filter(_.tid == deleted.tid).headOption.getOrElse(LineGoodreceiving()), deleted)
+      val k2 = k.replaceLine(deleted)
       edited(k2)
     }
     def AddNewLine(line:LineGoodreceiving) = {
@@ -117,8 +113,8 @@ object GOODRECEIVING {
     }
 
     def buildForm (p: Props, s:State): Seq[ReactElement] = {
-      val supplier =  SPACircuit.zoom(_.store.get.models.get(1)).eval(SPACircuit.getRootModel).get.get.items.asInstanceOf[List[Supplier]]
-      val store =  SPACircuit.zoom(_.store.get.models.get(2)).eval(SPACircuit.getRootModel).get.get.items.asInstanceOf[List[Store]]
+      val supplier =  SPACircuit.zoom(_.store.get.models.get(1)).eval(SPACircuit.getRootModel).getOrElse(Ready(Data(List.empty[Supplier]))).get.items.asInstanceOf[List[Supplier]]
+      val store =  SPACircuit.zoom(_.store.get.models.get(2)).eval(SPACircuit.getRootModel).getOrElse(Ready(Data(List.empty[Store]))).get.items.asInstanceOf[List[Store]]
       val porder = s.item.getOrElse(Goodreceiving[LineGoodreceiving]().add(LineGoodreceiving(item = Some("4711"))))
       val  storeList=store map (iws =>(iws.id+"|"+iws.name))
       val  supplierList=supplier map (iws =>(iws.id+"|"+iws.name))
