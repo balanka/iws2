@@ -41,49 +41,52 @@ object LineGoodreceivingList {
     def updateItem1(id: String) = {
       val itemId = id.substring(0, id.indexOf("|"))
       log.debug(s"ItemId Key is ${itemId}  ")
-      $.modState(s => s.copy(item = s.item.map(_.copy(item = Some(itemId)))))
+      $.modState(s => s.copy(item = s.item.map(_.copy(item = Some(itemId)))))>>setModfied
     }
 
     def updateVat1(id: String) = {
       val vatId = id.substring(0, id.indexOf("|"))
       log.debug(s"ItemId Key is ${vatId}  ")
-      $.modState(s => s.copy(item = s.item.map(_.copy(vat = Some(vatId)))))
+      $.modState(s => s.copy(item = s.item.map(_.copy(vat = Some(vatId)))))>>setModfied
     }
 
     def updateUnit1(id:String) = {
       val qtyUnit = id.substring(0, id.indexOf("|"))
       log.debug(s" Unit is ${qtyUnit}")
-      $.modState(s => s.copy(item = s.item.map(_.copy(unit = Some(qtyUnit)))))
+      $.modState(s => s.copy(item = s.item.map(_.copy(unit = Some(qtyUnit)))))>>setModfied
     }
 
     def updateDuedate(e: ReactEventI) = {
       val l =e.target.value.toLong
-      $.modState(s => s.copy(item = s.item.map(_.copy(duedate = Some(new Date(l))))))
+      $.modState(s => s.copy(item = s.item.map(_.copy(duedate = Some(new Date(l))))))>>setModfied
     }
     def updateText(e: ReactEventI) = {
       val l =e.target.value
-      $.modState(s => s.copy(item = s.item.map(_.copy(text = l))))
+      $.modState(s => s.copy(item = s.item.map(_.copy(text = l))))>>setModfied
     }
     def updatePrice(e: ReactEventI, s1:State) = {
       val l =e.target.value.toDouble
       log.debug(s"Item price is ${l} State:${s1}")
-      $.modState(s => s.copy(item = s.item.map(_.copy(price = l))))
+      $.modState(s => s.copy(item = s.item.map(_.copy(price = l))))>>setModfied
     }
     def updateQuantity(e: ReactEventI) = {
       val l =e.target.value
       log.debug(s"Item quantity is ${l}")
-      $.modState(s => s.copy(item = s.item.map(_.copy(quantity = BigDecimal(l)))))
+      $.modState(s => s.copy(item = s.item.map(_.copy(quantity = BigDecimal(l)))))>>setModfied
     }
 
     def delete(line:LineGoodreceiving, deleteLineCallback:LineGoodreceiving =>Callback) =
       Callback.log(s"LinePurchaseOrder deleted>>>>>  ${line}") >> deleteLineCallback(line)
 
     def save(line:LineGoodreceiving, saveLineCallback:LineGoodreceiving =>Callback) = {
-      //log.debug(s" saved  Line order is ${line}")
-      saveLineCallback(line)>>$.modState(s => s.copy(item = Some(line)))
-     // saveLineCallback(line)
-
+      val modifiedLine =line.copy(modified = true)
+      log.debug(s" saved  Line gooreceiving is ${modifiedLine}")
+      if (line.modified)
+        saveLineCallback(modifiedLine) //>>$.modState(s => s.copy(item = Some(line)))
+      else  Callback { log.debug(s" No change to save for ${modifiedLine}")}
+     // $.modState(s => s.copy(item = None))
     }
+    def setModfied = $.modState(s => s.copy(item = s.item.map(_.copy(modified = true))))
     def newLine(line:LineGoodreceiving, newLineCallback:LineGoodreceiving =>Callback) = {
       log.debug(s" newLine called with   ${line}")
      newLineCallback(line)>> edit(line)
