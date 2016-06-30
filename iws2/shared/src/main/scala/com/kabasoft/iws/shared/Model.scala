@@ -210,7 +210,7 @@ case class PurchaseOrder [LinePurchaseOrder] (tid:Long = 0L,oid:Long = 0L, model
                                               lines:Option[List[LinePurchaseOrder]]=Some(List.empty[LinePurchaseOrder]),
                                               modified:Boolean =false, created:Boolean = false, deleted:Boolean = false) extends Transaction [LinePurchaseOrder]{
  def add(line:LinePurchaseOrder) = copy(lines = Some(getLines ++: List(line)))
- def remove(line:LinePurchaseOrder) = copy(lines = Some(getLines.filter(_.equals(line))) )
+ //def remove(line:LinePurchaseOrder) = copy(lines = Some(getLines.filter(_.equals(line))) )
  def getLines = lines.getOrElse(List.empty[LinePurchaseOrder])
  def getLinesWithId(id:Long) = getLines.filter(equals(_,id))
  def replaceLine( newLine:LinePurchaseOrder) = copy(lines = Some( getLines map ( old => if (newLine.equals(old))  newLine else old )))
@@ -219,7 +219,7 @@ case class Goodreceiving [LineGoodreceiving] (tid:Long = 0L,oid:Long = 0L, model
                                               lines:Option[List[LineGoodreceiving]]=Some(List.empty[LineGoodreceiving]),
                                               modified:Boolean =false, created:Boolean = false, deleted:Boolean = false) extends Transaction [LineGoodreceiving]{
   def add(line:LineGoodreceiving) = copy(lines = Some(getLines ++: List(line)))
-  def remove(line:LineGoodreceiving) = copy(lines = Some(getLines.filter(_.equals(line))) )
+  //def remove(line:LineGoodreceiving) = copy(lines = Some(getLines.filter(_.equals(line))) )
   def getLines:List[LineGoodreceiving] = lines.getOrElse(List.empty[LineGoodreceiving])
   def getLinesWithId(id:Long) = getLines.filter(equals(_,id))
   def replaceLine( newLine:LineGoodreceiving) = copy(lines = Some( getLines map ( old => if (newLine.equals(old))  newLine else old )))
