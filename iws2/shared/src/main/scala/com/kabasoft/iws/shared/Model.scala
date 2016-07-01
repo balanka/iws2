@@ -26,7 +26,6 @@ trait ContainerT [+A<:IWS,-B<:IWS] {
   def size = items.size
   def items : Seq[A]
   def add(newItem: B): ContainerT [A,B]
-  //def updatedAll( newItems:Seq[B]): ContainerT [A,B]
 }
 
 case class Data  (items: Seq[IWS]) extends ContainerT [IWS,IWS]{
@@ -139,8 +138,8 @@ case class Balance( amount: Amount = 0) extends IWS {
   def modelId=0
 }
 case class CostCenter(id:String ="0",  name:String ="", modelId:Int = 6, description:String ="") extends IWS with Masterfile
-case class Account (id: String ="-1", name: String  ="", modelId:Int = 9,description:String  ="",
-                    dateOfOpen: Option[Date] = Some(new Date()), dateOfClose: Option[Date] = Some(new Date()), balance: Balance = Balance()) extends Masterfile
+case class Account (id: String ="-1", name: String  ="", modelId:Int = 9,description:String  ="", groupId:Option[String]= None,
+                    accounts:Option[List[Account]] = None, dateOfOpen: Option[Date] = Some(new Date()), dateOfClose: Option[Date] = Some(new Date()), balance: Balance = Balance(0.0)) extends Masterfile
 
 case class Article(id:String ="", name:String ="", modelId:Int = 7, description:String  ="", price:Amount = 0, qtty_id:String ="Stk") extends IWS with Masterfile
 case class QuantityUnit(id:String ="0",name:String ="", modelId:Int =4 ,description:String ="") extends IWS with Masterfile
@@ -172,7 +171,7 @@ case class LinePurchaseOrder  (tid:Long = 0L, transid:Long =0, modelId:Int = 102
     val prime = 31
     var result = 1
     result = prime * result + tid.toInt
-    //result = prime * result + (if (name == null) 0 else name.hashCode)
+    result = prime * result + transid.hashCode
      result
   }
 }
@@ -193,7 +192,7 @@ case class LineGoodreceiving  (tid:Long = 0L, transid:Long =0, modelId:Int = 105
     val prime = 31
     var result = 1
     result = prime * result + tid.toInt
-    //result = prime * result + (if (name == null) 0 else name.hashCode)
+    result = prime * result + transid.hashCode
     result
   }
 }
@@ -242,7 +241,7 @@ object  Store_{ def unapply (in:Store) =Some(in.id,in.name, in.modelId, in.stree
 object  Vat_{ def unapply (in:Vat) =Some(in.id,in.name, in.modelId, in.description,in.percent)}
 object  CostCenter_{ def unapply (in:CostCenter) =Some(in.id,in.name,in.description)}
 object  QuantityUnit_{ def unapply (in:QuantityUnit) =Some(in.id,in.name,in.modelId, in.description)}
-object  Account_{ def unapply (in:Account) =Some(in.id,in.name,in.modelId, in.description,in.dateOfOpen,in.dateOfClose,in.balance)}
+object  Account_{ def unapply (in:Account) =Some(in.id,in.name,in.modelId, in.description, in.groupId, in.accounts, in.dateOfOpen,in.dateOfClose,in.balance)}
 object  Article_{ def unapply (in:Article) =Some(in.id,in.name, in.modelId, in.description, in.price, in.qtty_id)}
 object  ArticleGroup_{ def unapply (in:ArticleGroup) =Some(in.id,in.name,in.modelId, in.description)}
 object  LinePurchaseOrder_{ def unapply (in:LinePurchaseOrder) = Some(in.tid,in.transid, in.modelId, in.item, in.unit, in.price, in.quantity, in.vat, in.duedate, in.text)}
@@ -296,7 +295,7 @@ object Account {
       validateAccountNo(id,modelId) |@|
         validateOpenCloseDate(openDate.getOrElse(new Date()), closeDate)
       ) { (n, d) =>
-      Account(n, name, modelId,description, d._1, d._2, balance)
+      Account(n, name, modelId,description, None, None, d._1, d._2, balance)
     }.disjunction
   }
 
@@ -338,32 +337,11 @@ object Account {
 object Model {
 
   import common._
-  import boopickle.Default._
-
- /* implicit val amountPickler = transformPickler[BigDecimal,String](b=> String.valueOf(b.doubleValue()),
-    t =>  scala.math.BigDecimal(t))
-  implicit val datePickler = transformPickler[java.util.Date,Long](_.getTime,t => new java.util.Date(t))
-  implicit val pickler = compositePickler[IWS]
-  pickler.addConcreteType[CostCenter]
-  pickler.addConcreteType[Balance]
-  pickler.addConcreteType[Account]
-  pickler.addConcreteType[Article]
-  pickler.addConcreteType[Supplier]
-  pickler.addConcreteType[Customer]
-  pickler.addConcreteType[QuantityUnit]
-  pickler.addConcreteType[ArticleGroup]
-  pickler.addConcreteType[LinePurchaseOrder]
-  pickler.addConcreteType[PurchaseOrder[LinePurchaseOrder]].addConcreteType[LinePurchaseOrder]
-  pickler.addConcreteType[Vat]
-  pickler.addConcreteType[Store]
-  */
-
-
 
  val accounts=List(
-   Account("1000", "Kasse", 9, "Kasse", today.some, today.some),
-   Account("2000", "Bank", 9, "Bank",  today.some, today.some),
-   Account("3000", "Forderung", 9, "Forderung",today.some, today.some)
+   Account("1000", "Kasse", 9, "Kasse",None, None, today.some, today.some),
+   Account("2000", "Bank", 9, "Bank", None, None, today.some, today.some),
+   Account("3000", "Forderung", 9, "Forderung", None, None, today.some, today.some)
  )
 
   val quantityUnits=List(
