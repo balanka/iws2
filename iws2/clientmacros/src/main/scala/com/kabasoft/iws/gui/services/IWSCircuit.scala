@@ -106,16 +106,16 @@ object IWSCircuit extends Circuit[RootModel[IWS,IWS]] with ReactConnector[RootMo
   override protected def initialModel = {
 
     val store: Pot[DStore[IWS, IWS]] = Ready(DStore(Map(
-      1 -> Ready(Data(Seq(Supplier()))),
-      3 -> Ready(Data(Seq(Customer()))),
-      4 -> Ready(Data(Seq(QuantityUnit("1", "QuantityUnit", 4, "QuantityUnit")))),
-      5 -> Ready(Data(Seq(Vat()))),
-      6 -> Ready(Data(Seq(CostCenter("1", "CostCenter", 6, "CostCenter")))),
-      7 -> Ready(Data(Seq(Article()))),
+      1 -> Ready(Data(Seq.empty[Supplier])),
+      3 -> Ready(Data(Seq.empty[Customer])),
+      4 -> Ready(Data(Seq.empty[QuantityUnit])),
+      5 -> Ready(Data(Seq.empty[Vat])),
+      6 -> Ready(Data(Seq.empty[CostCenter])),
+      7 -> Ready(Data(Seq.empty[Article])),
       9 -> Ready(Data(Seq.empty[Account])),
-      8 -> Ready(Data(Seq(ArticleGroup()))),
-     101 -> Ready(Data(Seq(PurchaseOrder[LinePurchaseOrder]()))),
-     104 -> Ready(Data(Seq(Goodreceiving[LineGoodreceiving]())))
+      8 -> Ready(Data(Seq.empty[ArticleGroup])),
+     101 -> Ready(Data(Seq.empty[PurchaseOrder[LinePurchaseOrder]])),
+     104 -> Ready(Data(Seq.empty[Goodreceiving[LineGoodreceiving]]))
 
     )))
 
