@@ -12,7 +12,7 @@ object TabComponent {
     <.div(^.cls:="container",
       <.div(^.cls:="row",
         <.div(^.cls:="col-sm-2",
-           buildTabHeader(items)),
+            buildTabHeader(items)),
             buildTabContent(items))
     )
 
