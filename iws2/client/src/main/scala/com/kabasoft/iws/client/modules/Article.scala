@@ -27,16 +27,16 @@ object ARTICLE {
         IWSCircuit.dispatch(Refresh(Article()))
       }
 
-    def edit(itemx:Option[Article]) = {
+    def edit(itemx:Option[Article]) =
       $.modState(s => s.copy(item = itemx))
-    }
-    def edited(itemx:Article) = {
-      $.props >>= (_.proxy.dispatch(Update(itemx)))
-    }
 
-    def delete(itemx:Article) = {
+    def edited(itemx:Article) =
+      $.props >>= (_.proxy.dispatch(Update(itemx)))
+
+
+    def delete(itemx:Article) =
       $.props >>= (_.proxy.dispatch(Delete(itemx)))
-    }
+
 
     def updateId(e: ReactEventI) = {
       val r = e.target.value
@@ -62,7 +62,7 @@ object ARTICLE {
         TabComponent(Seq(
           TabItem("vtab1", "Form", "#vtab1", true,buildFormTable(s)),
           TabItem("vtab2", "sub account", "#vtab2", false, ArticleList(subArticles))))
-      )
+        )
       )
     }
     def buildFormTable(s: State) =
@@ -93,7 +93,7 @@ object ARTICLE {
       val saveButton = Button(Button.Props(edited(s.item.getOrElse(Article())),
         addStyles = Seq(bss.pullRight, bss.buttonXS, bss.buttonOpt(CommonStyle.success))), Icon.circleO, " Save")
       val newButton=Button(Button.Props(edit(Some(Article())), addStyles = Seq(bss.pullRight, bss.buttonXS)), Icon.plusSquare, " New")
-      Panel(Panel.Props("Account"), <.div(^.className := "panel-heading",^.padding :=0.px), <.div(^.padding :=0.px,
+      Panel(Panel.Props("Article"), <.div(^.className := "panel-heading",^.padding :=0.px), <.div(^.padding :=0.px,
         p.proxy().renderFailed(ex => "Error loading"),
         p.proxy().renderPending(_ > 500, _ => "Loading..."),
         AccordionPanel("Edit", buildFormTab(p,s), List(saveButton, newButton)),
