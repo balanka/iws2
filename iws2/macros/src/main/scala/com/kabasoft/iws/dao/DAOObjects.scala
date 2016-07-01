@@ -23,16 +23,30 @@ object DAOObjects  {
 
   val xa= DriverManagerTransactor[Task]("org.postgresql.Driver","jdbc:postgresql:world","postgres","")
 
-  implicit def accountDAO = new DAO[Account]
-  {
-     def insert(model: List[Account]):Int = Update[Account] (Queries.accountInsertSQL).updateMany(model).transact(xa).run
-     def create = Queries.createAccount.run.transact(xa).run
-     def update(model:Account) :Int = Queries.accountUpdateName(model).run.transact(xa).run
-     def delete(id:String):Int = Queries.accountDelete(id).run.transact(xa).run
-     def all :List[Account]= Queries.accountSelect.process.list.transact(xa).run
-     def find(id:String) : List[Account] = Queries.accountIdSelect(id).process.list.transact(xa).run
-     def findSome(id:String) = Queries.accountSelectSome(id).process.list.transact(xa).run
-     def findSome1(id:Long) = Queries.accountSelectSome(id+"").process.list.transact(xa).run
+  implicit def accountDAO = new DAO[Account] {
+
+    def insert(model: List[Account]): Int = doobie.imports.Update[Queries.ACCOUNT_TYPE](Queries.accountInsertSQL).
+      updateMany(model.map(x =>
+      (x.id, x.name, x.modelId, x.description, x.groupId.getOrElse(""), x.dateOfOpen.getOrElse(new Date()), x.dateOfClose.getOrElse(new Date())))).transact(xa).run
+
+    def create = Queries.createAccount.run.transact(xa).run
+    def update(model: Account): Int = Queries.accountUpdateName(model).run.transact(xa).run
+    def delete(id: String): Int = Queries.accountDelete(id).run.transact(xa).run
+    def all: List[Account] = Queries.accountSelect.process.list.transact(xa).run.map(x =>
+      Account(x._1, x._2, x._3, x._4, Some(x._5),None, Some(x._6), Some(x._7)).copy(accounts = Some(findSome2(x._1))))
+
+    def find(id: String): List[Account] = Queries.accountIdSelect(id).process.list.transact(xa).run.map(x =>
+     Account(x._1, x._2, x._3, x._4, Some(x._5), None, Some(x._6), Some(x._7)).copy(accounts = Some(findSome2(x._1))))
+
+    def findSome(id: String): List[Account] = Queries.accountSelectSome(id).process.list.transact(xa).run.map(x =>
+     Account(x._1, x._2, x._3, x._4, Some(x._5),None, Some(x._6), Some(x._7)).copy(accounts = Some(findSome2(x._1))))
+
+    def findSome1(id: Long): List[Account] = Queries.accountSelectSome(id + "").process.list.transact(xa).run.map(x =>
+      Account(x._1, x._2, x._3, x._4, Some(x._5), None, Some(x._6), Some(x._7)).copy(accounts = Some(findSome2(x._1))))
+
+    def findSome2(groupid: String): List[Account] = Queries.accountSelectByGroupId(groupid).process.list.transact(xa).run.map(x =>
+      Account(x._1, x._2, x._3, x._4, Some(x._5), None, Some(x._6), Some(x._7)).copy(accounts = Some(findSome2(x._1))))
+
   }
 
   implicit def articleDAO = new DAO[Article]
