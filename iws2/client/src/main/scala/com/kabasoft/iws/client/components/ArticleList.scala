@@ -19,14 +19,6 @@ object ArticleList {
                    deleteCB: Option[Article => Callback] = None
   )
 
-  def updateItem1(l: String) = {
-    // def updateItem1(e: ReactEventI) = {
-    // val l =Some(e.target.value)
-    //log.debug(s"ItemId Key is ${l}  ")
-    Callback.log(s"KEY pressed >>>>>>>>>>>>>>>>>>>>>>>> ${l}")
-   // $.modState(s => s.copy(item = s.item.map(_.copy(item = Some(l)))))>>$.modState(s => s.copy(search =s.search+l))
-    // $.modState(s => s.copy(item =  s.item))
-  }
   private val ArticleList = ReactComponentB[Props]("ArticleList")
     .render_P(p => {
       val style = bss.listGroup
@@ -38,7 +30,7 @@ object ArticleList {
         def deleteButton = Button(Button.Props(deleteCB(item), addStyles = Seq(bss.pullRight, bss.buttonXS, bss.buttonOpt(CommonStyle.danger))), Icon.trash, "")
         var tag = EmptyTag
         if((p.deleteCB !=None) && (p.editCB !=None)) tag = List(editButton , deleteButton)
-        <.li(style.itemOpt(CommonStyle.success),^.fontSize:=12,^.fontWeight:=50,^.maxHeight:=30,
+        <.li(style.itemOpt(CommonStyle.success),^.fontSize:=12.px, ^.fontWeight:=50.px, ^.maxHeight:=30.px,
           <.span(" "),
           <.span(item.id),
           <.span(" "),

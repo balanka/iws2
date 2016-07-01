@@ -68,7 +68,7 @@ object ARTICLE {
     def buildFormTable(s: State) =
       <.table(^.className := "table-responsive table-condensed", ^.tableLayout := "fixed",
         <.tbody(
-          <.tr(bss.formGroup, ^.height := 20,
+          <.tr(bss.formGroup, ^.height := 20.px,
             buildWItem("id", s.item.map(_.id), updateId),
             buildWItem("name", s.item.map(_.name), updateName),
             buildWItem("description", s.item.map(_.description), updateDescription),
@@ -81,7 +81,7 @@ object ARTICLE {
     def buildWItem[A](id:String , value:Option[String],evt:ReactEventI=> Callback) =
       List( <.td(<.label(^.`for` := id, id)),
         <.td(<.input.text(bss.formControl, ^.id := id, ^.value := value,
-          ^.placeholder := id),  ^.onChange ==> evt, ^.paddingLeft := 10))
+          ^.placeholder := id),  ^.onChange ==> evt, ^.paddingLeft := 10.px))
 
     def buildItem(id:String , value:String) =
       List( <.td(<.label(^.`for` := id, id)),
@@ -93,7 +93,7 @@ object ARTICLE {
       val saveButton = Button(Button.Props(edited(s.item.getOrElse(Article())),
         addStyles = Seq(bss.pullRight, bss.buttonXS, bss.buttonOpt(CommonStyle.success))), Icon.circleO, " Save")
       val newButton=Button(Button.Props(edit(Some(Article())), addStyles = Seq(bss.pullRight, bss.buttonXS)), Icon.plusSquare, " New")
-      Panel(Panel.Props("Account"), <.div(^.className := "panel-heading",^.padding :=0), <.div(^.padding :=0,
+      Panel(Panel.Props("Account"), <.div(^.className := "panel-heading",^.padding :=0.px), <.div(^.padding :=0.px,
         p.proxy().renderFailed(ex => "Error loading"),
         p.proxy().renderPending(_ > 500, _ => "Loading..."),
         AccordionPanel("Edit", buildFormTab(p,s), List(saveButton, newButton)),
