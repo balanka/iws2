@@ -1,8 +1,8 @@
 package com.kabasoft.iws.client.components
 
 import com.kabasoft.iws.gui.Utils._
-import com.kabasoft.iws.gui.macros.GlobalStyles
-import com.kabasoft.iws.shared.{Article, IWS, Masterfile}
+import com.kabasoft.iws.gui.macros.{GlobalStyles, Icon}
+import com.kabasoft.iws.shared.{Article, IWS}
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.prefix_<^._
 import com.kabasoft.iws.gui.macros.Bootstrap.{Button, CommonStyle}
@@ -14,10 +14,9 @@ import scalacss.ScalaCssReact._
 object ArticleList {
   @inline private def bss = GlobalStyles.bootstrapStyles
   //val formater =NumberFormat.getIntegerInstance(new java.util.Locale("de", "DE"))
-  case class ArticleListProps(items: Seq[IWS],
-    stateChange: IWS => Callback,
-    editItem: IWS => Callback,
-    deleteItem: IWS => Callback
+  case class Props(items: Seq[IWS],
+                   editCB: Option[Article => Callback] = None,
+                   deleteCB: Option[Article => Callback] = None
   )
 
   def updateItem1(l: String) = {
@@ -28,11 +27,17 @@ object ArticleList {
    // $.modState(s => s.copy(item = s.item.map(_.copy(item = Some(l)))))>>$.modState(s => s.copy(search =s.search+l))
     // $.modState(s => s.copy(item =  s.item))
   }
-  private val ArticleList = ReactComponentB[ArticleListProps]("ArticleList")
+  private val ArticleList = ReactComponentB[Props]("ArticleList")
     .render_P(p => {
       val style = bss.listGroup
-      def buildIdNameList (list: Seq[Masterfile]): Seq[String]= list map (iws =>(iws.id+iws.name))
       def renderItem(item: Article) = {
+        def  f(acc:Article):Callback = Callback.empty
+        def  editCB(acc:Article):Callback = p.editCB.getOrElse(f(_))(acc)
+        def  deleteCB(acc:Article):Callback = p.editCB.getOrElse(f(_))(acc)
+        def editButton =  Button(Button.Props(editCB(item), addStyles = Seq(bss.pullRight, bss.buttonXS, bss.buttonOpt(CommonStyle.success))), Icon.edit, "")
+        def deleteButton = Button(Button.Props(deleteCB(item), addStyles = Seq(bss.pullRight, bss.buttonXS, bss.buttonOpt(CommonStyle.danger))), Icon.trash, "")
+        var tag = EmptyTag
+        if((p.deleteCB !=None) && (p.editCB !=None)) tag = List(editButton , deleteButton)
         <.li(style.itemOpt(CommonStyle.success),^.fontSize:=12,^.fontWeight:=50,^.maxHeight:=30,
           <.span(" "),
           <.span(item.id),
@@ -41,24 +46,16 @@ object ArticleList {
           <.span(" "),
           <.span(item.description),
           <.span(" "),
-         // <.span(buildSItem[String]("item",
-           // itemsx = buildIdNameList(p.items.asInstanceOf[Seq[Masterfile]]).asInstanceOf[List[String]],
-         //   defValue = "0001", evt = updateItem1)),
-
-
-          // <.s(item.dateOfOpen.get.toString),
-         // <.span(" "),
-         // <.s("%06.2f".format(item.balance.amount.toDouble)),
-          Button(Button.Props(p.editItem(item), addStyles = Seq(bss.pullRight, bss.buttonXS, bss.buttonOpt(CommonStyle.success))), "Edit"),
-          Button(Button.Props(p.deleteItem(item), addStyles = Seq(bss.pullRight, bss.buttonXS,bss.buttonOpt(CommonStyle.danger))), "Delete")
+          tag
         )
       }
       <.ul(style.listGroup)(p.items.asInstanceOf[Seq[Article]].sortBy(_.id) map renderItem)
     })
     .build
 
-  def apply(items: Seq[IWS], stateChange: IWS => Callback, editItem: IWS => Callback, deleteItem: IWS => Callback) = {
-    ArticleList(ArticleListProps(items, stateChange, editItem, deleteItem))
+  def apply(items: Seq[Article]) = ArticleList(Props(items))
+  def apply(items: Seq[Article], editCB: Option[Article => Callback], deleteCB:  Option[Article => Callback]) = {
+    ArticleList(Props(items,  editCB, deleteCB))
 
   }
 }

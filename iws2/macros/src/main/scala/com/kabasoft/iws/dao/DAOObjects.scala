@@ -51,14 +51,27 @@ object DAOObjects  {
 
   implicit def articleDAO = new DAO[Article]
   {
-     def insert( model: List[Article]) :Int = Update[Article] (Queries.articleInsertSQL).updateMany(model).transact(xa).run
+     def insert(model: List[Article]): Int = doobie.imports.Update[Queries.ARTICLE_TYPE](Queries.articleInsertSQL).
+      updateMany(model.map(x =>
+        (x.id, x.name, x.modelId, x.description, x.price, x.qttyUnit, x.packUnit, x.groupId.getOrElse("")))).transact(xa).run
+
      def create = Queries.createArticle.run.transact(xa).run
      def update(model:Article):Int = Queries.articleUpdateName(model).run.transact(xa).run
      def delete(id:String):Int = Queries.articleDelete(id).run.transact(xa).run
-     def all = Queries.articleSelect.process.list.transact(xa).run
-     def find(id:String) : List[Article] = Queries.articleIdSelect(id).process.list.transact(xa).run
-     def findSome(id:String) = articleWithQtyUnit(id).process.list.transact(xa).run
-     def findSome1(id:Long) = Queries.articleWithQtyUnit(id+"").process.list.transact(xa).run
+     def all: List[Article] = Queries.articleSelect.process.list.transact(xa).run.map(x =>
+      Article(x._1, x._2, x._3, x._4, x._5, x._6, x._7, Some(x._8)).copy(articles = Some(findSome2(x._1))))
+
+    def find(id: String): List[Article] = Queries.articleIdSelect(id).process.list.transact(xa).run.map(x =>
+      Article(x._1, x._2, x._3, x._4, x._5, x._6, x._7, Some(x._8)).copy(articles = Some(findSome2(x._1))))
+
+    def findSome(id: String): List[Article] = Queries.articleSelectSome(id).process.list.transact(xa).run.map(x =>
+      Article(x._1, x._2, x._3, x._4, x._5, x._6, x._7, Some(x._8)).copy(articles = Some(findSome2(x._1))))
+
+    def findSome1(id: Long): List[Article] = Queries.articleSelectSome(id + "").process.list.transact(xa).run.map(x =>
+      Article(x._1, x._2, x._3, x._4, x._5, x._6, x._7, Some(x._8)).copy(articles = Some(findSome2(x._1))))
+
+    def findSome2(groupId: String): List[Article] = Queries.articleSelectByGroupId(groupId).process.list.transact(xa).run.map(x =>
+      Article(x._1, x._2, x._3, x._4, x._5, x._6, x._7, Some(x._8)).copy(articles = Some(findSome2(x._1))))
   }
 
   implicit def categoryDAO = new DAO[ArticleGroup]

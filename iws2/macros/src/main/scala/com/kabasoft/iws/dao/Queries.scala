@@ -16,23 +16,23 @@ import com.kabasoft.iws.shared.Model._
 
 object Queries  {
 
-   type ACCOUNT_TYPE =(String,String, Int, String, String,  Date, Date)
-
+   type ACCOUNT_TYPE =(String, String, Int, String, String,  Date, Date)
+  type ARTICLE_TYPE =(String, String, Int, String, scala.math.BigDecimal, String, String, String)
   def create: Update0 = createSchema.update
   def accountInsertSQL= "INSERT INTO account VALUES (?, ?, ?, ?, ?, ?, ?)"
   def accountSelect =  sql"SELECT * FROM account".query[ACCOUNT_TYPE]
   def accountIdSelect(id:String) = sql"SELECT * FROM account where id =$id".query[ACCOUNT_TYPE]
   def accountSelectSome = {id:String =>sql"SELECT * FROM account where id =$id".query[ACCOUNT_TYPE]}
   def accountSelectByGroupId = {id:String =>sql"SELECT * FROM account where groupid =$id".query[ACCOUNT_TYPE]}
-  def accountUpdateName = {(model:Account) =>sql"Update account set name =${model.name}, modelId=${model.modelId}, description=${model.description},groupId=${model.groupId.getOrElse("")} where id =${model.id}".update}
+  def accountUpdateName = {(model:Account) =>sql"Update account set name =${model.name}, modelId=${model.modelId}, description=${model.description}, groupId=${model.groupId.getOrElse("")} where id =${model.id}".update}
   def accountDelete = {id:String =>sql"Delete FROM account where id =$id".update}
 
-  def articleInsertSQL= "INSERT INTO article VALUES (?, ?, ?, ?, ?, ?)"
-  def articleSelect = sql"SELECT id, name, modelId, description,price, qtty_id FROM article".query[Article]
-  def articleIdSelect(id:String) = sql"SELECT * FROM article where id =$id".query[Article]
-  def articleWithQtyUnit(id:String) = sql"SELECT a.id, a.name, a.description,a.price,a.qtty_id FROM article a LEFT JOIN  QuantityUnit q ON q.id = a.qtty_id and a.id=$id".query[Article]
-  def articleSelectSome = {id:String =>sql"SELECT * FROM article  where id =$id".query[Article]}
-  def articleUpdateName= {(model:Article) =>sql"Update article set name =${model.name}, description =${model.description},price =${model.price},  qtty_id =${model.qtty_id}    where id =${model.id}".update}
+  def articleInsertSQL= "INSERT INTO article VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
+  def articleSelect = sql"SELECT *  FROM article".query[ARTICLE_TYPE]
+  def articleIdSelect(id:String) = sql"SELECT * FROM article where id =$id".query[ARTICLE_TYPE]
+  def articleSelectByGroupId = {groupId:String =>sql"SELECT * FROM article where groupid =$groupId".query[ARTICLE_TYPE]}
+  def articleSelectSome = {id:String =>sql"SELECT * FROM article  where id =$id".query[ARTICLE_TYPE]}
+  def articleUpdateName= {(model:Article) =>sql"Update article set name =${model.name}, description =${model.description}, price =${model.price},  qttyUnit =${model.qttyUnit} , packUnit =${model.packUnit}, groupId=${model.groupId.getOrElse("")}   where id =${model.id}".update}
   def articleDelete = {id:String =>sql"Delete FROM article where id =$id".update}
 
   def quantityUnitInsertSQL = "INSERT INTO quantityUnit VALUES (?, ?, ?, ?)"
@@ -234,7 +234,9 @@ object Queries  {
               modelId int NOT NULL,
               description     VARCHAR NOT NULL,
               price  DECIMAL(20,2) NOT NULL,
-              qtty_id VARCHAR NOT NULL
+              qttyUnit VARCHAR NOT NULL,
+              packUnit VARCHAR NOT NULL,
+              groupid  VARCHAR NOT NULL
                );""".update
   val createCostCenter=sql"""
   DROP TABLE IF EXISTS costcenter;
@@ -327,7 +329,9 @@ object Queries  {
                   modelId int NOT NULL,
                   description     VARCHAR NOT NULL,
                   price  DECIMAL(20,2) NOT NULL,
-                  qtty_id VARCHAR NOT NULL
+                  qttyUnit VARCHAR NOT NULL,
+                  packUnit VARCHAR NOT NULL,
+                  groupid  VARCHAR NOT NULL
                 );
          DROP TABLE IF EXISTS quantityUnit;
          CREATE TABLE quantityUnit(

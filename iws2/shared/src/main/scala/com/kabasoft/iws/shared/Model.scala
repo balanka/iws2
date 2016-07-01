@@ -139,9 +139,12 @@ case class Balance( amount: Amount = 0) extends IWS {
 }
 case class CostCenter(id:String ="0",  name:String ="", modelId:Int = 6, description:String ="") extends IWS with Masterfile
 case class Account (id: String ="-1", name: String  ="", modelId:Int = 9,description:String  ="", groupId:Option[String]= None,
-                    accounts:Option[List[Account]] = None, dateOfOpen: Option[Date] = Some(new Date()), dateOfClose: Option[Date] = Some(new Date()), balance: Balance = Balance(0.0)) extends Masterfile
+                    accounts:Option[List[Account]] = None, dateOfOpen: Option[Date] = Some(new Date()), dateOfClose: Option[Date] =
+                    Some(new Date()), balance: Balance = Balance(0.0)) extends Masterfile
 
-case class Article(id:String ="", name:String ="", modelId:Int = 7, description:String  ="", price:Amount = 0, qtty_id:String ="Stk") extends IWS with Masterfile
+case class Article(id:String ="", name:String ="", modelId:Int = 7, description:String  ="", price:Amount = 0,
+                   qttyUnit:String ="Stk", packUnit:String ="Stk", groupId:Option[String] = None,
+                   articles:Option[List[Article]] = None) extends IWS with Masterfile
 case class QuantityUnit(id:String ="0",name:String ="", modelId:Int =4 ,description:String ="") extends IWS with Masterfile
 case class ArticleGroup(id:String ="", name:String ="", modelId:Int = 8, description:String ="") extends IWS with Masterfile
 abstract class BusinessPartner(id: String ="", name: String ="", modelId:Int, street: String ="", city: String ="", state: String ="", zip: String ="") extends IWS
@@ -242,7 +245,7 @@ object  Vat_{ def unapply (in:Vat) =Some(in.id,in.name, in.modelId, in.descripti
 object  CostCenter_{ def unapply (in:CostCenter) =Some(in.id,in.name,in.description)}
 object  QuantityUnit_{ def unapply (in:QuantityUnit) =Some(in.id,in.name,in.modelId, in.description)}
 object  Account_{ def unapply (in:Account) =Some(in.id,in.name,in.modelId, in.description, in.groupId, in.accounts, in.dateOfOpen,in.dateOfClose,in.balance)}
-object  Article_{ def unapply (in:Article) =Some(in.id,in.name, in.modelId, in.description, in.price, in.qtty_id)}
+object  Article_{ def unapply (in:Article) =Some(in.id,in.name, in.modelId, in.description, in.price, in.qttyUnit, in.packUnit, in.articles)}
 object  ArticleGroup_{ def unapply (in:ArticleGroup) =Some(in.id,in.name,in.modelId, in.description)}
 object  LinePurchaseOrder_{ def unapply (in:LinePurchaseOrder) = Some(in.tid,in.transid, in.modelId, in.item, in.unit, in.price, in.quantity, in.vat, in.duedate, in.text)}
 object  PurchaseOrder_{ def unapply (in:PurchaseOrder[LinePurchaseOrder]) = Some(in.tid,in.oid, in.modelId, in.store, in.account, in.lines)}
@@ -351,12 +354,12 @@ object Model {
     QuantityUnit("Stk","Stueck", 4, "Stueck")
   )
   val articles=List(
-    Article("001","Masterfile", 7, "Financials Application for Enterprise",BigDecimal(5000.0),"Stk"),
-    Article("002","Inventory", 7, "Financials Application for Enterprise",BigDecimal(5000.0),"Stk"),
-    Article("003","Purchasing",7,  "Financials Application for Enterprise",BigDecimal(5000.0),"Stk"),
-    Article("004","CRM", 7, "Financials Application for Enterprise",BigDecimal(5000.0),"Stk"),
-    Article("005","Financials",7, "Financials Application for Enterprise",BigDecimal(5000.0),"Stk"),
-    Article("006","Analytics",7, "Enterprise Analytics & Decision support for Management",BigDecimal(50000.0),"Stk")
+    Article("001","Masterfile", 7, "Financials Application for Enterprise",BigDecimal(5000.0),"Stk", "Stk", None, None),
+    Article("002","Inventory", 7, "Financials Application for Enterprise",BigDecimal(5000.0),"Stk", "Stk", None, None),
+    Article("003","Purchasing",7,  "Financials Application for Enterprise",BigDecimal(5000.0),"Stk", "Stk", None, None),
+    Article("004","CRM", 7, "Financials Application for Enterprise",BigDecimal(5000.0),"Stk", "Stk", None, None),
+    Article("005","Financials",7, "Financials Application for Enterprise",BigDecimal(5000.0),"Stk", "Stk", None, None),
+    Article("006","Analytics",7, "Enterprise Analytics & Decision support for Management",BigDecimal(50000.0),"Stk", "Stk", None, None)
 
 
   )
