@@ -1,7 +1,6 @@
 package com.kabasoft.iws.client.components
 
 import com.kabasoft.iws.shared.Account
-import com.kabasoft.iws.shared._
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.prefix_<^._
 import com.kabasoft.iws.gui.macros.Bootstrap.{Button, CommonStyle}
@@ -14,8 +13,8 @@ object AccountList {
   @inline private def bss = GlobalStyles.bootstrapStyles
 
   case class AccountListProps(items: Seq[Account],
-                              editCB: Option[ Account => Callback]=None,
-                              deleteCB:  Option[Account => Callback]=None)
+                              editCB: Option[ Account => Callback] = None,
+                              deleteCB:  Option[Account => Callback] = None)
 
   private val AccountList = ReactComponentB[AccountListProps]("AccountList")
     .render_P(p => {
@@ -29,14 +28,13 @@ object AccountList {
         def deleteButton = Button(Button.Props(deleteCB(item), addStyles = Seq(bss.pullRight, bss.buttonXS, bss.buttonOpt(CommonStyle.danger))), Icon.trash, "")
         var tag = EmptyTag
         if((p.deleteCB !=None) && (p.editCB !=None)) tag = List(editButton , deleteButton)
-        //List(<.div(bss.formGroup,
-        <.li(style.itemOpt(CommonStyle.success),^.fontSize:=12,^.fontWeight:=50,^.maxHeight:=30,^.height:=30, ^.tableLayout:="fixed",
 
+        <.li(style.itemOpt(CommonStyle.success),^.fontSize:=12.px,^.fontWeight:=50.px,^.maxHeight:=30.px,^.height:=30.px, ^.tableLayout:="fixed",
           <.span(item.id),
-          <.span(item.name ,^.paddingLeft:=10),
-          <.span(item.description ,^.paddingLeft:=10),
+          <.span(item.name ,^.paddingLeft:=10.px),
+          <.span(item.description ,^.paddingLeft:=10.px),
           //<.span(Utils.format(item.dateOfOpen.get),^.paddingLeft:=10),
-          <.span("%06.2f".format(item.balance.amount.toDouble),^.paddingLeft:=10),
+          <.span("%06.2f".format(item.balance.amount.toDouble),^.paddingLeft:=10.px),
           tag
           )
       }
