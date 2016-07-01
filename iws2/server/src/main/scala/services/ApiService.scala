@@ -12,7 +12,7 @@ import com.kabasoft.iws.services.Request._
 
 class ApiService extends Api {
 
-   def welcome(name: String): String = s"Welcome to SPA, $name! Time is now ${new Date}"
+   def welcome(name: String): String = s"Welcome to IWS, $name! Time is now ${new Date}"
 
   def create(item:IWS) ={
    item match {
