@@ -16,12 +16,15 @@ import com.kabasoft.iws.shared.Model._
 
 object Queries  {
 
+   type ACCOUNT_TYPE =(String,String, Int, String, String,  Date, Date)
+
   def create: Update0 = createSchema.update
-  def accountInsertSQL= "INSERT INTO account VALUES (?, ?, ?, ?, ?,?,?)"
-  def accountSelect =  sql"SELECT id, name, modelId, description,dateOfOpen, dateOfClose, balance FROM account".query[Account]
-  def accountIdSelect(id:String) = sql"SELECT * FROM account where id =$id".query[Account]
-  def accountSelectSome = {id:String =>sql"SELECT * FROM account where id =$id".query[Account]}
-  def accountUpdateName = {(model:Account) =>sql"Update account set name =${model.name},description=${model.description} where id =${model.id}".update}
+  def accountInsertSQL= "INSERT INTO account VALUES (?, ?, ?, ?, ?, ?, ?)"
+  def accountSelect =  sql"SELECT * FROM account".query[ACCOUNT_TYPE]
+  def accountIdSelect(id:String) = sql"SELECT * FROM account where id =$id".query[ACCOUNT_TYPE]
+  def accountSelectSome = {id:String =>sql"SELECT * FROM account where id =$id".query[ACCOUNT_TYPE]}
+  def accountSelectByGroupId = {id:String =>sql"SELECT * FROM account where groupid =$id".query[ACCOUNT_TYPE]}
+  def accountUpdateName = {(model:Account) =>sql"Update account set name =${model.name}, modelId=${model.modelId}, description=${model.description},groupId=${model.groupId.getOrElse("")} where id =${model.id}".update}
   def accountDelete = {id:String =>sql"Delete FROM account where id =$id".update}
 
   def articleInsertSQL= "INSERT INTO article VALUES (?, ?, ?, ?, ?, ?)"
@@ -96,11 +99,12 @@ object Queries  {
     sql"Update LinePurchaseOrder set transid=${model.transid}, item=${model.item.get}, modelId=${model.modelId}, unit=${model.unit.get},quantity = ${model.quantity}, price=${model.price},vat=${model.vat.get},duedate=${model.duedate.get}, text =${model.text} where id =${model.tid}".update}
   def linePurchaseOrderDelete = {(id:Long) =>sql"Delete FROM LinePurchaseOrder where id =$id".update}
   //INSERT INTO PurchaseOrder ( oid, modelId, store, account) VALUES (0,101,'200','1000');
+  type PurchaseOrder_TYPE =(Long,Long,Int, String,String)
   def purchaseOrderInsertSQL = "INSERT INTO PurchaseOrder (id, oid, modelId, store, account) VALUES (?, ?, ?,?,?)"
-  def purchaseOrderSelect = sql"SELECT * FROM PurchaseOrder".query[(Long,Long, Int, String,String)]
-  def purchaseOrderIdSelect1(id:String) = sql"SELECT * FROM PurchaseOrder  where id =$id.toLong".query[(Long,Long,Int, String,String)]
-  def purchaseOrderIdSelect(id:Long) = sql"SELECT * FROM PurchaseOrder  where id =$id".query[(Long,Long,Int, String,String)]
-  def purchaseOrderSelectSome = { id:String =>sql"SELECT * FROM PurchaseOrder where id =$id".query[(Long,Long, Int, String,String)]}
+  def purchaseOrderSelect = sql"SELECT * FROM PurchaseOrder".query[PurchaseOrder_TYPE]
+  def purchaseOrderIdSelect1(id:String) = sql"SELECT * FROM PurchaseOrder  where id =$id.toLong".query[PurchaseOrder_TYPE]
+  def purchaseOrderIdSelect(id:Long) = sql"SELECT * FROM PurchaseOrder  where id =$id".query[PurchaseOrder_TYPE]
+  def purchaseOrderSelectSome = { id:String =>sql"SELECT * FROM PurchaseOrder where id =$id".query[PurchaseOrder_TYPE]}
   def purchaseOrderUpdateName= {(model:PurchaseOrder[LinePurchaseOrder]) =>
     sql"Update PurchaseOrder set oid =${model.oid}, store=${model.store.get}, account=${model.account.get} where id =${model.tid}".update}
   def purchaseOrderDelete = {id:Long =>sql"Delete FROM PurchaseOrder where id =$id".update}
@@ -114,12 +118,12 @@ object Queries  {
   def lineGoodreceivingUpdateName = {(model:LineGoodreceiving) =>
     sql"Update LineGoodreceiving set transid=${model.transid}, item=${model.item.get}, modelId=${model.modelId}, unit=${model.unit.get},quantity = ${model.quantity}, price=${model.price},vat=${model.vat.get},duedate=${model.duedate.get}, text =${model.text} where id =${model.tid}".update}
   def lineGoodreceivingDelete = {(id:Long) =>sql"Delete FROM LineGoodreceiving where id =$id".update}
-
+  type Goodreceiving_TYPE =(Long,Long,Int, String,String)
   def goodreceivingInsertSQL = "INSERT INTO Goodreceiving (id, oid, modelId, store, account) VALUES (?, ?, ?,?,?)"
-  def goodreceivingSelect = sql"SELECT * FROM Goodreceiving".query[(Long,Long, Int, String,String)]
-  def goodreceivingIdSelect1(id:String) = sql"SELECT * FROM Goodreceiving  where id =$id.toLong".query[(Long,Long,Int, String,String)]
-  def goodreceivingIdSelect(id:Long) = sql"SELECT * FROM Goodreceiving  where id =$id".query[(Long,Long,Int, String,String)]
-  def goodreceivingSelectSome = { id:String =>sql"SELECT * FROM Goodreceiving where id =$id".query[(Long,Long, Int, String,String)]}
+  def goodreceivingSelect = sql"SELECT * FROM Goodreceiving".query[Goodreceiving_TYPE]
+  def goodreceivingIdSelect1(id:String) = sql"SELECT * FROM Goodreceiving  where id =$id.toLong".query[Goodreceiving_TYPE]
+  def goodreceivingIdSelect(id:Long) = sql"SELECT * FROM Goodreceiving  where id =$id".query[Goodreceiving_TYPE]
+  def goodreceivingSelectSome = { id:String =>sql"SELECT * FROM Goodreceiving where id =$id".query[Goodreceiving_TYPE]}
   def goodreceivingUpdateName= {(model:Goodreceiving[LineGoodreceiving]) =>
     sql"Update Goodreceiving set oid =${model.oid}, store=${model.store.get}, account=${model.account.get} where id =${model.tid}".update}
   def goodreceivingDelete = {id:Long =>sql"Delete FROM Goodreceiving where id =$id".update}
@@ -216,9 +220,10 @@ object Queries  {
                 name   VARCHAR NOT NULL,
                 modelId int NOT NULL,
                 description     VARCHAR NOT NULL,
+                groupid  VARCHAR NOT NULL,
                 dateOfOpen      DATE NOT NULL,
                 dateOfClose     DATE NOT NULL,
-                balance   DECIMAL(20,2) NOT NULL
+                balance   DECIMAL(20,2) NOT NULL DEFAULT 0.0
                 );""".update
 
   val createArticle=sql"""
@@ -310,9 +315,10 @@ object Queries  {
                 name   VARCHAR NOT NULL,
                 modelId int NOT NULL,
                 description     VARCHAR NOT NULL,
+                groupid  VARCHAR NOT NULL,
                 dateOfOpen      DATE NOT NULL,
                 dateOfClose     DATE NOT NULL,
-                balance   DECIMAL(20,2) NOT NULL
+                balance   DECIMAL(20,2) NOT NULL DEFAULT 0.0
                 );
            DROP TABLE IF EXISTS article;
            CREATE TABLE article(
