@@ -23,31 +23,21 @@ object ACCOUNT {
 
   case class Props(proxy: ModelProxy[Pot[Data]])
   case class State(selectedItem: Option[Account] = None, name:String)
-
-
   class Backend($: BackendScope[Props, State]) {
     def mounted(props: Props) =
       Callback {
         IWSCircuit.dispatch(Refresh(Account()))
       }
-     // Callback.ifTrue(props.proxy().isEmpty, props.proxy.dispatch(Refresh[Account](Account())))
 
     def edit(item:Option[Account]) = {
-//      log.debug(s" KKKKKKKKKKKKKKKKKK1 ${item.map(_.name)}")
       $.modState(s => s.copy(selectedItem = item))
-
     }
     def edited(item:Account) = {
-      log.debug(s" SSSSSSSSSSSSSSSS ${item.name}")
-      //Callback.log("Account edited>>>>> " +item)  >>
       $.props >>= (_.proxy.dispatch(Update[Account](item)))
      }
 
     def delete(item:Account) = {
-      log.debug(s" OOOOOOOOOOOOOOO ${item.name}")
-     // val cb = Callback.log("Account deleted>>>>> " +item)  >>
         $.props >>= (_.proxy.dispatch(Delete(item)))
-      //cb >> $.modState(s => s.copy(name = "Account"))
     }
 
     def updateId(e: ReactEventI) = {
@@ -62,7 +52,10 @@ object ACCOUNT {
       val r = e.target.value
       $.modState(s => s.copy(s.selectedItem.map( z => z.copy(description = r))))
     }
-
+    def updateGroupId(e: ReactEventI) = {
+      val id= e.target.value
+      $.modState(s => s.copy(s.selectedItem.map( z => z.copy(groupId = Some(id)))))
+    }
     val NameChanger = ReactComponentB[ExternalVar[String]]("Name changer")
       .render_P { evar =>
         def updateName = (event: ReactEventI) => evar.set(event.target.value)
@@ -72,59 +65,27 @@ object ACCOUNT {
       }
       .build
 
-    case class TabItem[A](id: String, title: String, route:String, active:Boolean,body: A => ReactElement, tabItems:Seq[TabItem[A]]=List.empty[TabItem[A]])
-    case class Address(id:String, street:String ="", zipCode:String ="", city:String ="", country:String="DE", route:String, title:String)
-    // tabbable tabs-left
-    def buildAddressTab: ReactElement  =
-      <.div(^.cls:="container",
-        <.div(^.cls:="row",
-          <.div(^.cls:="col-sm-2",
-            <.ul(^.id:="nav-tabs-wrapper", ^.cls:="nav nav-tabs nav-pills nav-stacked well",
-            //<.ul( ^.cls:="nav nav-pills well",
-            <.li(^.cls:="active", <.a(^.href:="#vtab1", "data-toggle".reactAttr:="tab","Home")),
-            <.li(<.a(^.href:="#vtab2", "data-toggle".reactAttr:="tab", "Delivery")),
-            <.li(<.a(^.href:="#vtab3", "data-toggle".reactAttr:="tab", "Billing"))
-          )
-        ),
-          <.div(^.cls:="col-sm-9",
-            <.div(^.cls:="tab-content",
-              buildAddress(Address("vtab1","Meisen Str 96","33967","Bielefeld","DE","#vtab1","Home Address"),true),
-              buildAddress(Address("vtab2","Meisen Str2 96","33967","Bielefeld2","DE","#vtab2","Delivery Address")),
-              buildAddress(Address("vtab3","Meisen Str3 96","33967","Bielefeld3","DE","#vtab3","Billing Address"))
-          )
-        )
-      )
-    )
-
-    def buildAddress(adr: Address , active:Boolean=false): ReactElement  = {
-      var titleTag = "tab-pane fade"
-     if (active) titleTag = "tab-pane fade in active"
-      <.div(^.role := "tabpanel", ^.cls := titleTag, ^.id := adr.id,
-        <.table(^.cls := "table-responsive table-condensed", ^.tableLayout := "fixed",
-          <.tbody(
-            <.tr(bss.formGroup, ^.height := 20,
-              buildItem("street",adr.street),
-              buildItem("zipCode",adr.zipCode)),
-            <.tr(bss.formGroup, ^.height := 20,
-              buildItem("city", adr.city),
-              buildItem("country",adr.country))
-           ))
-      )
-    }
- def get(a:Address) :String = a.city
-
-    def buildForm(s: State): Seq[ReactElement] =
+    def buildFormTab(p: Props, s: State): Seq[ReactElement] = {
+      val subAccounts = s.selectedItem.getOrElse(Account()).accounts.getOrElse(List.empty[Account])
       List(<.div(bss.formGroup,
+        TabComponent(Seq(
+          TabItem("vtab1", "Form", "#vtab1", true,buildFormTable(s)),
+          TabItem("vtab2", "sub account", "#vtab2", false, AccountList(subAccounts))))
+       )
+     )
+    }
+    def buildFormTable(s: State) =
         <.table(^.className := "table-responsive table-condensed", ^.tableLayout := "fixed",
           <.tbody(
             <.tr(bss.formGroup, ^.height := 20,
               buildWItem("id", s.selectedItem.map(_.id), updateId),
               buildWItem("name", s.selectedItem.map(_.name), updateName),
-              buildWItem("description", s.selectedItem.map(_.description), updateDescription))
+              buildWItem("description", s.selectedItem.map(_.description), updateDescription),
+              buildWItem("group", s.selectedItem.map(_.groupId.getOrElse("groupId")), updateGroupId)
+            )
            )
          )
-        )
-      )
+
 
     def buildWItem[A](id:String , value:Option[String],evt:ReactEventI=> Callback) =
      List( <.td(<.label(^.`for` := id, id)),
@@ -138,23 +99,21 @@ object ACCOUNT {
 
     def render(p: Props, s: State) ={
     val items =  IWSCircuit.zoom(_.store.get.models.get(9)).eval(IWSCircuit.getRootModel).get.get.items.asInstanceOf[List[Account]]
+    val saveButton = Button(Button.Props(edited(s.selectedItem.getOrElse(Account())),
+        addStyles = Seq(bss.pullRight, bss.buttonXS, bss.buttonOpt(CommonStyle.success))), Icon.circleO, " Save")
+    val newButton=Button(Button.Props(edit(Some(Account())), addStyles = Seq(bss.pullRight, bss.buttonXS)), Icon.plusSquare, " New")
       Panel(Panel.Props("Account"), <.div(^.className := "panel-heading",^.padding :=0), <.div(^.padding :=0,
         p.proxy().renderFailed(ex => "Error loading"),
         p.proxy().renderPending(_ > 500, _ => "Loading..."),
-        AccordionPanel("Edit", buildForm(s),
-                        List(Button(Button.Props(edited(s.selectedItem.getOrElse(Account())),
-                             addStyles = Seq(bss.pullRight, bss.buttonXS, bss.buttonOpt(CommonStyle.success))), Icon.circleO, " Save"),
-                             Button(Button.Props(edit(Some(Account())), addStyles = Seq(bss.pullRight, bss.buttonXS)), Icon.plusSquare, " New"))),
-
-          AccountList(items, item => p.proxy.dispatch(Update(item)),
-                             item => edit(Some(item)),
-                             item => p.proxy.dispatch(Delete[Account](item))),
-        buildAddressTab
+        AccordionPanel("Edit", buildFormTab(p,s), List(saveButton, newButton)),
+        AccordionPanel("List",
+          List(AccountList(items,
+            Some(item => edit(Some(item))),
+            Some(item => p.proxy.dispatch(Delete[Account](item))))))
       ))
-  }
+     }
   }
 
-  // create the React component for To Do management
   val component = ReactComponentB[Props]("Account")
     .initialState(State(name="Account"))
     .renderBackend[Backend]
