@@ -10,8 +10,10 @@ import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.prefix_<^._
 import com.kabasoft.iws.gui.macros.Bootstrap._
 import com.kabasoft.iws.gui.macros._
+import com.kabasoft.iws.gui.Utils._
 import com.kabasoft.iws.gui.logger._
 import com.kabasoft.iws.gui.services.IWSCircuit
+
 
 import scalacss.ScalaCssReact._
 
@@ -82,30 +84,18 @@ object ARTICLE {
       <.table(^.className := "table-responsive table-condensed", ^.tableLayout := "fixed",
         <.tbody(
           <.tr(bss.formGroup, ^.height := 20.px,
-            buildWItem("id", s.item.map(_.id), updateId),
-            buildWItem("name", s.item.map(_.name), updateName),
-            buildWItem("description", s.item.map(_.description), updateDescription),
-            buildWItem("group", s.item.map(_.groupId.getOrElse("groupId")), updateGroupId)),
+            buildWItem("id", s.item.map(_.id), "id" , updateId),
+            buildWItem("name", s.item.map(_.name), "name", updateName),
+            buildWItem("description", s.item.map(_.description), "description", updateDescription),
+            buildWItem("group", s.item.map(_.groupId.getOrElse("groupId")), "groupId", updateGroupId)),
           <.tr(bss.formGroup, ^.height := 20.px,
-            buildWItem("price", s.item.map( x => fm(x.price.bigDecimal)), updatePrice),
-            buildWItem("qttyUnit", s.item.map(_.qttyUnit), updateQttyUnit),
-            buildWItem("packUnit", s.item.map(_.packUnit), updatePackUnit)
+            buildWItem("price", s.item.map( x => fm(x.price.bigDecimal)), "0.0", updatePrice),
+            buildWItem("qttyUnit", s.item.map(_.qttyUnit), "qttyUnit", updateQttyUnit),
+            buildWItem("packUnit", s.item.map(_.packUnit), "packUnit", updatePackUnit)
           )
         )
       )
     }
-
-
-
-    def buildWItem[A](id:String , value:Option[String],evt:ReactEventI=> Callback) =
-      List( <.td(<.label(^.`for` := id, id)),
-        <.td(<.input.text(bss.formControl, ^.id := id, ^.value := value,
-          ^.placeholder := id),  ^.onChange ==> evt, ^.paddingLeft := 10.px))
-
-    def buildItem(id:String , value:String) =
-      List( <.td(<.label(^.`for` := id, id)),
-        <.td(<.input.text(bss.formControl, ^.id := id, ^.value := value,
-          ^.placeholder := id),^.paddingLeft := 1))
 
     def render(p: Props, s: State) ={
       val items =  IWSCircuit.zoom(_.store.get.models.get(7)).eval(IWSCircuit.getRootModel).get.get.items.asInstanceOf[List[Article]]
