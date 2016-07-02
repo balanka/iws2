@@ -17,7 +17,7 @@ import japgolly.scalajs.react.vdom.prefix_<^._
 import scalacss.ScalaCssReact._
 
 
-object Utils{
+object Utils {
   @inline private def bss = GlobalStyles.bootstrapStyles
 
 
@@ -32,6 +32,7 @@ object Utils{
     List(<.td(<.label(^.`for` := id, id), ^.maxHeight:=2.px),
       <.td(<.input.text(bss.formControl, ^.id := id, ^.value := m.toString,
         ^.placeholder := id), ^.onChange ==> evt, ^.maxHeight:=2.px, ^.paddingLeft := 10.px,  ^.autoFocus := true))
+        //^.placeholder := id), ^.onChange ==> evt, ^.maxHeight:=2.px, ^.paddingLeft := 10.px,  ^.autoFocus := true))
   }
 
   def buildItem[A](id:String , value:Option[A], defValue:A) = {
