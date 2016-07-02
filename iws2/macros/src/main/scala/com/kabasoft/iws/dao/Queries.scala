@@ -66,7 +66,7 @@ object Queries  {
   def supplierUpdateName= {(model:Supplier) =>sql"Update supplier set  name =${model.name},street=${model.street}, city=${model.city}, zip=${model.zip}, state =${model.state} where id =${model.id}".update}
   def supplierDelete = {id:String =>sql"Delete FROM supplier where id =$id".update}
 
-  def storeInsertSQL = "INSERT INTO store VALUES (?, ?, ?, ?, ?, ?, ?)"
+  def storeInsertSQL = "INSERT INTO store (id, name, modelId, street, city,state,zip)  VALUES (?, ?, ?, ?, ?, ?, ?)"
   def storeSelect = sql"SELECT id, name, modelId, street, city, state,zip FROM store".query[Store]
   def storeIdSelect(id:String)  = sql"SELECT * FROM store where id =$id".query[Store]
   def storeSelect1 = sql"SELECT id, name, street, city, state, zip FROM store".query[Store]
