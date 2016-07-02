@@ -34,7 +34,7 @@ object IWSMain extends js.JSApp {
                   MenuItem("003","Article","#art"),
                   MenuItem("004","Customer","#cust"),
                   MenuItem("005","Supplier","#sup"),
-                  MenuItem("006","Article group","#cat"),
+                  //MenuItem("006","Article group","#cat"),
                   MenuItem("007","Quantity unit","#qty"),
                   MenuItem("010","Cost center","#cost"),
                   MenuItem("011","Store","#sto")
@@ -55,7 +55,7 @@ object IWSMain extends js.JSApp {
   val z4 = BackendMacro.makeBackend(QuantityUnit())
   val z5 = BackendMacro.makeBackend(Vat())
   val z6 = BackendMacro.makeBackend(CostCenter())
-  val z8 = BackendMacro.makeBackend(ArticleGroup())
+  //val z8 = BackendMacro.makeBackend(ArticleGroup())
 
   // configure the router
   val routerConfig = RouterConfigDsl[Page].buildConfig { dsl =>
@@ -68,7 +68,7 @@ object IWSMain extends js.JSApp {
     val x5 =  IWSCircuit.connect(_.store.get.models.get(5).get)
     val x6 =  IWSCircuit.connect(_.store.get.models.get(6).get)
     val x7 =  IWSCircuit.connect(_.store.get.models.get(7).get,"Article")
-    val x8 =  IWSCircuit.connect(_.store.get.models.get(8).get)
+    //val x8 =  IWSCircuit.connect(_.store.get.models.get(8).get)
     val x9 =  IWSCircuit.connect(_.store.get.models.get(9).get)
     val x101 = IWSCircuit.connect(_.store.get.models.get(101).get, "POrder")
     val x104 = IWSCircuit.connect(_.store.get.models.get(104).get, "Goodreceiving")
@@ -84,7 +84,7 @@ object IWSMain extends js.JSApp {
       | staticRoute("#vat", VatPage$) ~> renderR(ctl => x5(p5=>(z5(p5.asInstanceOf[ModelProxy[Pot[Data]]]))))
       | staticRoute("#acc", AccountPage$) ~> renderR(ctl => x9(p9 =>(ACCOUNT(p9.asInstanceOf[ModelProxy[Pot[Data]]]))))
       | staticRoute("#cust", CustomerPage$) ~> renderR(ctl => x3(p3 =>(CUSTOMER(p3.asInstanceOf[ModelProxy[Pot[Data]]]))))
-      | staticRoute("#cat", CategoryPage$) ~> renderR(ctl => x8(p8 => (z8(p8.asInstanceOf[ModelProxy[Pot[Data]]]))))
+      //| staticRoute("#cat", CategoryPage$) ~> renderR(ctl => x8(p8 => (z8(p8.asInstanceOf[ModelProxy[Pot[Data]]]))))
       | staticRoute("#sup", SupplierPage$) ~> renderR(ctl => x1(p1 =>(z1(p1.asInstanceOf[ModelProxy[Pot[Data]]]))))
       | staticRoute("#cost", CostCenterPage$) ~> renderR(ctl => x6(p6 =>(z6(p6.asInstanceOf[ModelProxy[Pot[Data]]]))))
       ).notFound(redirectToPage(DashboardPage$)(Redirect.Replace))
