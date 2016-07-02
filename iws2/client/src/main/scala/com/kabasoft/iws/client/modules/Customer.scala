@@ -11,6 +11,7 @@ import japgolly.scalajs.react.vdom.prefix_<^._
 import com.kabasoft.iws.gui.macros.Bootstrap._
 import com.kabasoft.iws.gui.logger._
 import com.kabasoft.iws.gui.macros.IWSList
+import com.kabasoft.iws.gui.services.IWSCircuit
 
 //import com.kabasoft.iws.gui.macros.MasterDetails
 import com.kabasoft.iws.shared._
@@ -28,8 +29,10 @@ object CUSTOMER {
    case class State(selectedItem: Option[Customer] = None, name:String="Customer")
    class Backend($: BackendScope[Props, State]) {
      def mounted(props: Props) =
-      Callback.ifTrue(props.proxy().isEmpty, props.proxy.dispatch(Refresh(Customer())))
-
+       Callback {
+         IWSCircuit.dispatch(Refresh(Customer()))
+         //Callback.when(props.proxy().isEmpty)(props.proxy.dispatch(Refresh(Customer())))
+       }
       def edit(item:Option[Customer]) = {
       $.modState(s => s.copy(selectedItem = item))
     }
@@ -50,13 +53,6 @@ object CUSTOMER {
        cb >> $.modState(s => s.copy(name = "Customer"))
     }
 
-
-
-    //def f [S, A]: (S,A) => S
-
-    // def get: Customer => String
-   // def set: String => CUSTOMER.State =>  CUSTOMER.State
-    //def set1x: (String, CUSTOMER.State ) =>  CUSTOMER.State
 
     def updateIt(e: ReactEventI, set: (String, CUSTOMER.State ) =>  CUSTOMER.State) = {
       val r = e.target.value
@@ -118,20 +114,8 @@ object CUSTOMER {
             )
           )
 
-    /*type T = (Boolean, String, String)
-  type R = MasterDetails.customerComponent.Props
-
-
-    val l1 = Seq(AccordionTabItem[T, R]("tab1", "Customer", "#tab1", true,MasterDetails.customerComponent.buildTabContent),
-                  AccordionTabItem[T,R]("tab2", "News", "#tab2", false,MasterDetails.customerComponent.buildTabContent),
-                  AccordionTabItem[T,R]("tab3", "Newsletters", "#tab3", false,MasterDetails.customerComponent.buildTabContent))
-    //val l2= Seq( AccordionTabItem[AccordionTabItem]("tab4","Orders" ,"#tab4", false,buildTabContent2), AccordionTabItem("tab5","Invoices","#tab5", false, buildTabContent2),AccordionTabItem ("tab6","Shipments","#tab6", false,buildTabContent2))
-    val menu1 = AccordionMenuItem("collapseOne", "Content", "#collapseOne", true, l1)
-    //val menu2 = AccordionMenuItem ("collapseTwo", "Modules","#collapseTwo", false, l2)
-    val menu = Seq(menu1)
-    */
-
      def render(p: Props, s: State) ={
+       val items =  IWSCircuit.zoom(_.store.get.models.get(3)).eval(IWSCircuit.getRootModel).get.get.items.asInstanceOf[List[Customer]]
        def saveButton = Button(Button.Props(edited(s.selectedItem.getOrElse(Customer())), addStyles = Seq(bss.pullRight, bss.buttonXS,
          bss.buttonOpt(CommonStyle.success))), Icon.circleO, "Save")
        def newButton =  Button(Button.Props(edit(Some(Customer())), addStyles = Seq(bss.pullRight, bss.buttonXS)), Icon.plusSquare, "New")
@@ -139,12 +123,12 @@ object CUSTOMER {
          p.proxy().renderFailed(ex => "Error loading"),
          p.proxy().renderPending(_ > 500, _ => "Loading..."),
          AccordionPanel("Edit", Seq(buildForm(s)), List(newButton,saveButton)),
-         p.proxy().render(
-           all => CustomerList(all.items.asInstanceOf[List[Customer]],
-             //item => p.proxy.dispatch(Update(item.asInstanceOf[Customer])),
-             item => edit(Some(item.asInstanceOf[Customer])), item => p.proxy.dispatch(Delete[Customer](item.asInstanceOf[Customer]))))
+        // p.proxy().render(
+           CustomerList(items,
+             item => edit(Some(item.asInstanceOf[Customer])),
+             item => p.proxy.dispatch(Delete[Customer](item.asInstanceOf[Customer]))))
          //TabComponent(Seq(item1, item2, item3)))
-       ))
+       )
      }
 
   }

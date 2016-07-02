@@ -12,7 +12,7 @@ import scalacss.ScalaCssReact._
 object CustomerList {
   @inline private def bss = GlobalStyles.bootstrapStyles
 
-  case class Props(items: Seq[IWS], editItem: IWS => Callback, deleteItem: IWS => Callback)
+  case class Props(items: Seq[Customer], editItem: Customer => Callback, deleteItem: Customer => Callback)
 
   private val CustomerList = ReactComponentB[Props]("CustomerList")
     .render_P(p => {
@@ -30,10 +30,10 @@ object CustomerList {
           editButton,deleteButton
           )
       }
-      <.ul(style.listGroup)(p.items.asInstanceOf[Seq[Customer]].sortBy(_.id) map renderItem)
+      <.ul(style.listGroup)(p.items.sortBy(_.id) map renderItem)
     })
     .build
 
-  def apply(items: Seq[IWS], editItem: IWS => Callback, deleteItem: IWS => Callback) =
+  def apply(items: Seq[Customer], editItem: Customer => Callback, deleteItem: Customer => Callback) =
     CustomerList(Props(items, editItem, deleteItem))
 }
