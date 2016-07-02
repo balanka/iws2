@@ -54,8 +54,19 @@ object ARTICLE {
       val id= e.target.value
       $.modState(s => s.copy(s.item.map( z => z.copy(groupId = Some(id)))))
     }
+    def updatePrice(e: ReactEventI) = {
+      val price= e.target.value
+      $.modState(s => s.copy(s.item.map( z => z.copy(price =BigDecimal(price)))))
+    }
 
-
+    def updateQttyUnit(e: ReactEventI) = {
+      val qttyUnit1 = e.target.value
+      $.modState(s => s.copy(s.item.map( z => z.copy(qttyUnit = qttyUnit1))))
+    }
+    def updatePackUnit(e: ReactEventI) = {
+      val packUnit1 = e.target.value
+      $.modState(s => s.copy(s.item.map( z => z.copy(packUnit = packUnit1))))
+    }
     def buildFormTab(p: Props, s: State): Seq[ReactElement] = {
       val subArticles = s.item.getOrElse(Article()).articles.getOrElse(List.empty[Article])
       List(<.div(bss.formGroup,
@@ -65,17 +76,25 @@ object ARTICLE {
         )
       )
     }
-    def buildFormTable(s: State) =
+    def buildFormTable(s: State) = {
+       def fm(m:BigDecimal) = "%06.2f".format(m)
+
       <.table(^.className := "table-responsive table-condensed", ^.tableLayout := "fixed",
         <.tbody(
           <.tr(bss.formGroup, ^.height := 20.px,
             buildWItem("id", s.item.map(_.id), updateId),
             buildWItem("name", s.item.map(_.name), updateName),
             buildWItem("description", s.item.map(_.description), updateDescription),
-            buildWItem("group", s.item.map(_.groupId.getOrElse("groupId")), updateGroupId)
+            buildWItem("group", s.item.map(_.groupId.getOrElse("groupId")), updateGroupId)),
+          <.tr(bss.formGroup, ^.height := 20.px,
+            buildWItem("price", s.item.map( x => fm(x.price.bigDecimal)), updatePrice),
+            buildWItem("qttyUnit", s.item.map(_.qttyUnit), updateQttyUnit),
+            buildWItem("packUnit", s.item.map(_.packUnit), updatePackUnit)
           )
         )
       )
+    }
+
 
 
     def buildWItem[A](id:String , value:Option[String],evt:ReactEventI=> Callback) =
