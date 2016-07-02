@@ -107,6 +107,7 @@ object IWSCircuit extends Circuit[RootModel[IWS,IWS]] with ReactConnector[RootMo
 
     val store: Pot[DStore[IWS, IWS]] = Ready(DStore(Map(
       1 -> Ready(Data(Seq.empty[Supplier])),
+      2 -> Ready(Data(Seq.empty[MStore])),
       3 -> Ready(Data(Seq.empty[Customer])),
       4 -> Ready(Data(Seq.empty[QuantityUnit])),
       5 -> Ready(Data(Seq.empty[Vat])),

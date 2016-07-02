@@ -12,6 +12,7 @@ import japgolly.scalajs.react.vdom.prefix_<^._
 import com.kabasoft.iws.gui.macros.Bootstrap._
 import com.kabasoft.iws.gui.logger._
 import com.kabasoft.iws.gui.macros.IWSList
+import com.kabasoft.iws.gui.services.IWSCircuit
 
 //import com.kabasoft.iws.gui.macros.MasterDetails
 import com.kabasoft.iws.shared._
@@ -26,55 +27,54 @@ object STORE {
   @inline private def bss = GlobalStyles.bootstrapStyles
 
    case class Props(proxy: ModelProxy[Pot[Data]])
-   case class State(selectedItem: Option[Store] = None, name:String="Store")
+   case class State(item: Option[Store] = None, name:String="Store")
    class Backend($: BackendScope[Props, State]) {
      def mounted(props: Props) =
-      Callback.when(props.proxy().isEmpty)(props.proxy.dispatch(Refresh(Store())))
+       Callback {
+         IWSCircuit.dispatch(Refresh(Store()))
+         //Callback.when(props.proxy().isEmpty)(props.proxy.dispatch(Refresh(Store())))
+       }
 
-      def edit(item:Option[Store]) = {
-      $.modState(s => s.copy(selectedItem = item))
-    }
 
-    def edit1(item:IWS) = {
-      $.modState(s => s.copy(selectedItem = Some(item.asInstanceOf[Store])))
+      def edit(itemx:Option[Store]) = {
+      $.modState(s => s.copy(item = itemx))
     }
 
     def edited(item:Store) = {
-      Callback.log("Customer edited>>>>> " +item)  >>
+      Callback.log("Store edited>>>>> " +item)  >>
       $.props >>= (_.proxy.dispatch(Update(item)))
 
      }
 
     def delete(item:Store) = {
-      val cb = Callback.log("Customer deleted>>>>> " +item)  >>
+      val cb = Callback.log("Store deleted>>>>> " +item)  >>
         $.props >>= (_.proxy.dispatch(Delete(item)))
-       cb >> $.modState(s => s.copy(name = "Customer"))
+       cb >> $.modState(s => s.copy(name = "Store"))
     }
-
 
     def updateId(e: ReactEventI) = {
       val r = e.target.value
-      $.modState(s => s.copy(s.selectedItem.map( z => z.copy(id = r))))
+      $.modState(s => s.copy(s.item.map( z => z.copy(id = r))))
     }
     def updateName(e: ReactEventI) = {
       val r = e.target.value
-      $.modState(s => s.copy(s.selectedItem.map( z => z.copy(name = r))))
+      $.modState(s => s.copy(s.item.map( z => z.copy(name = r))))
     }
     def updateStreet(e: ReactEventI) = {
       val r1 = e.target.value
-      $.modState(s => s.copy(s.selectedItem.map( z => z.copy(street = r1))))
+      $.modState(s => s.copy(s.item.map( z => z.copy(street = r1))))
     }
     def updateCity(e: ReactEventI) = {
       val r2 = e.target.value
-      $.modState(s => s.copy(s.selectedItem.map( z => z.copy(city = r2))))
+      $.modState(s => s.copy(s.item.map( z => z.copy(city = r2))))
     }
     def updateState(e: ReactEventI) = {
       val r3 = e.target.value
-      $.modState(s => s.copy(s.selectedItem.map( z => z.copy(state = r3))))
+      $.modState(s => s.copy(s.item.map( z => z.copy(state = r3))))
     }
     def updateZip(e: ReactEventI) = {
       val r4 = e.target.value
-      $.modState(s => s.copy(s.selectedItem.map( z => z.copy(zip = r4))))
+      $.modState(s => s.copy(s.item.map( z => z.copy(zip = r4))))
     }
     
     
@@ -93,39 +93,42 @@ object STORE {
           <.table(^.className := "table-responsive table-condensed", ^.tableLayout := "fixed",
             <.tbody(
               <.tr(^.height := 20,
-                   buildWItem[String]("id", s.selectedItem.map(_.id),"id",updateId),
-                   buildWItem[String]("name", s.selectedItem.map(_.name), "", updateName),
-                   buildWItem[String]("street", s.selectedItem.map(_.street), "", updateStreet)
+                   buildWItem[String]("id", s.item.map(_.id),"id",updateId),
+                   buildWItem[String]("name", s.item.map(_.name), "", updateName),
+                   buildWItem[String]("street", s.item.map(_.street), "", updateStreet)
                  ),
               <.tr(^.height := 20,
-                    buildWItem[String]("city", s.selectedItem.map(_.city), "", updateCity),
-                    buildWItem[String]("state", s.selectedItem.map(_.state), "", updateState),
-                    buildWItem[String]("zip", s.selectedItem.map(_.zip), "", updateZip)
+                    buildWItem[String]("city", s.item.map(_.city), "", updateCity),
+                    buildWItem[String]("state", s.item.map(_.state), "", updateState),
+                    buildWItem[String]("zip", s.item.map(_.zip), "", updateZip)
                  )
             )
           )
 
      def render(p: Props, s: State) ={
-       def saveButton = Button(Button.Props(edited(s.selectedItem.getOrElse(Store())), addStyles = Seq(bss.pullRight, bss.buttonXS,
+       val items =  IWSCircuit.zoom(_.store.get.models.get(2)).eval(IWSCircuit.getRootModel).get.get.items.asInstanceOf[List[Store]]
+       log.debug(s"itemsitemsitemsitemsitemsitemsitemsitems is ${items}")
+       def saveButton = Button(Button.Props(edited(s.item.getOrElse(Store())), addStyles = Seq(bss.pullRight, bss.buttonXS,
          bss.buttonOpt(CommonStyle.success))), Icon.circleO, "Save")
        def newButton =  Button(Button.Props(edit(Some(Store())), addStyles = Seq(bss.pullRight, bss.buttonXS)), Icon.plusSquare, "New")
-       Panel(Panel.Props("Customer"), <.div(^.className := "panel-heading",^.padding :=0), <.div(^.padding :=0,
+       Panel(Panel.Props("Store"), <.div(^.className := "panel-heading",^.padding :=0), <.div(^.padding :=0,
          p.proxy().renderFailed(ex => "Error loading"),
          p.proxy().renderPending(_ > 500, _ => "Loading..."),
+
          AccordionPanel("Edit", Seq(buildForm(s)), List(newButton,saveButton)),
-         p.proxy().render(
-           all => StoreList(all.items.asInstanceOf[List[Store]],
-             //item => p.proxy.dispatch(Update(item.asInstanceOf[Customer])),
-             item => edit(Some(item.asInstanceOf[Store])), item => p.proxy.dispatch(Delete[Store](item.asInstanceOf[Store]))))
+           StoreList(items,
+              item => edit(Some(item.asInstanceOf[Store])),
+              item => p.proxy.dispatch(Delete(item)))
+         )
          //TabComponent(Seq(item1, item2, item3)))
-       ))
+       )
      }
 
   }
 
-  val component = ReactComponentB[Props]("Customer")
-    //.initialState(State(name="Customer"))
-    .initialState(State())
+  val component = ReactComponentB[Props]("Store")
+    .initialState(State( Some(Store())))
+    //.initialState(State())
     .renderBackend[Backend]
     .componentDidMount(scope => scope.backend.mounted(scope.props))
     .build
