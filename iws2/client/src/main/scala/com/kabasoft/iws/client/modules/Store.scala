@@ -29,7 +29,7 @@ object STORE {
    case class State(selectedItem: Option[Store] = None, name:String="Store")
    class Backend($: BackendScope[Props, State]) {
      def mounted(props: Props) =
-      Callback.ifTrue(props.proxy().isEmpty, props.proxy.dispatch(Refresh(Store())))
+      Callback.when(props.proxy().isEmpty)(props.proxy.dispatch(Refresh(Store())))
 
       def edit(item:Option[Store]) = {
       $.modState(s => s.copy(selectedItem = item))
