@@ -1,7 +1,6 @@
 package com.kabasoft.iws.client.components
 
 import java.util.Date
-
 import com.kabasoft.iws.gui.Utils._
 import com.kabasoft.iws.gui.logger._
 import com.kabasoft.iws.gui.macros.Bootstrap.{Button, CommonStyle}
@@ -10,6 +9,7 @@ import com.kabasoft.iws.gui.services.IWSCircuit
 import com.kabasoft.iws.shared.{Store => MStore, _}
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.prefix_<^._
+import org.scalajs.dom.ext.KeyCode
 
 import scalacss.ScalaCssReact._
 
@@ -61,28 +61,34 @@ object LineGoodreceivingList {
       val l =e.target.value
       $.modState(s => s.copy(item = s.item.map(_.copy(text = l))))>>setModfied
     }
-    def updatePrice(e: ReactEventI, s1:State) = {
-      val l =e.target.value.toDouble
-      log.debug(s"Item price is ${l} State:${s1}")
-      $.modState(s => s.copy(item = s.item.map(_.copy(price = l))))>>setModfied
+    def updatePrice(e: ReactKeyboardEventI): Option[Callback] = {
+      val i=e.target.value.trim
+      log.debug(s"Item price is ${i}")
+      if (e.nativeEvent.keyCode == KeyCode.Enter && i.nonEmpty) {
+        val l =i.replace(",", ".").toDouble
+        Some(Callback(e.target.value ="")>> $.modState(s => s.copy(item = s.item.map(_.copy(price = l))))>>setModfied)
+      } else {
+        None
+      }
     }
-    def updateQuantity(e: ReactEventI) = {
-      val l =e.target.value
-      log.debug(s"Item quantity is ${l}")
-      $.modState(s => s.copy(item = s.item.map(_.copy(quantity = BigDecimal(l)))))>>setModfied
+
+    def updateQuantity(e: ReactKeyboardEventI): Option[Callback] = {
+      val i = e.target.value.trim
+      log.debug(s" you entered i = ${i} keycode ${e.nativeEvent.keyCode} enter ${KeyCode.Enter}")
+      if (e.nativeEvent.keyCode == KeyCode.Enter && i.nonEmpty) {
+        val l =i.replace(",", ".").toDouble
+        log.debug(s"Item quantity is ${l} i  ${i}")
+        Some(Callback(e.target.value ="")>>$.modState(s => s.copy(item = s.item.map(_.copy(quantity = l))))>>setModfied)
+      } else {
+        None
+      }
     }
 
     def delete(line:LineGoodreceiving, deleteLineCallback:LineGoodreceiving =>Callback) =
       Callback.log(s"LinePurchaseOrder deleted>>>>>  ${line}") >> deleteLineCallback(line)
 
-    def save(line:LineGoodreceiving, saveLineCallback:LineGoodreceiving =>Callback) = {
-      val modifiedLine =line.copy(modified = true)
-      log.debug(s" saved  Line gooreceiving is ${modifiedLine}")
-      if (line.modified)
-        saveLineCallback(modifiedLine) //>>$.modState(s => s.copy(item = Some(line)))
-      else  Callback { log.debug(s" No change to save for ${modifiedLine}")}
-     // $.modState(s => s.copy(item = None))
-    }
+    def save(line:LineGoodreceiving, saveLineCB:LineGoodreceiving =>Callback) = saveLineCB(line.copy(modified = true))
+
     def setModfied = $.modState(s => s.copy(item = s.item.map(_.copy(modified = true))))
     def newLine(line:LineGoodreceiving, newLineCallback:LineGoodreceiving =>Callback) = {
       log.debug(s" newLine called with   ${line}")
@@ -103,8 +109,8 @@ object LineGoodreceivingList {
       def buildIdNameList (list: List[Masterfile]): List[String]= list map (iws =>(iws.id+"|"+iws.name))
       def editFormLine : Seq [TagMod]=List(
               buildSItem("item", itemsx = buildIdNameList(items), defValue = "0001", evt = updateItem),
-              buildWItem[BigDecimal]("price", s.item.map(_.price), 0.0, updatePrice(_, s)),
-              buildWItem[BigDecimal]("quantity", s.item.map(_.quantity), 0.0, updateQuantity),
+              buildWItem1[String]("price", s.item.map(_.price.toString()), "0,0", updatePrice),
+              buildWItem1[String]("quantity", s.item.map(_.quantity.toString()), "0,0", updateQuantity),
               buildSItem("q.unit", itemsx = buildIdNameList(qttyUnit), defValue = "KG", evt = updateUnit),
               buildSItem("Vat", itemsx = buildIdNameList(vat), defValue = "7", evt = updateVat),
               buildWItem[Date]("duedate", s.item.map(_.duedate.getOrElse(new Date())), new Date(),
@@ -133,7 +139,7 @@ object LineGoodreceivingList {
         <.span(item.id),
         <.span(item.item ,^.paddingLeft:=10.px),
         <.span("%06.2f".format(item.price.bigDecimal),^.paddingLeft:=10.px),
-        <.span("%06.2f".format(item.quantity.bigDecimal),^.paddingLeft:=10.px),
+        <.span("%6.2f".format(item.quantity.bigDecimal),^.paddingLeft:=10.px),
         <.span(item.unit ,^.paddingLeft:=10.px),
         <.span(item.vat ,^.paddingLeft:=10.px),
         <.span(editButton, deleteButton,^.alignContent:="center")
