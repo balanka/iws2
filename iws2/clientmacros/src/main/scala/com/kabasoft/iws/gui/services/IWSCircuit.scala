@@ -3,31 +3,30 @@ package com.kabasoft.iws.gui.services
 import autowire._
 import com.kabasoft.iws.gui.logger._
 import com.kabasoft.iws.gui.macros._
-import com.kabasoft.iws.shared.{Store => MStore, _}
+import com.kabasoft.iws.shared._
 import diode._
 import diode.data._
 import diode.react.ReactConnector
 import diode.util._
 import boopickle.Default._
 
+
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
-case class UpdateMotd(potResult: Pot[String] = Empty) extends PotAction[String, UpdateMotd] {
-  override def next(value: Pot[String]) = UpdateMotd(value)
-}
 
-// The base model of our application
 case class RootModel [+A<:IWS,-B<:IWS](store:Pot[DStore[A,B]], motd:Pot[String])
 case class DStore [+A<:IWS,-B<:IWS](models: Map[Int, Pot[ContainerT[A,B]]]) {
   def updated (newItem: B) = {
-     val mapx = models.get(newItem.modelId).getOrElse(Ready(Data(List.empty[Account]))).map(_.update(newItem))
-
+     val mapx = models.get(newItem.modelId).get.map(_.update(newItem))
+    log.info("UPDATE UPDATE"+ mapx)
     //val x= models.get(newItem.modelId).get.map(_.update(newItem))
       DStore (models+ (newItem.modelId -> mapx))
   }
 
    //def updatedAll(newModels: Map[Int, Pot[ContainerT[B,A]]])  = DStore[A,B](newModels.asInstanceOf[Map[Int, Pot[ContainerT[A,B]]]])
-  def updatedAll(newModels: Map[Int, Pot[ContainerT[B,A]]])  = { DStore[A,B]( models.asInstanceOf[Map[Int, Pot[ContainerT[A,B]]]]++
+  def updatedAll(newModels: Map[Int, Pot[ContainerT[B,A]]])  = {
+     log.debug("+++++++++<<<<<<<<<<< newModels: "+newModels)
+     DStore[A,B]( models.asInstanceOf[Map[Int, Pot[ContainerT[A,B]]]]++
     newModels.asInstanceOf[Map[Int, Pot[ContainerT[A,B]]]])}
   def remove(item:B) = {
     //log.info("+>>>>>>>>Item to Delete++++++ ${item}")
@@ -80,13 +79,14 @@ class IWSHandler[M](modelRW: ModelRW[M, Pot[DStore[IWS,IWS]]]) extends ActionHan
       log.info("+++++++++>>>>>>>>XXX"+xx)
       val  a = all.filter(_.modelId == xx.modelId)
      // val r =value.get.models.get(xx.modelId).get.get
+      log.info("+++++++++aaaa0000000"+ a +"<<<<<<<<<<<"+ all)
       val r =value.get.models.get(xx.modelId).get.get.asInstanceOf[Data].items
-      log.info("+++++++++aaaa ${a}<<<<<<<<<<< ${r}")
+      log.info("+++++++++rrrrr<<<<<<<<<<<"+(all++r))
 
-      val x = Map(xx.modelId ->Ready(Data(a++r)))
+      val x = Map(xx.modelId ->Ready(Data(all++r)))
       updated(Ready(value.get.updatedAll(x)))
     case Update(item:IWS) =>
-      log.info("+++++++++<<<<<<<<<<< UpdateTodo: "+item)
+      log.debug("+++++++++<<<<<<<<<<< UpdateTodo: "+item)
       updated(Ready(value.get.updated(item)), Effect(AjaxClient[Api].update(item).call().map(UpdateAll[IWS])))
     case FindAll(item:IWS) =>
       log.info("+++++++++<<<<<<<<<<< FindAll : "+item)
@@ -107,7 +107,7 @@ object IWSCircuit extends Circuit[RootModel[IWS,IWS]] with ReactConnector[RootMo
 
     val store: Pot[DStore[IWS, IWS]] = Ready(DStore(Map(
       1 -> Ready(Data(Seq.empty[Supplier])),
-      2 -> Ready(Data(Seq.empty[MStore])),
+      2 -> Ready(Data(Seq.empty[Store])),
       3 -> Ready(Data(Seq.empty[Customer])),
       4 -> Ready(Data(Seq.empty[QuantityUnit])),
       5 -> Ready(Data(Seq.empty[Vat])),
