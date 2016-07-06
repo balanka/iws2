@@ -2,7 +2,7 @@ package com.kabasoft.iws.client.components
 
 import com.kabasoft.iws.gui.Utils._
 import com.kabasoft.iws.gui.macros.{GlobalStyles, Icon}
-import com.kabasoft.iws.shared.{Article, IWS}
+import com.kabasoft.iws.shared.Article
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.prefix_<^._
 import com.kabasoft.iws.gui.macros.Bootstrap.{Button, CommonStyle}
@@ -14,7 +14,7 @@ import scalacss.ScalaCssReact._
 object ArticleList {
   @inline private def bss = GlobalStyles.bootstrapStyles
   //val formater =NumberFormat.getIntegerInstance(new java.util.Locale("de", "DE"))
-  case class Props(items: Seq[IWS],
+  case class Props(items: Seq[Article],
                    editCB: Option[Article => Callback] = None,
                    deleteCB: Option[Article => Callback] = None
   )
@@ -42,7 +42,7 @@ object ArticleList {
           tag
         )
       }
-      <.ul(style.listGroup)(p.items.asInstanceOf[Seq[Article]].sortBy(_.id) map renderItem)
+      <.ul(style.listGroup)(p.items.sortBy(_.id) map renderItem)
     })
     .build
 
