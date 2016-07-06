@@ -21,7 +21,6 @@ object PurchaseOrderList {
   private val purchaseOrderList = ReactComponentB[Props]("PurchaseOrderList")
     .render_P(p => {
       val style = bss.listGroup
-      log.debug(s" Order list items >>>>>>>>>>>>>>>>>>>>>>>> ${p.items}")
       def renderHeader = {
         <.li(style.itemOpt(CommonStyle.info),^.fontSize:=12.px,^.fontWeight:=50.px,^.maxHeight:=30.px)(
           <.span("  "),
@@ -47,8 +46,6 @@ object PurchaseOrderList {
           <.span("    "),
           <.span(trans.account),
           editButton,deleteButton
-          // <.span("    "),
-          // <.span(item.quantity.toDouble)
         )
       }
       // <.ul(style.listGroup)(renderHeader)( p.items.filter(_.tid >=52).sortBy(_.tid)(Ordering[Long].reverse) map renderItem)
