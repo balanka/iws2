@@ -28,9 +28,9 @@ object Queries  {
   def accountDelete = {id:String =>sql"Delete FROM account where id =$id".update}
 
   def articleInsertSQL= "INSERT INTO article VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
-  def articleSelect = sql"SELECT *  FROM article".query[ARTICLE_TYPE]
+  def articleSelect = sql"SELECT id, name, modelId, description, price, qttyUnit, packUnit, groupId  FROM article".query[ARTICLE_TYPE]
   def articleIdSelect(id:String) = sql"SELECT * FROM article where id =$id".query[ARTICLE_TYPE]
-  def articleSelectByGroupId = {groupId:String =>sql"SELECT * FROM article where groupid =$groupId".query[ARTICLE_TYPE]}
+  def articleSelectByGroupId = {groupId:String =>sql"SELECT id, name, modelId, description, price, qttyUnit, packUnit, groupId FROM article where groupid =$groupId".query[ARTICLE_TYPE]}
   def articleSelectSome = {id:String =>sql"SELECT * FROM article  where id =$id".query[ARTICLE_TYPE]}
   def articleUpdateName= {(model:Article) =>sql"Update article set name =${model.name}, description =${model.description}, price =${model.price},  qttyUnit =${model.qttyUnit} , packUnit =${model.packUnit}, groupId=${model.groupId.getOrElse("")}   where id =${model.id}".update}
   def articleDelete = {id:String =>sql"Delete FROM article where id =$id".update}
