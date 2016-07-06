@@ -22,44 +22,41 @@ object LinePurchaseOrderList {
 
   class Backend($: BackendScope[Props, State]) {
 
-
     def mounted(props: Props) =
       Callback {
         IWSCircuit.dispatch(Refresh(Article()))
         IWSCircuit.dispatch(Refresh(QuantityUnit()))
         IWSCircuit.dispatch(Refresh(Vat()))
       }
-      // props.proxy1.dispatch(Refresh (Article()))>> props.proxy1.dispatch(Refresh (Account()))
-
 
     def edit(line:LinePurchaseOrder) = {
-      log.debug(s" order to edit Line is ${line}")
+      //log.debug(s" order to edit Line is ${line}")
        $.modState(s => s.copy(item = Some(line)))
     }
 
-    def updateItem1(id: String) = {
+    def updateItem(id: String) = {
       val itemId = id.substring(0, id.indexOf("|"))
-      log.debug(s"ItemId Key is ${itemId}  ")
+      //log.debug(s"ItemId Key is ${itemId}  ")
       $.modState(s => s.copy(item = s.item.map(_.copy(item = Some(itemId)))))>>
         setModfied
     }
 
-    def updateVat1(id: String) = {
+    def updateVat(id: String) = {
       val vatId = id.substring(0, id.indexOf("|"))
       log.debug(s"ItemId Key is ${vatId}  ")
       $.modState(s => s.copy(item = s.item.map(_.copy(vat = Some(vatId)))))>>
         setModfied
     }
 
-    def updateUnit1(id:String) = {
+    def updateUnit(id:String) = {
       val qtyUnit = id.substring(0, id.indexOf("|"))
-      log.debug(s" Unit is ${qtyUnit}")
+      //log.debug(s" Unit is ${qtyUnit}")
       $.modState(s => s.copy(item = s.item.map(_.copy(unit = Some(qtyUnit)))))>>
         setModfied
     }
 
     def updateDuedate(e: ReactEventI) = {
-      val l =e.target.value.toLong
+      val l = e.target.value.toLong
       $.modState(s => s.copy(item = s.item.map(_.copy(duedate = Some(new Date(l))))))>>
         setModfied
     }
@@ -70,7 +67,7 @@ object LinePurchaseOrderList {
     }
     def updatePrice(e: ReactEventI, s1:State) = {
       val l =e.target.value.toDouble
-      log.debug(s"Item price is ${l} State:${s1}")
+      //log.debug(s"Item price is ${l} State:${s1}")
       $.modState(s => s.copy(item = s.item.map(_.copy(price = l))))>>
       setModfied
     }
@@ -106,21 +103,17 @@ object LinePurchaseOrderList {
       val qttyUnit =  IWSCircuit.zoom(_.store.get.models.get(4)).eval(IWSCircuit.getRootModel).get.get.items.asInstanceOf[List[QuantityUnit]]
       val vat =  IWSCircuit.zoom(_.store.get.models.get(5)).eval(IWSCircuit.getRootModel).get.get.items.asInstanceOf[List[Vat]]
 
-     // log.debug(s" ARTICLESSSSS ${items} VAAAAAAAAT ${vat} QttyUnit ${qttyUnit}")
       def saveButton = Button(Button.Props(save(s.item.getOrElse(LinePurchaseOrder()),p.saveLine),
         addStyles = Seq(bss.pullRight, bss.buttonXS, bss.buttonOpt(CommonStyle.success))), Icon.circleO, "")
       def newButton = Button(Button.Props( newLine(LinePurchaseOrder( created = true),p.newLine),
         addStyles = Seq(bss.pullRight, bss.buttonXS)), Icon.plusSquare, "")
       def buildIdNameList (list: List[Masterfile]): List[String]= list map (iws =>(iws.id+"|"+iws.name))
       def editFormLine : Seq [TagMod]=List(
-              //buildWItem[String]("item", s.item.map(_.item.getOrElse("item")), "item", updateItem(_, s)),
-              buildSItem("item", itemsx = buildIdNameList(items), defValue = "0001", evt = updateItem1),
+              buildSItem("item", itemsx = buildIdNameList(items), defValue = "0001", evt = updateItem),
               buildWItem[BigDecimal]("price", s.item.map(_.price), 0.0, updatePrice(_, s)),
               buildWItem[BigDecimal]("quantity", s.item.map(_.quantity), 0.0, updateQuantity),
-              //buildWItem[String]("unit", s.item.map(_.unit.getOrElse("unit")), "unit", updateUnit),
-              //buildWItem[String]("vat", s.item.map(_.vat.getOrElse("vat")), "19", updateVat),
-              buildSItem("q.unit", itemsx = buildIdNameList(qttyUnit), defValue = "KG", evt = updateUnit1),
-              buildSItem("Vat", itemsx = buildIdNameList(vat), defValue = "7", evt = updateVat1),
+              buildSItem("q.unit", itemsx = buildIdNameList(qttyUnit), defValue = "KG", evt = updateUnit),
+              buildSItem("Vat", itemsx = buildIdNameList(vat), defValue = "7", evt = updateVat),
               buildWItem[Date]("duedate", s.item.map(_.duedate.getOrElse(new Date())), new Date(),
                 updateDuedate), saveButton, newButton)
       <.div(bss.formGroup,

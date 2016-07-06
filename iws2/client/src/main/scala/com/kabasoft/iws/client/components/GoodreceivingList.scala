@@ -12,7 +12,6 @@ import scalacss.ScalaCssReact._
 object GoodreceivingList {
   @inline private def bss = GlobalStyles.bootstrapStyles
 
-
   case class Props(items: Seq[Goodreceiving[LineGoodreceiving]],
                    edit: Goodreceiving[LineGoodreceiving] => Callback,
                    delete: Goodreceiving[LineGoodreceiving] => Callback)
@@ -20,7 +19,6 @@ object GoodreceivingList {
   private val goodreceivingList = ReactComponentB[Props]("GoodreceivingList")
     .render_P(p => {
       val style = bss.listGroup
-      log.debug(s" Goodreceiving list items >>>>>>>>>>>>>>>>>>>>>>>> ${p.items}")
       def renderHeader = {
         <.li(style.itemOpt(CommonStyle.info),^.fontSize:=12.px,^.fontWeight:=50.px,^.maxHeight:=30.px)(
           <.span("  "),
@@ -46,11 +44,8 @@ object GoodreceivingList {
           <.span("    "),
           <.span(trans.account),
           editButton,deleteButton
-          // <.span("    "),
-          // <.span(item.quantity.toDouble)
         )
       }
-      log.debug(s" GGGGGGGGGG ${p.items}")
 
       // <.ul(style.listGroup)(renderHeader)( p.items.filter(_.tid >=52).sortBy(_.tid)(Ordering[Long].reverse) map renderItem)
       <.ul(style.listGroup)(renderHeader)(p.items.sortBy(_.tid)(Ordering[Long].reverse) map renderItem)
