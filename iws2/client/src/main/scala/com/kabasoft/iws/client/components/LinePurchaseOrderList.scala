@@ -24,18 +24,12 @@ object LinePurchaseOrderList {
 
   class Backend($: BackendScope[Props, State]) {
 
-   // def vat = IWSCircuit.zoom(_.store.get.models.get(5)).eval(IWSCircuit.getRootModel).get.get.items.asInstanceOf[List[Vat]]
-
-    def mounted(props: Props) = {
-      Callback {
+    def mounted(props: Props) = Callback {
         IWSCircuit.dispatch(Refresh(Article()))
         IWSCircuit.dispatch(Refresh(QuantityUnit()))
         IWSCircuit.dispatch(Refresh(Vat()))
-       // $.modState(s => s.copy(vatList = Some(buildIdNameList(vat)))).runNow()
       }
 
-
-  }
     def edit(line:LinePurchaseOrder) = {
       //log.debug(s" order to edit Line is ${line}")
        $.modState(s => s.copy(item = Some(line)))
@@ -120,7 +114,7 @@ object LinePurchaseOrderList {
         addStyles = Seq(bss.pullRight, bss.buttonXS)), Icon.plusSquare, "")
       def buildIdNameList [A<:Masterfile](list: List[A]): List[String]= list map (iws =>(iws.id+"|"+iws.name))
       def buildArticleList [A<:Article](list: List[A]): List[String]= list map (iws =>(iws.id+":"+iws.name +":"+iws.qttyUnit  +":"+iws.vat.getOrElse("0")))
-      def fmt(t:Date) = Moment(t.getTime).format("DD.MM.YYYY")
+
 //      val  itemsList=items.toSet[Article].toList.filter(_.id !="-1") map (iws =>(iws.id+"|"+iws.name))
 //      log.debug(s" itemsList  ${itemsList}")
 //      val  qttyUnitList=qttyUnit.toSet[QuantityUnit].toList.filter(_.id !="-1") map (iws =>(iws.id+"|"+iws.name))
@@ -164,7 +158,7 @@ object LinePurchaseOrderList {
         <.span("%6.2f".format(item.quantity.bigDecimal),^.paddingLeft:=10.px),
         <.span(item.unit ,^.paddingLeft:=10.px),
         <.span(item.vat ,^.paddingLeft:=10.px),
-       // <.span(buildSItem("Vat", itemsx =s.vatList.getOrElse(List.empty[String]) , defValue = "7", evt = updateVat)),
+        <.span( Moment(item.duedate.get.getTime).format("DD.MM.YYYY"),^.paddingLeft:=10),
         <.span(editButton,^.alignContent:="center")
       )
     }
