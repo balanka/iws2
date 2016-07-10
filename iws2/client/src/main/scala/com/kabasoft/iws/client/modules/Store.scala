@@ -12,7 +12,8 @@ import japgolly.scalajs.react.vdom.prefix_<^._
 import com.kabasoft.iws.gui.macros.Bootstrap._
 import com.kabasoft.iws.gui.logger._
 import com.kabasoft.iws.gui.macros.IWSList
-import com.kabasoft.iws.gui.services.IWSCircuit
+import com.kabasoft.iws.gui.services.{IWSCircuit, RootModel}
+import diode.ModelR
 
 //import com.kabasoft.iws.gui.macros.MasterDetails
 import com.kabasoft.iws.shared._
@@ -25,16 +26,25 @@ import scalacss.ScalaCssReact._
 object STORE {
 
   @inline private def bss = GlobalStyles.bootstrapStyles
-
+  @volatile var itemsx = Set.empty[Store]
+  implicit def orderingById[A <: Store]: Ordering[A] = {Ordering.by(e => (e.id, e.id))}
    case class Props(proxy: ModelProxy[Pot[Data]])
    case class State(item: Option[Store] = None, name:String="Store")
    class Backend($: BackendScope[Props, State]) {
-     def mounted(props: Props) =
+     def mounted(props: Props) = {
+       IWSCircuit.subscribe(IWSCircuit.zoom(_.store.get.models.get(2).get)) (listener)
+
+       def listener(cursor: ModelR[RootModel[IWS,IWS], Pot[ContainerT[IWS,IWS]]]): Unit = {
+         itemsx  = collection.immutable.SortedSet[Store]() ++
+           IWSCircuit.zoom(_.store.get.models.get(2)).eval(IWSCircuit.getRootModel).get.get.items.asInstanceOf[List[Store]].toSet
+         log.debug(s" Store Listener ${itemsx}")
+         render(props,$.state.runNow())
+       }
        Callback {
          IWSCircuit.dispatch(Refresh(Store()))
          //Callback.when(props.proxy().isEmpty)(props.proxy.dispatch(Refresh(Store())))
        }
-
+     }
 
       def edit(itemx:Option[Store]) = {
       $.modState(s => s.copy(item = itemx))
@@ -106,11 +116,16 @@ object STORE {
           )
 
      def render(p: Props, s: State) ={
-       val items =  IWSCircuit.zoom(_.store.get.models.get(2)).eval(IWSCircuit.getRootModel).get.get.items.asInstanceOf[List[Store]]
-       log.debug(s"itemsitemsitemsitemsitemsitemsitemsitems is ${items}")
+      // val items =  IWSCircuit.zoom(_.store.get.models.get(2)).eval(IWSCircuit.getRootModel).get.get.items.asInstanceOf[List[Store]]
+
        def saveButton = Button(Button.Props(edited(s.item.getOrElse(Store())), addStyles = Seq(bss.pullRight, bss.buttonXS,
          bss.buttonOpt(CommonStyle.success))), Icon.circleO, "Save")
        def newButton =  Button(Button.Props(edit(Some(Store())), addStyles = Seq(bss.pullRight, bss.buttonXS)), Icon.plusSquare, "New")
+       if( itemsx.filter(!_.id.isEmpty).size <=1) {
+         itemsx = IWSCircuit.zoom(_.store.get.models.get(2)).eval(IWSCircuit.getRootModel).get.get.items.asInstanceOf[List[Store]].toSet
+       }
+       val items = itemsx.toList.sorted
+       log.debug(s"itemsitemsitemsitemsitemsitemsitemsitems is ${items}")
        Panel(Panel.Props("Store"), <.div(^.className := "panel-heading",^.padding :=0), <.div(^.padding :=0,
          p.proxy().renderFailed(ex => "Error loading"),
          p.proxy().renderPending(_ > 500, _ => "Loading..."),
