@@ -30,12 +30,6 @@ trait ContainerT [+A<:IWS,-B<:IWS] {
   def add(newItem: B): ContainerT [A,B]
 }
 
-/*case class Data  (items: Set[IWS]) extends ContainerT [IWS,IWS]{
-  override def update(newItem: IWS) = Data(items+newItem)
-  override def add(newItem: IWS)= Data(items + newItem)
-  override def remove (item: IWS) = Data(items-item)
-}
-*/
 sealed trait  Masterfile extends IWS {
   def name:String
   def description:String
@@ -66,17 +60,7 @@ case class Data  (items: Seq[IWS]) extends ContainerT [IWS,IWS]{
   override def add(newItem: IWS)= Data(items :+ newItem)
   override def remove (item: IWS) = Data(items.filterNot(_.id==item.id))
 }
-/*
-case class Data  (items: Seq[IWS]) extends ContainerT [IWS,IWS]{
-  private[Data] var  items1: Set[IWS]  = items.toSet
-  override def update(newItem: IWS):Data = {
-     items1 = items1+ newItem
-     println(s" items1items1items1 ${items1}")
-    Data(items1.toList)
-  }
-  override def add(newItem: IWS)= update(newItem)
-  override def remove (item: IWS) = { items1 -= item; Data(items1.toList)}
-}*/
+
 sealed trait Trans extends IWS { def tid:Long}
 sealed trait Transaction [L] extends Trans {
     def id = tid.toString
@@ -186,10 +170,10 @@ case class Account (id: String ="-1", name: String  ="", modelId:Int = 9,descrip
                     accounts:Option[List[Account]] = None, dateOfOpen: Option[Date] = Some(new Date()), dateOfClose: Option[Date] =
                     Some(new Date()), balance: Balance = Balance(0.0)) extends Masterfile
 
-case class Article(id:String ="-1", name:String ="", modelId:Int = 7, description:String  ="", price:Amount = 0,
-                   qttyUnit:String ="Stk", packUnit:String ="Stk", groupId:Option[String] = None,
+case class Article(id:String ="-1", name:String ="", modelId:Int = 7, description:String  ="", price:Amount = 0, avgPrice:Amount = 0, salesPrice:Amount=0,
+                   qttyUnit:String ="Stk", packUnit:String ="Stk", groupId:Option[String] = None, vat:Option[String] = None,
                    articles:Option[List[Article]] = None) extends IWS with Masterfile
-case class QuantityUnit(id:String ="-1",name:String ="", modelId:Int =4 ,description:String ="") extends IWS with Masterfile
+case class QuantityUnit(id:String ="-1",name:String ="", modelId:Int = 4 ,description:String ="") extends IWS with Masterfile
 case class ArticleGroup(id:String ="-1", name:String ="", modelId:Int = 8, description:String ="") extends IWS with Masterfile
 abstract class BusinessPartner(id: String ="-1", name: String ="", modelId:Int, street: String ="", city: String ="", state: String ="", zip: String ="") extends IWS
 case class Supplier(id: String ="-1", name: String ="" , modelId:Int = 1, street: String ="", city: String ="", state: String ="", zip: String ="") extends
@@ -200,7 +184,7 @@ case class Customer(id: String ="-1", name: String ="", modelId:Int = 3, street:
 BusinessPartner (id: String, name: String , modelId:Int, street: String, city: String, state: String , zip: String )
 
 
-case class Vat(id:String ="",name:String ="-1", modelId:Int =5 ,description:String ="", percent:Amount =0) extends Masterfile
+case class Vat(id:String ="-1",name:String ="", modelId:Int = 5 ,description:String ="", percent:Amount =0) extends Masterfile
 case class LinePurchaseOrder  (tid:Long = 0L, transid:Long =0, modelId:Int = 102,item:Option[String] = None, unit:Option[String] = None, price: Amount = 0,
                                quantity:Amount = 0,vat:Option[String] = None, duedate:Option[Date] = Some(new Date()),text:String ="txt",
                                modified:Boolean= false, created:Boolean= false, deleted:Boolean= false) extends LineInventoryTransaction {
@@ -302,7 +286,8 @@ object  Vat_{ def unapply (in:Vat) =Some(in.id,in.name, in.modelId, in.descripti
 object  CostCenter_{ def unapply (in:CostCenter) =Some(in.id,in.name,in.description)}
 object  QuantityUnit_{ def unapply (in:QuantityUnit) =Some(in.id,in.name,in.modelId, in.description)}
 object  Account_{ def unapply (in:Account) =Some(in.id,in.name,in.modelId, in.description, in.groupId, in.accounts, in.dateOfOpen,in.dateOfClose,in.balance)}
-object  Article_{ def unapply (in:Article) =Some(in.id,in.name, in.modelId, in.description, in.price, in.qttyUnit, in.packUnit, in.articles)}
+object  Article_{ def unapply (in:Article) =Some(in.id,in.name, in.modelId, in.description, in.price,
+  in.avgPrice, in.salesPrice, in.qttyUnit, in.packUnit, in.vat, in.articles)}
 object  ArticleGroup_{ def unapply (in:ArticleGroup) =Some(in.id,in.name,in.modelId, in.description)}
 object  LinePurchaseOrder_{ def unapply (in:LinePurchaseOrder) = Some(in.tid,in.transid, in.modelId, in.item, in.unit, in.price, in.quantity, in.vat, in.duedate, in.text)}
 object  PurchaseOrder_{ def unapply (in:PurchaseOrder[LinePurchaseOrder]) = Some(in.tid,in.oid, in.modelId, in.store, in.account, in.lines)}
@@ -413,12 +398,12 @@ object Model {
     QuantityUnit("Stk","Stueck", 4, "Stueck")
   )
   val articles=List(
-    Article("001","Masterfile", 7, "Financials Application for Enterprise",BigDecimal(5000.0),"Stk", "Stk", None, None),
-    Article("002","Inventory", 7, "Financials Application for Enterprise",BigDecimal(5000.0),"Stk", "Stk", None, None),
-    Article("003","Purchasing",7,  "Financials Application for Enterprise",BigDecimal(5000.0),"Stk", "Stk", None, None),
-    Article("004","CRM", 7, "Financials Application for Enterprise",BigDecimal(5000.0),"Stk", "Stk", None, None),
-    Article("005","Financials",7, "Financials Application for Enterprise",BigDecimal(5000.0),"Stk", "Stk", None, None),
-    Article("006","Analytics",7, "Enterprise Analytics & Decision support for Management",BigDecimal(50000.0),"Stk", "Stk", None, None)
+    Article("001","Masterfile", 7, "Financials Application for Enterprise",BigDecimal(5000.0), BigDecimal(5000.0), BigDecimal(5000.0),"Stk", "Stk", None, None),
+    Article("002","Inventory", 7, "Financials Application for Enterprise",BigDecimal(5000.0), BigDecimal(5000.0), BigDecimal(5000.0), "Stk", "Stk", None, None),
+    Article("003","Purchasing",7,  "Financials Application for Enterprise",BigDecimal(5000.0),BigDecimal(5000.0), BigDecimal(5000.0),"Stk", "Stk", None, None),
+    Article("004","CRM", 7, "Financials Application for Enterprise",BigDecimal(5000.0),BigDecimal(5000.0), BigDecimal(5000.0), "Stk", "Stk", None, None),
+    Article("005","Financials",7, "Financials Application for Enterprise",BigDecimal(5000.0), BigDecimal(5000.0), BigDecimal(5000.0), "Stk", "Stk", None, None),
+    Article("006","Analytics",7, "Enterprise Analytics & Decision support for Management",BigDecimal(50000.0), BigDecimal(5000.0), BigDecimal(5000.0), "Stk", "Stk", None, None)
 
 
   )

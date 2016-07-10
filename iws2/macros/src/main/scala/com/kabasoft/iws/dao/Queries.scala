@@ -17,7 +17,7 @@ import com.kabasoft.iws.shared.Model._
 object Queries  {
 
    type ACCOUNT_TYPE =(String, String, Int, String, String,  Date, Date)
-  type ARTICLE_TYPE =(String, String, Int, String, scala.math.BigDecimal, String, String, String)
+  type ARTICLE_TYPE =(String, String, Int, String, scala.math.BigDecimal, scala.math.BigDecimal, scala.math.BigDecimal,String, String, String, String)
   def create: Update0 = createSchema.update
   def accountInsertSQL= "INSERT INTO account VALUES (?, ?, ?, ?, ?, ?, ?)"
   def accountSelect =  sql"SELECT * FROM account".query[ACCOUNT_TYPE]
@@ -27,12 +27,12 @@ object Queries  {
   def accountUpdateName = {(model:Account) =>sql"Update account set name =${model.name}, modelId=${model.modelId}, description=${model.description}, groupId=${model.groupId.getOrElse("")} where id =${model.id}".update}
   def accountDelete = {id:String =>sql"Delete FROM account where id =$id".update}
 
-  def articleInsertSQL= "INSERT INTO article VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
-  def articleSelect = sql"SELECT id, name, modelId, description, price, qttyUnit, packUnit, groupId  FROM article".query[ARTICLE_TYPE]
+  def articleInsertSQL= "INSERT INTO article (id, name, modelId, description, price, avgPrice, salesPrice, qttyUnit, packUnit, groupId, vat ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+  def articleSelect = sql"SELECT id, name, modelId, description, price, avgprice, salesPrice, qttyUnit, packUnit, groupId, vat  FROM article".query[ARTICLE_TYPE]
   def articleIdSelect(id:String) = sql"SELECT * FROM article where id =$id".query[ARTICLE_TYPE]
-  def articleSelectByGroupId = {groupId:String =>sql"SELECT id, name, modelId, description, price, qttyUnit, packUnit, groupId FROM article where groupid =$groupId".query[ARTICLE_TYPE]}
+  def articleSelectByGroupId = {groupId:String =>sql"SELECT id, name, modelId, description, price, avgprice, salesPrice, qttyUnit, packUnit, groupId, vat FROM article where groupid =$groupId".query[ARTICLE_TYPE]}
   def articleSelectSome = {id:String =>sql"SELECT * FROM article  where id =$id".query[ARTICLE_TYPE]}
-  def articleUpdateName= {(model:Article) =>sql"Update article set name =${model.name}, description =${model.description}, price =${model.price},  qttyUnit =${model.qttyUnit} , packUnit =${model.packUnit}, groupId=${model.groupId.getOrElse("")}   where id =${model.id}".update}
+  def articleUpdateName= {(model:Article) =>sql"Update article set name =${model.name}, description =${model.description}, price =${model.price},  avgprice =${model.avgPrice}, salesPrice =${model.salesPrice}, qttyUnit =${model.qttyUnit} , packUnit =${model.packUnit}, groupId=${model.groupId.getOrElse("")} , vat =${model.vat.getOrElse("0")}  where id =${model.id}".update}
   def articleDelete = {id:String =>sql"Delete FROM article where id =$id".update}
 
   def quantityUnitInsertSQL = "INSERT INTO quantityUnit VALUES (?, ?, ?, ?)"
