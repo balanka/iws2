@@ -62,18 +62,17 @@ object GOODRECEIVING {
     }
     def saveLine(linex:LineGoodreceiving) = {
       val line = linex.copy(modified=true)
-     // log.debug(s"purchaseOrder is yyyyyyyyyy" + line)
       val k = $.state.runNow().item.getOrElse(Goodreceiving[LineGoodreceiving]())
       val k2 = k.replaceLine( line.copy(transid = k.tid))
      // log.debug(s"purchaseOrder saved is ZZZZZZZZZZ" + k2)
-      Callback {
-        IWSCircuit.dispatch(Update(k2))
-      }
-      //$.modState(s => s.copy(item =Some(k2)))
-    }
+      runCB(k2)
 
+    }
+    def runCB (item:Goodreceiving[LineGoodreceiving]) = Callback {
+      IWSCircuit.dispatch(Update(item))
+      $.modState(s => s.copy(item =Some(item))).runNow()
+    }
     def delete(item:Goodreceiving[LineGoodreceiving]) = {
-      // val s = $.state.runNow().item
       Callback.log("PurchaseOrder deleted>>>>> ${item}  ${s}")
       $.props >>= (_.proxy.dispatch(Delete(item)))
       //$.modState(s => s.copy(item = None)).runNow()
@@ -82,13 +81,13 @@ object GOODRECEIVING {
       val  deleted =line1.copy(deleted = true)
       val k =$.state.runNow().item.getOrElse(Goodreceiving[LineGoodreceiving]())
       val k2 = k.replaceLine(deleted)
-      edited(k2)
+       runCB(k2)
     }
     def AddNewLine(line:LineGoodreceiving) = {
       val  created =line.copy(created = true)
       log.debug(s"New Line Purchase order before  edit>>>>>  ${line}")
-      $.modState(s => s.copy(item = s.item.map(_.add(line.copy(transid=s.item.getOrElse(Goodreceiving[LineGoodreceiving]()).tid)))))
-      //editLine()
+      $.modState(s => s.copy(item = s.item.map(_.add(line.copy(transid=
+                s.item.getOrElse(Goodreceiving[LineGoodreceiving]()).tid)))))
     }
 
     def filterWith(line:LineGoodreceiving, search:String) =
