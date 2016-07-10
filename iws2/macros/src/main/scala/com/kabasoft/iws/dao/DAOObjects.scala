@@ -53,25 +53,25 @@ object DAOObjects  {
   {
      def insert(model: List[Article]): Int = doobie.imports.Update[Queries.ARTICLE_TYPE](Queries.articleInsertSQL).
       updateMany(model.map(x =>
-        (x.id, x.name, x.modelId, x.description, x.price, x.qttyUnit, x.packUnit, x.groupId.getOrElse("")))).transact(xa).run
+        (x.id, x.name, x.modelId, x.description, x.price,  x.avgPrice, x.salesPrice, x.qttyUnit, x.packUnit,  x.groupId.getOrElse(""), x.vat.getOrElse("0")))).transact(xa).run
 
      def create = Queries.createArticle.run.transact(xa).run
      def update(model:Article):Int = Queries.articleUpdateName(model).run.transact(xa).run
      def delete(id:String):Int = Queries.articleDelete(id).run.transact(xa).run
      def all: List[Article] = Queries.articleSelect.process.list.transact(xa).run.map(x =>
-      Article(x._1, x._2, x._3, x._4, x._5, x._6, x._7, Some(x._8)).copy(articles = Some(findSome2(x._1))))
+      Article(x._1, x._2, x._3, x._4, x._5, x._6, x._7, x._8, x._9, Some(x._10), Some(x._11)).copy(articles = Some(findSome2(x._1))))
 
     def find(id: String): List[Article] = Queries.articleIdSelect(id).process.list.transact(xa).run.map(x =>
-      Article(x._1, x._2, x._3, x._4, x._5, x._6, x._7, Some(x._8)).copy(articles = Some(findSome2(x._1))))
+      Article(x._1, x._2, x._3, x._4, x._5, x._6, x._7,  x._8, x._9, Some(x._10), Some(x._11)).copy(articles = Some(findSome2(x._1))))
 
     def findSome(id: String): List[Article] = Queries.articleSelectSome(id).process.list.transact(xa).run.map(x =>
-      Article(x._1, x._2, x._3, x._4, x._5, x._6, x._7, Some(x._8)).copy(articles = Some(findSome2(x._1))))
+      Article(x._1, x._2, x._3, x._4, x._5, x._6, x._7,  x._8, x._9, Some(x._10), Some(x._11)).copy(articles = Some(findSome2(x._1))))
 
     def findSome1(id: Long): List[Article] = Queries.articleSelectSome(id + "").process.list.transact(xa).run.map(x =>
-      Article(x._1, x._2, x._3, x._4, x._5, x._6, x._7, Some(x._8)).copy(articles = Some(findSome2(x._1))))
+      Article(x._1, x._2, x._3, x._4, x._5, x._6, x._7,  x._8, x._9, Some(x._10), Some(x._11)).copy(articles = Some(findSome2(x._1))))
 
     def findSome2(groupId: String): List[Article] = Queries.articleSelectByGroupId(groupId).process.list.transact(xa).run.map(x =>
-      Article(x._1, x._2, x._3, x._4, x._5, x._6, x._7, Some(x._8)).copy(articles = Some(findSome2(x._1))))
+      Article(x._1, x._2, x._3, x._4, x._5, x._6, x._7,  x._8, x._9, Some(x._10), Some(x._11)).copy(articles = Some(findSome2(x._1))))
   }
 
   implicit def categoryDAO = new DAO[ArticleGroup]
@@ -112,7 +112,7 @@ object DAOObjects  {
   {
     def insert(model: List[Store]) :Int =  Update[Store](Queries.storeInsertSQL).updateMany(model).transact(xa).run
     def create = Queries.createStore.run.transact(xa).run
-    def update(model:Store) = Queries.storeUpdateName(model).run.transact(xa).run
+    def update(model:Store) = {  println(s"sql ${ Queries.storeUpdateName(model)}") ; Queries.storeUpdateName(model).run.transact(xa).run}
     def delete(id:String):Int = Queries.storeDelete(id).run.transact(xa).run
     def all = Queries.storeSelect.process.list.transact(xa).run
     def find(id:String) : List[Store] = Queries.storeIdSelect(id).process.list.transact(xa).run
@@ -246,7 +246,7 @@ implicit def purchaseOrderDAO = new DAO[PurchaseOrder[LinePurchaseOrder]]{
     def insert(model: List[Goodreceiving[LineGoodreceiving]]) :Int = {
       val tid:Long = Queries.getSequence ("goodreceiving", "id").unique.transact(xa).run;
       val ret= doobie.imports.Update[(Long,Long, Int, String,String)](Queries.goodreceivingInsertSQL).updateMany(model.map(
-        x=>(tid, x.oid, x.modelId, x.store.get,x.account.get))).transact(xa).run;
+        x=>(tid, x.oid, x.modelId, x.store.getOrElse(""),x.account.getOrElse("")))).transact(xa).run;
       model.map( x=>implicitly[DAO[LineGoodreceiving]].insert(x.lines.getOrElse(List[LineGoodreceiving]()).map( z => z.copy(transid=tid))))
       ret
 
