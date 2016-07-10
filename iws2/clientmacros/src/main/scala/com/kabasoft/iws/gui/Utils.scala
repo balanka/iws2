@@ -7,12 +7,12 @@ import japgolly.scalajs.react.vdom.prefix_<^._
 import com.kabasoft.iws.gui.logger._
 import com.kabasoft.iws.gui.macros.GlobalStyles.IWSStyles
 import com.kabasoft.iws.gui.macros.GlobalStyles
+import com.kabasoft.iws.shared.Masterfile
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.prefix_<^._
 
 import scalacss.ScalaCssReact._
 import scalacss.Defaults._
-
 import org.widok.moment._
 
 object Utils {
@@ -21,10 +21,14 @@ object Utils {
   val r = IWSStyles.td(10).htmlClass
 
   def fmt(t:Date) = Moment(t.getTime).format("DD.MM.YYYY")
-
+  def fmt(m:BigDecimal) = "%06.2f".format(m)
 
   // def format(d:String) = LocalDate.of(2016,7,7) //parse(d,DateTimeFormatter.ISO_LOCAL_DATE)
   //def format(d:String) = com.zoepepper.facades.jsjoda.LocalDate.parse(d,DateTimeFormatter.ISO_LOCAL_DATE)
+
+  def noAction(e: ReactEventI):Callback = Callback {}
+
+  def buildIdNameList [A<:Masterfile](list: List[A]): List[String]= list map (iws =>(iws.id+":"+iws.name))
 
   def buildDItem[A](id:String , value:Option[A], defValue:A, evt:ReactKeyboardEventI=> Option[Callback]) = {
     val m = value getOrElse defValue
