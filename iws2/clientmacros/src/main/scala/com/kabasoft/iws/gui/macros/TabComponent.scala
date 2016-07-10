@@ -9,9 +9,9 @@ object TabComponent {
   case class Props(items: Seq[TabItem])
 
   def buildTab (items:Seq[TabItem] ):ReactElement  =
-    <.div(^.cls:="container",
-      <.div(^.cls:="row",
-        <.div(^.cls:="col-sm-2",
+    <.div(^.cls:="container-fluid",
+      <.div(^.cls:="row", ^.padding:=2.px,
+        <.div(^.cls:="col-sm-2",  ^.padding:=1.px,
             buildTabHeader(items)),
             buildTabContent(items))
     )
@@ -19,11 +19,11 @@ object TabComponent {
   def buildIt(item:TabItem) ={
     var titleTag = "tab-pane fade"
     if (item.active) titleTag = "tab-pane fade in active"
-    <.div(^.role := "tabpanel", ^.cls := titleTag, ^.id := item.id, item.content)
+    <.div(^.role := "tabpanel", ^.cls := titleTag,  ^.id := item.id, item.content)
   }
   def buildTabContent( tabItems: Seq[TabItem])=
-    <.div(^.cls := "col-sm-6",
-      <.div(^.cls := "tab-content", tabItems map (item => buildIt(item))
+    <.div(^.cls := "col-sm-10", ^.padding:=1.px,
+      <.div(^.cls := "tab-content",  tabItems map (item => buildIt(item))
     )
    )
 
