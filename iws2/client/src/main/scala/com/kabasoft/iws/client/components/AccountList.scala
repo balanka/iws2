@@ -1,11 +1,15 @@
 package com.kabasoft.iws.client.components
 
+import com.kabasoft.iws.gui.Utils
 import com.kabasoft.iws.shared.Account
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.prefix_<^._
 import com.kabasoft.iws.gui.macros.Bootstrap.{Button, CommonStyle}
-import com.kabasoft.iws.gui.macros.{GlobalStyles,Icon}
+import com.kabasoft.iws.gui.macros.{GlobalStyles, Icon}
+
 import scalacss.ScalaCssReact._
+import org.widok.moment._
+
 
 
 
@@ -33,7 +37,7 @@ object AccountList {
           <.span(item.id),
           <.span(item.name ,^.paddingLeft:=10.px),
           <.span(item.description ,^.paddingLeft:=10.px),
-          //<.span(Utils.format(item.dateOfOpen.get),^.paddingLeft:=10),
+          <.span( Moment(item.dateOfOpen.get.getTime).format("DD.MM.YYYY"),^.paddingLeft:=10),
           <.span("%06.2f".format(item.balance.amount.toDouble),^.paddingLeft:=10.px),
           tag
           )
