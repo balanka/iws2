@@ -1,6 +1,7 @@
 package com.kabasoft.iws.client.components
 
 import java.util.Date
+
 import com.kabasoft.iws.gui.Utils._
 import com.kabasoft.iws.gui.logger._
 import com.kabasoft.iws.gui.macros.Bootstrap.{Button, CommonStyle}
@@ -10,6 +11,7 @@ import com.kabasoft.iws.shared.{Store => MStore, _}
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.prefix_<^._
 import org.scalajs.dom.ext.KeyCode
+import org.widok.moment.Moment
 
 import scalacss.ScalaCssReact._
 
@@ -24,8 +26,7 @@ object LineGoodreceivingList {
 
   class Backend($: BackendScope[Props, State]) {
 
-    def mounted(props: Props) =
-      Callback {
+    def mounted(props: Props) = Callback {
         IWSCircuit.dispatch(Refresh(Article()))
         IWSCircuit.dispatch(Refresh(QuantityUnit()))
         IWSCircuit.dispatch(Refresh(Vat()))
@@ -36,9 +37,14 @@ object LineGoodreceivingList {
        $.modState(s => s.copy(item = Some(line)))
     }
     def updateItem(id: String) = {
-      val itemId = id.substring(0, id.indexOf("|"))
-      //log.debug(s"ItemId Key is ${itemId}  ")
-      $.modState(s => s.copy(item = s.item.map(_.copy(item = Some(itemId)))))>>setModfied
+      val r =id.split(":")
+      val itemId = r(0)
+      val qttyUnitId = r(2)
+      val  vatId = r(3)
+      log.debug(s"ItemId Key is ${r}  itemid  ${itemId} qttyUnitId ${qttyUnitId} vatId ${vatId}  ")
+      $.modState(s => s.copy(item = s.item.map(_.copy(unit=Some(qttyUnitId)))))>>
+        $.modState(s => s.copy(item = s.item.map(_.copy(vat=Some(vatId)))))>>
+        $.modState(s => s.copy(item = s.item.map(_.copy(item = Some(itemId)))))>>setModfied
     }
 
     def updateVat(id: String) = {
@@ -89,7 +95,7 @@ object LineGoodreceivingList {
 
     def save(line:LineGoodreceiving, saveLineCB:LineGoodreceiving =>Callback) = saveLineCB(line.copy(modified = true))
 
-    def setModfied = $.modState(s => s.copy(item = s.item.map(_.copy(modified = true))))
+    def setModfied = Callback {$.modState(s => s.copy(item = s.item.map(_.copy(modified = true)))).runNow() }
     def newLine(line:LineGoodreceiving, newLineCallback:LineGoodreceiving =>Callback) = {
       log.debug(s" newLine called with   ${line}")
      newLineCallback(line)>> edit(line)
@@ -101,20 +107,20 @@ object LineGoodreceivingList {
       val items =  IWSCircuit.zoom(_.store.get.models.get(7)).eval(IWSCircuit.getRootModel).get.get.items.asInstanceOf[List[Article]]
       val qttyUnit =  IWSCircuit.zoom(_.store.get.models.get(4)).eval(IWSCircuit.getRootModel).get.get.items.asInstanceOf[List[QuantityUnit]]
       val vat =  IWSCircuit.zoom(_.store.get.models.get(5)).eval(IWSCircuit.getRootModel).get.get.items.asInstanceOf[List[Vat]]
-
       def saveButton = Button(Button.Props(save(s.item.getOrElse(LineGoodreceiving()),p.saveLine),
         addStyles = Seq(bss.pullRight, bss.buttonXS, bss.buttonOpt(CommonStyle.success))), Icon.circleO, "")
       def newButton = Button(Button.Props( newLine(LineGoodreceiving( created = true),p.newLine),
         addStyles = Seq(bss.pullRight, bss.buttonXS)), Icon.plusSquare, "")
-      def buildIdNameList (list: List[Masterfile]): List[String]= list map (iws =>(iws.id+"|"+iws.name))
+      def buildIdNameList [A<:Masterfile](list: List[A]): List[String]= list.filter(_.id !="-1") map (iws =>(iws.id+"|"+iws.name))
+      def buildArticleList [A<:Article](list: List[A]): List[String]= list.filter(_.id !="-1") map (iws =>(iws.id+":"+iws.name +":"+iws.qttyUnit  +":"+iws.vat.getOrElse("0")))
       def editFormLine : Seq [TagMod]=List(
-              buildSItem("item", itemsx = buildIdNameList(items), defValue = "0001", evt = updateItem),
-              buildWItem1[String]("price", s.item.map(_.price.toString()), "0,0", updatePrice),
-              buildWItem1[String]("quantity", s.item.map(_.quantity.toString()), "0,0", updateQuantity),
+              buildSItem("item", itemsx = buildArticleList(items), defValue = "0001", evt = updateItem),
+              buildDItem[String]("price", s.item.map(_.price.toString()), "0,0", updatePrice),
+              buildDItem[String]("quantity", s.item.map(_.quantity.toString()), "0,0", updateQuantity),
               buildSItem("q.unit", itemsx = buildIdNameList(qttyUnit), defValue = "KG", evt = updateUnit),
               buildSItem("Vat", itemsx = buildIdNameList(vat), defValue = "7", evt = updateVat),
-              buildWItem[Date]("duedate", s.item.map(_.duedate.getOrElse(new Date())), new Date(),
-                updateDuedate), saveButton, newButton)
+              buildWItem[String]("duedate", s.item.map( e =>(fmt(e.duedate.getOrElse(new Date())))),
+               fmt(new Date()), updateDuedate), saveButton, newButton)
       <.div(bss.formGroup,
         //<.ul(style.listGroup)(all.filter(p.predicate (_,s.search)).sortBy(_.tid)(Ordering[Long].reverse) map (e =>renderItem(e,p))),
         <.ul(style.listGroup)(its.sortBy(_.tid)(Ordering[Long].reverse) map (e =>renderItem(e,p))),
@@ -142,6 +148,7 @@ object LineGoodreceivingList {
         <.span("%6.2f".format(item.quantity.bigDecimal),^.paddingLeft:=10.px),
         <.span(item.unit ,^.paddingLeft:=10.px),
         <.span(item.vat ,^.paddingLeft:=10.px),
+        <.span( Moment(item.duedate.get.getTime).format("DD.MM.YYYY"),^.paddingLeft:=10),
         <.span(editButton, deleteButton,^.alignContent:="center")
       )
     }
