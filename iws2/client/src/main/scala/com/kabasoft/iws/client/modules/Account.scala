@@ -1,6 +1,7 @@
 package com.kabasoft.iws.client.modules
 
 import com.kabasoft.iws.client.components.AccountList
+import com.kabasoft.iws.gui.Utils._
 import com.kabasoft.iws.gui._
 import com.kabasoft.iws.shared.Account
 import diode.react.ReactPot._
@@ -13,8 +14,7 @@ import com.kabasoft.iws.gui.macros.Bootstrap._
 import com.kabasoft.iws.shared._
 import com.kabasoft.iws.gui.macros._
 import com.kabasoft.iws.gui.logger._
-import com.kabasoft.iws.gui.services.{IWSCircuit, RootModel}
-import diode.ModelR
+import com.kabasoft.iws.gui.services.IWSCircuit
 
 import scalacss.ScalaCssReact._
 
@@ -23,24 +23,15 @@ object ACCOUNT {
   @inline private def bss = GlobalStyles.bootstrapStyles
   @volatile var itemsx = Set.empty[Account]
   case class Props(proxy: ModelProxy[Pot[Data]])
-  case class State(selectedItem: Option[Account] = None, name:String)
+  case class State(item: Option[Account] = None, name:String)
   class Backend($: BackendScope[Props, State]) {
     implicit def orderingById[A <: Account]: Ordering[A] = {Ordering.by(e => (e.id, e.id))}
-    def mounted(props: Props) = {
-      def listener(cursor: ModelR[RootModel[IWS,IWS], Pot[ContainerT[IWS,IWS]]]): Unit = {
-        itemsx  = collection.immutable.SortedSet[Account]() ++
-          IWSCircuit.zoom(_.store.get.models.get(2)).eval(IWSCircuit.getRootModel).get.get.items.asInstanceOf[List[Account]].toSet
-        log.debug(s" Store Listener ${itemsx}")
-        render(props,$.state.runNow())
-      }
-      IWSCircuit.subscribe(IWSCircuit.zoom(_.store.get.models.get(9).get)) (listener)
-
-      Callback {
+    def mounted(props: Props) = Callback {
         IWSCircuit.dispatch(Refresh(Account()))
       }
-  }
+
     def edit(item:Option[Account]) = {
-      $.modState(s => s.copy(selectedItem = item))
+      $.modState(s => s.copy(item = item))
     }
     def edited(item:Account) = {
       $.props >>= (_.proxy.dispatch(Update[Account](item)))
@@ -52,19 +43,21 @@ object ACCOUNT {
 
     def updateId(e: ReactEventI) = {
       val r = e.target.value
-      $.modState(s => s.copy(s.selectedItem.map( z => z.copy(id = r))))
+      $.modState(s => s.copy(s.item.map(z => z.copy(id = r))))
     }
     def updateName(e: ReactEventI) = {
       val r = e.target.value
-      $.modState(s => s.copy(s.selectedItem.map( z => z.copy(name = r))))
+      $.modState(s => s.copy(s.item.map(z => z.copy(name = r))))
     }
     def updateDescription(e: ReactEventI) = {
       val r = e.target.value
-      $.modState(s => s.copy(s.selectedItem.map( z => z.copy(description = r))))
+      $.modState(s => s.copy(s.item.map(z => z.copy(description = r))))
     }
-    def updateGroupId(e: ReactEventI) = {
-      val id= e.target.value
-      $.modState(s => s.copy(s.selectedItem.map( z => z.copy(groupId = Some(id)))))
+
+    def updateGroupId(id: String) = {
+      val groupId = id.substring(0, id.indexOf(":"))
+      log.debug(s"groupId  is ${groupId}  ")
+      $.modState(s => s.copy(s.item.map( z => z.copy(groupId = Some(groupId)))))
     }
     val NameChanger = ReactComponentB[ExternalVar[String]]("Name changer")
       .render_P { evar =>
@@ -75,27 +68,28 @@ object ACCOUNT {
       }
       .build
 
-    def buildFormTab(p: Props, s: State): Seq[ReactElement] = {
-      val subAccounts = s.selectedItem.getOrElse(Account()).accounts.getOrElse(List.empty[Account])
+    def buildFormTab(p: Props, s: State, items:List[Account]): Seq[ReactElement] = {
+      val subAccounts = s.item.getOrElse(Account()).accounts.getOrElse(List.empty[Account])
       List(<.div(bss.formGroup,
         TabComponent(Seq(
-          TabItem("vtab1", "Form", "#vtab1", true,buildFormTable(s)),
+          TabItem("vtab1", "Form", "#vtab1", true,buildFormTable(s,items)),
           TabItem("vtab2", "sub account", "#vtab2", false, AccountList(subAccounts))))
        )
      )
     }
-    def buildFormTable(s: State) =
+    def buildFormTable(s: State, items:List[Account]) =
         <.table(^.className := "table-responsive table-condensed", ^.tableLayout := "fixed",
           <.tbody(
             <.tr(bss.formGroup, ^.height := 20,
-              buildWItem("id", s.selectedItem.map(_.id), updateId),
-              buildWItem("name", s.selectedItem.map(_.name), updateName),
-              buildWItem("description", s.selectedItem.map(_.description), updateDescription),
-              buildWItem("group", s.selectedItem.map(_.groupId.getOrElse("groupId")), updateGroupId)
+              buildWItem("id", s.item.map(_.id), updateId),
+              buildWItem("name", s.item.map(_.name), updateName),
+              buildWItem("description", s.item.map(_.description), updateDescription)),
+            <.tr(bss.formGroup, ^.height := 20,
+              buildWItem("group", s.item.map(_.groupId.getOrElse("groupId")), noAction),
+              buildSItem("group", itemsx = buildIdNameList(items), defValue = "-1", evt = updateGroupId)
             )
            )
          )
-
 
     def buildWItem[A](id:String , value:Option[String],evt:ReactEventI=> Callback) =
      List( <.td(<.label(^.`for` := id, id)),
@@ -106,21 +100,17 @@ object ACCOUNT {
       List( <.td(<.label(^.`for` := id, id)),
             <.td(<.input.text(bss.formControl, ^.id := id, ^.value := value,
                                ^.placeholder := id),^.paddingLeft := 1))
-
     def render(p: Props, s: State) ={
     val itemsx =  IWSCircuit.zoom(_.store.get.models.get(9)).eval(IWSCircuit.getRootModel).get.get.items.asInstanceOf[List[Account]].toSet
-    val saveButton = Button(Button.Props(edited(s.selectedItem.getOrElse(Account())),
+    val saveButton = Button(Button.Props(edited(s.item.getOrElse(Account())),
         addStyles = Seq(bss.pullRight, bss.buttonXS, bss.buttonOpt(CommonStyle.success))), Icon.circleO, " Save")
     val newButton=Button(Button.Props(edit(Some(Account())), addStyles = Seq(bss.pullRight, bss.buttonXS)), Icon.plusSquare, " New")
-//      if( itemsx.filter(_.id.equals("-1")).size <=1) {
-//        itemsx = IWSCircuit.zoom(_.store.get.models.get(2)).eval(IWSCircuit.getRootModel).get.get.items.asInstanceOf[List[Account]].toSet
-//      }
-      val items = itemsx.toList.sorted
+    val items = itemsx.toList.sorted
 
       Panel(Panel.Props("Account"), <.div(^.className := "panel-heading",^.padding :=0), <.div(^.padding :=0,
         p.proxy().renderFailed(ex => "Error loading"),
         p.proxy().renderPending(_ > 500, _ => "Loading..."),
-        AccordionPanel("Edit", buildFormTab(p,s), List(saveButton, newButton)),
+        AccordionPanel("Edit", buildFormTab(p,s,items), List(saveButton, newButton)),
         AccordionPanel("List",
           List(AccountList(items,
             Some(item => edit(Some(item))),
