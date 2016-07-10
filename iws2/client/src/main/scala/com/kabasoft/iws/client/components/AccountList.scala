@@ -39,6 +39,7 @@ object AccountList {
           <.span(item.description ,^.paddingLeft:=10.px),
           <.span( Moment(item.dateOfOpen.get.getTime).format("DD.MM.YYYY"),^.paddingLeft:=10),
           <.span("%06.2f".format(item.balance.amount.toDouble),^.paddingLeft:=10.px),
+          <.span(item.groupId.getOrElse("0").asInstanceOf[String], ^.paddingLeft:=10.px),
           tag
           )
       }
