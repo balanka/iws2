@@ -1,6 +1,6 @@
 package com.kabasoft.iws.client.modules
 
-import com.kabasoft.iws.client.components.{Chart, ChartData, ChartDataset, Motd}
+import com.kabasoft.iws.client.components.{Chart, ChartData, ChartDataset}
 import com.kabasoft.iws.gui.AppRouter.Page
 import diode.react._
 import diode.data.Pot
