@@ -36,8 +36,11 @@ object ArticleList {
           <.span(item.description, ^.paddingLeft:=10.px),
           <.span(item.qttyUnit, ^.paddingLeft:=10.px),
           <.span(item.packUnit, ^.paddingLeft:=10.px),
-          //<.span(item.groupId.get, ^.paddingLeft:=10.px),
+          <.span(item.groupId.getOrElse("0").asInstanceOf[String], ^.paddingLeft:=10.px),
+          <.span(item.vat.getOrElse("-1").asInstanceOf[String], ^.paddingLeft:=10.px),
           <.span("%06.2f".format(item.price.bigDecimal),^.paddingLeft:=10.px),
+          <.span("%06.2f".format(item.avgPrice.bigDecimal),^.paddingLeft:=10.px),
+          <.span("%06.2f".format(item.salesPrice.bigDecimal),^.paddingLeft:=10.px),
           <.span(" "),
           tag
         )
