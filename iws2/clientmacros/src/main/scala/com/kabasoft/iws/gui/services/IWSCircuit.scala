@@ -18,14 +18,14 @@ case class RootModel [+A<:IWS,-B<:IWS](store:Pot[DStore[A,B]], motd:Pot[String])
 case class DStore [+A<:IWS,-B<:IWS](models: Map[Int, Pot[ContainerT[A,B]]]) {
   def updated (newItem: B) = {
      val mapx = models.get(newItem.modelId).get.map(_.update(newItem))
-    log.info("UPDATE UPDATE"+ mapx)
+    //log.info("UPDATE UPDATE"+ mapx)
     //val x= models.get(newItem.modelId).get.map(_.update(newItem))
       DStore (models+ (newItem.modelId -> mapx))
   }
 
    //def updatedAll(newModels: Map[Int, Pot[ContainerT[B,A]]])  = DStore[A,B](newModels.asInstanceOf[Map[Int, Pot[ContainerT[A,B]]]])
   def updatedAll(newModels: Map[Int, Pot[ContainerT[B,A]]])  = {
-     log.debug("+++++++++<<<<<<<<<<< newModels: "+newModels)
+     //log.debug("+++++++++<<<<<<<<<<< newModels: "+newModels)
      DStore[A,B]( models.asInstanceOf[Map[Int, Pot[ContainerT[A,B]]]]++
     newModels.asInstanceOf[Map[Int, Pot[ContainerT[A,B]]]])}
   def remove(item:B) = {
@@ -76,17 +76,17 @@ class IWSHandler[M](modelRW: ModelRW[M, Pot[DStore[IWS,IWS]]]) extends ActionHan
     case UpdateAll(all:Seq[IWS]) =>
       val xx = all.seq.headOption.get
       //log.info("+++++++++>>>>>>>>ZZZZZZZZZ"+all)
-      log.info("+++++++++>>>>>>>>XXX"+xx)
+     // log.info("+++++++++>>>>>>>>XXX"+xx)
       val  a = all.filter(_.modelId == xx.modelId)
      // val r =value.get.models.get(xx.modelId).get.get
-      log.info("+++++++++aaaa0000000"+ a +"<<<<<<<<<<<"+ all)
+      //log.info("+++++++++aaaa0000000"+ a +"<<<<<<<<<<<"+ all)
       val r =value.get.models.get(xx.modelId).get.get.asInstanceOf[Data].items
-      log.info("+++++++++rrrrr<<<<<<<<<<<"+(all++r))
+     // log.info("+++++++++rrrrr<<<<<<<<<<<"+(all++r))
 
       val x = Map(xx.modelId ->Ready(Data(all++r)))
       updated(Ready(value.get.updatedAll(x)))
     case Update(item:IWS) =>
-      log.debug("+++++++++<<<<<<<<<<< UpdateTodo: "+item)
+      //log.debug("+++++++++<<<<<<<<<<< UpdateTodo: "+item)
       updated(Ready(value.get.updated(item)), Effect(AjaxClient[Api].update(item).call().map(UpdateAll[IWS])))
     case FindAll(item:IWS) =>
       log.info("+++++++++<<<<<<<<<<< FindAll : "+item)
