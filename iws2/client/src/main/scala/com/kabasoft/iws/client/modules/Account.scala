@@ -13,22 +13,32 @@ import com.kabasoft.iws.gui.macros.Bootstrap._
 import com.kabasoft.iws.shared._
 import com.kabasoft.iws.gui.macros._
 import com.kabasoft.iws.gui.logger._
-import com.kabasoft.iws.gui.services.IWSCircuit
+import com.kabasoft.iws.gui.services.{IWSCircuit, RootModel}
+import diode.ModelR
 
 import scalacss.ScalaCssReact._
 
 object ACCOUNT {
 
   @inline private def bss = GlobalStyles.bootstrapStyles
-
+  @volatile var itemsx = Set.empty[Account]
   case class Props(proxy: ModelProxy[Pot[Data]])
   case class State(selectedItem: Option[Account] = None, name:String)
   class Backend($: BackendScope[Props, State]) {
-    def mounted(props: Props) =
+    implicit def orderingById[A <: Account]: Ordering[A] = {Ordering.by(e => (e.id, e.id))}
+    def mounted(props: Props) = {
+      def listener(cursor: ModelR[RootModel[IWS,IWS], Pot[ContainerT[IWS,IWS]]]): Unit = {
+        itemsx  = collection.immutable.SortedSet[Account]() ++
+          IWSCircuit.zoom(_.store.get.models.get(2)).eval(IWSCircuit.getRootModel).get.get.items.asInstanceOf[List[Account]].toSet
+        log.debug(s" Store Listener ${itemsx}")
+        render(props,$.state.runNow())
+      }
+      IWSCircuit.subscribe(IWSCircuit.zoom(_.store.get.models.get(9).get)) (listener)
+
       Callback {
         IWSCircuit.dispatch(Refresh(Account()))
       }
-
+  }
     def edit(item:Option[Account]) = {
       $.modState(s => s.copy(selectedItem = item))
     }
@@ -98,10 +108,15 @@ object ACCOUNT {
                                ^.placeholder := id),^.paddingLeft := 1))
 
     def render(p: Props, s: State) ={
-    val items =  IWSCircuit.zoom(_.store.get.models.get(9)).eval(IWSCircuit.getRootModel).get.get.items.asInstanceOf[List[Account]]
+    val itemsx =  IWSCircuit.zoom(_.store.get.models.get(9)).eval(IWSCircuit.getRootModel).get.get.items.asInstanceOf[List[Account]].toSet
     val saveButton = Button(Button.Props(edited(s.selectedItem.getOrElse(Account())),
         addStyles = Seq(bss.pullRight, bss.buttonXS, bss.buttonOpt(CommonStyle.success))), Icon.circleO, " Save")
     val newButton=Button(Button.Props(edit(Some(Account())), addStyles = Seq(bss.pullRight, bss.buttonXS)), Icon.plusSquare, " New")
+//      if( itemsx.filter(_.id.equals("-1")).size <=1) {
+//        itemsx = IWSCircuit.zoom(_.store.get.models.get(2)).eval(IWSCircuit.getRootModel).get.get.items.asInstanceOf[List[Account]].toSet
+//      }
+      val items = itemsx.toList.sorted
+
       Panel(Panel.Props("Account"), <.div(^.className := "panel-heading",^.padding :=0), <.div(^.padding :=0,
         p.proxy().renderFailed(ex => "Error loading"),
         p.proxy().renderPending(_ > 500, _ => "Loading..."),
