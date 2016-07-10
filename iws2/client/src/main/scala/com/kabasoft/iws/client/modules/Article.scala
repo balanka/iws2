@@ -111,14 +111,9 @@ object ARTICLE {
       )
     }
     def buildFormTable(s: State, items:List[Article]) = {
-       def fm(m:BigDecimal) = "%06.2f".format(m)
-      def buildIdNameList [A<:Masterfile](list: List[A]): List[String]= list map (iws =>(iws.id+":"+iws.name))
       val qttyUnit =  IWSCircuit.zoom(_.store.get.models.get(4)).eval(IWSCircuit.getRootModel).get.get.items.asInstanceOf[List[QuantityUnit]]
       val vat =       IWSCircuit.zoom(_.store.get.models.get(5)).eval(IWSCircuit.getRootModel).get.get.items.asInstanceOf[List[Vat]]
-      def noAction(e: ReactEventI):Callback = Callback {}
-     // <.div(^.cls :="container",
-      //  <.div(^.cls:="row col-md-8",
-     // <.table(^.className := "table-responsive  table-striped",
+
        <.table(^.className := "table-responsive table-condensed", //^.tableLayout := "fixed",
         <.tbody(
           <.tr(bss.formGroup, ^.height := 10.px,
@@ -126,9 +121,9 @@ object ARTICLE {
             buildWItem1("name", s.item.map(_.name), "name", updateName),
             buildWItem("description", s.item.map(_.description), "description", updateDescription)),
             <.tr(bss.formGroup, ^.height := 10.px,
-              buildWItem("price", s.item.map( x => fm(x.price.bigDecimal)), "0.0", updatePrice),
-              buildWItem1("avg price", s.item.map( x => fm(x.avgPrice.bigDecimal)), "0.0", updatePrice),
-              buildWItem("sales price", s.item.map( x => fm(x.salesPrice.bigDecimal)), "0.0", updatePrice)),
+              buildWItem("price", s.item.map( x => fmt(x.price.bigDecimal)), "0.0", updatePrice),
+              buildWItem1("avg price", s.item.map( x => fmt(x.avgPrice.bigDecimal)), "0.0", updatePrice),
+              buildWItem("sales price", s.item.map( x => fmt(x.salesPrice.bigDecimal)), "0.0", updatePrice)),
             <.tr(bss.formGroup, ^.height := 10.px,
               buildWItem("group", s.item.map(_.groupId.getOrElse("groupId")), "groupId", evt = noAction ),
               buildWItem("Vat", s.item.map(_.vat.getOrElse("Mwst")), "Mwst", evt = noAction),
