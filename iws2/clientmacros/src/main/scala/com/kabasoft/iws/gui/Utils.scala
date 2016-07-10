@@ -3,36 +3,59 @@ package com.kabasoft.iws.gui
 import java.time.LocalDate
 import java.util.Date
 
-
 import japgolly.scalajs.react.vdom.prefix_<^._
 import com.kabasoft.iws.gui.logger._
-import com.kabasoft.iws.gui.macros.{GlobalStyles, Refresh}
-import com.kabasoft.iws.shared.{Api, _}
-import diode.data.Pot
-import diode.react.ModelProxy
+import com.kabasoft.iws.gui.macros.GlobalStyles.IWSStyles
+import com.kabasoft.iws.gui.macros.GlobalStyles
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.prefix_<^._
 
-
 import scalacss.ScalaCssReact._
+import scalacss.Defaults._
 
+import org.widok.moment._
 
 object Utils {
   @inline private def bss = GlobalStyles.bootstrapStyles
+  @inline private def bss1 = GlobalStyles.IWSStyles
+  val r = IWSStyles.td(10).htmlClass
+
+  def fmt(t:Date) = Moment(t.getTime).format("DD.MM.YYYY")
 
 
-  def format(d:Date) = {
-    val START=1900
-    val  x=LocalDate.of(d.getYear,d.getMonth, d.getDate)
-    x.getDayOfMonth.toString.concat( ".".concat(x.getMonthValue.toString.concat(".").concat((x.getYear()+START).toString)))
+  // def format(d:String) = LocalDate.of(2016,7,7) //parse(d,DateTimeFormatter.ISO_LOCAL_DATE)
+  //def format(d:String) = com.zoepepper.facades.jsjoda.LocalDate.parse(d,DateTimeFormatter.ISO_LOCAL_DATE)
+
+  def buildDItem[A](id:String , value:Option[A], defValue:A, evt:ReactKeyboardEventI=> Option[Callback]) = {
+    val m = value getOrElse defValue
+    List(<.td(<.label(^.`for` := id, id), ^.maxHeight:=2.px),
+      <.td(<.input.text(bss.formControl, ^.id := id, //^.value := m.toString,
+        ^.placeholder := id), ^.onKeyUp ==>?evt , ^.maxHeight:=2.px, ^.paddingLeft := 10.px,  ^.autoFocus := true))
+    //^.placeholder := id), ^.onChange ==> evt, ^.maxHeight:=2.px, ^.paddingLeft := 10.px,  ^.autoFocus := true))
+  }
+  def buildDItem1(id:String , value:Option[BigDecimal], defValue:BigDecimal, evt:ReactEventI=> Callback) = {
+    val m = (value getOrElse defValue).bigDecimal
+    List(<.td(<.label(^.`for` := id, id), ^.maxHeight:=2.px),
+      <.td(<.input.text(bss.formControl, ^.id := id, ^.value :=m.toString,
+       // <.td(<.input.text(bss.formControl, ^.id := id, ^.value := "%06.2f".format(m).replace(".",","),
+        ^.placeholder := id), ^.onChange ==> evt, ^.maxHeight:=2.px, ^.paddingLeft := 10.px,  ^.autoFocus := true))
+    //^.placeholder := id), ^.onChange ==> evt, ^.maxHeight:=2.px, ^.paddingLeft := 10.px,  ^.autoFocus := true))
   }
 
-  def buildWItem[A](id:String , value:Option[A], defValue:A, evt:ReactEventI=> Callback) = {
+  def buildWItem1[A](id:String , value:Option[A], defValue:A, evt:ReactEventI=> Callback) = {
     val m = value getOrElse defValue
+    List(<.td(<.label(bss.td(50), ^.`for` := id, id), ^.maxHeight:=2.px),
+      <.td(<.input.text(bss.formControl, bss.td(100), ^.id := id, ^.value := m.toString,
+        ^.placeholder := id), ^.onChange ==> evt, ^.maxHeight:=2.px, ^.paddingLeft := 10.px,  ^.autoFocus := true))
+        //^.placeholder := id), ^.onChange ==> evt, ^.maxHeight:=2.px, ^.paddingLeft := 10.px,  ^.autoFocus := true))
+  }
+  def buildWItem[A](id:String , value:Option[A], defValue:A, evt:ReactEventI=> Callback ) = {
+    val m = value getOrElse defValue
+
     List(<.td(<.label(^.`for` := id, id), ^.maxHeight:=2.px),
       <.td(<.input.text(bss.formControl, ^.id := id, ^.value := m.toString,
         ^.placeholder := id), ^.onChange ==> evt, ^.maxHeight:=2.px, ^.paddingLeft := 10.px,  ^.autoFocus := true))
-        //^.placeholder := id), ^.onChange ==> evt, ^.maxHeight:=2.px, ^.paddingLeft := 10.px,  ^.autoFocus := true))
+    //^.placeholder := id), ^.onChange ==> evt, ^.maxHeight:=2.px, ^.paddingLeft := 10.px,  ^.autoFocus := true))
   }
 
   def buildItem[A](id:String , value:Option[A], defValue:A) = {
