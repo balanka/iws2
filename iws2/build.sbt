@@ -115,6 +115,7 @@ lazy val clientmacros: Project = (project in file("clientmacros"))
   .dependsOn(sharedJS)
   .dependsOn(macros)
 
+//enablePlugins(CallGraphPlugin)
 
 lazy val macros = (project in file("macros"))
   .settings(

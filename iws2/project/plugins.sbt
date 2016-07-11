@@ -18,3 +18,4 @@ addSbtPlugin("com.typesafe.sbt" % "sbt-digest" % "1.1.0")
 addSbtPlugin("com.typesafe.sbt" % "sbt-gzip" % "1.0.0")
 
 //addCompilerPlugin("org.scalamacros" %% "paradise" % "2.1.0" cross CrossVersion.full)
+//addSbtPlugin("com.github.lionelfleury" % "sbt-scalajs-callgraph" % "0.1.2")

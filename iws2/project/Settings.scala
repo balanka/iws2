@@ -10,7 +10,7 @@ object Settings {
   val name = "IWS"
 
   /** The version of your application */
-  val version = "1.1.2"
+  val version = "1.1.3"
 
   /** Options for the scala compiler */
   val scalacOptions = Seq(
@@ -46,6 +46,8 @@ object Settings {
     val chartjs = "1.0.1"
     val playScripts = "0.4.0"
     val javaTime ="0.1.0"
+    val jsjoda = "1.0.2"
+    val js_joda ="1.1.8"
   }
 
   /**
@@ -83,8 +85,10 @@ object Settings {
     "org.scala-js" %%% "scalajs-dom" % versions.scalaDom,
     "com.github.chandu0101.scalajs-react-components" %%% "core" % "0.4.1",
     "com.github.chandu0101.scalajs-react-components" %%% "macros" % "0.4.1",
-    "org.scala-js" %%% "scalajs-java-time" % versions.javaTime,
-    "com.github.japgolly.scalajs-react" %%% "ext-scalaz72" %  versions.scalajsReact
+    "com.zoepepper" %%% "scalajs-jsjoda" % versions.jsjoda,
+   // "org.scala-js" %%% "scalajs-java-time" % versions.javaTime,
+    // "com.github.japgolly.scalajs-react" %%% "ext-scalaz72" %  versions.scalajsReact
+    "io.github.widok" %%% "scala-js-momentjs" % "0.1.5"
     //"com.github.japgolly.scalajs-react" %%% "ext-monocle" % versions.monocleVersion
     //"com.acework" %%% "core" % "0.0.1-SNAPSHOT",
     //"com.acework" %%% "macro" % "0.0.1-SNAPSHOT"
@@ -97,6 +101,7 @@ object Settings {
     "org.webjars" % "jquery" % versions.jQuery / "jquery.js" minified "jquery.min.js",
     "org.webjars" % "bootstrap" % versions.bootstrap / "bootstrap.js" minified "bootstrap.min.js" dependsOn "jquery.js",
     "org.webjars" % "chartjs" % versions.chartjs / "Chart.js" minified "Chart.min.js",
+   // "org.webjars.npm" % "js-joda" % versions.js_joda/ "dist/js-joda.js" minified "dist/js-joda.min.js",
     "org.webjars" % "log4javascript" % versions.log4js / "js/log4javascript_uncompressed.js" minified "js/log4javascript.js"
 
   ))
