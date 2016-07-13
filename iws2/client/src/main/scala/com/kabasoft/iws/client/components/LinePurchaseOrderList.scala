@@ -34,16 +34,15 @@ object LinePurchaseOrderList {
       //log.debug(s" order to edit Line is ${line}")
        $.modState(s => s.copy(item = Some(line)))
     }
-
     def updateItem(id: String) = {
       val r =id.split(":")
       val itemId = r(0)
-      val qttyUnitId = r(1)
-      val  vatId = r(2)
-      $.modState(s =>
-        s.copy(item = s.item.map(_.copy(item = Some(itemId))))
-          .copy(item = s.item.map(_.copy(unit = Some(qttyUnitId))))
-          .copy(item = s.item.map(_.copy(vat = Some(vatId)))))>>setModfied
+      val qttyUnitId = r(2)
+      val  vatId = r(3)
+      log.debug(s"ItemId Key is ${r}  itemid  ${itemId} qttyUnitId ${qttyUnitId} vatId ${vatId}  ")
+      $.modState(s => s.copy(item = s.item.map(_.copy(unit=Some(qttyUnitId)))))>>
+        $.modState(s => s.copy(item = s.item.map(_.copy(vat=Some(vatId)))))>>
+        $.modState(s => s.copy(item = s.item.map(_.copy(item = Some(itemId)))))>>setModfied
     }
 
     def updateVat(id: String) = {
@@ -85,17 +84,9 @@ object LinePurchaseOrderList {
 
     def delete(line:LinePurchaseOrder, deleteLineCallback:LinePurchaseOrder =>Callback) =
       Callback.log(s"LinePurchaseOrder deleted>>>>>  ${line}") >> deleteLineCallback(line)
+    def save(line:LinePurchaseOrder, saveLineCB:LinePurchaseOrder =>Callback) = saveLineCB(line.copy(modified = true))
 
-    def save(line:LinePurchaseOrder, saveLineCallback:LinePurchaseOrder =>Callback) = {
-      val modifiedLine =line.copy(modified = true)
-      log.debug(s" saved  Line order is ${modifiedLine}")
-       if (line.modified)
-         saveLineCallback(modifiedLine) //>>$.modState(s => s.copy(item = Some(line)))
-      else  Callback { log.debug(s" No change to save for ${modifiedLine}")}
-
-    }
-
-    def setModfied = $.modState(s => s.copy(item = s.item.map(_.copy(modified = true))))
+    def setModfied = Callback {$.modState(s => s.copy(item = s.item.map(_.copy(modified = true)))).runNow() }
     def newLine(line:LinePurchaseOrder, newLineCallback:LinePurchaseOrder =>Callback) = {
       log.debug(s" newLine called with   ${line}")
      newLineCallback(line)>> edit(line)
@@ -115,12 +106,6 @@ object LinePurchaseOrderList {
       def buildIdNameList [A<:Masterfile](list: List[A]): List[String]= list map (iws =>(iws.id+"|"+iws.name))
       def buildArticleList [A<:Article](list: List[A]): List[String]= list map (iws =>(iws.id+":"+iws.name +":"+iws.qttyUnit  +":"+iws.vat.getOrElse("0")))
 
-//      val  itemsList=items.toSet[Article].toList.filter(_.id !="-1") map (iws =>(iws.id+"|"+iws.name))
-//      log.debug(s" itemsList  ${itemsList}")
-//      val  qttyUnitList=qttyUnit.toSet[QuantityUnit].toList.filter(_.id !="-1") map (iws =>(iws.id+"|"+iws.name))
-//      log.debug(s" qttyUnitList  ${qttyUnitList}")
-//      val  vatList=vat.toSet[Vat].toList.filter(_.id !="-1") map (iws =>(iws.id+"|"+iws.name))
-//      log.debug(s" vatList  ${vatList}")
       def editFormLine : Seq [TagMod]=List(
               buildSItem("item", itemsx = buildArticleList(items), defValue = "0001", evt = updateItem),
               buildWItem[BigDecimal]("price", s.item.map(_.price), 0.0, updatePrice(_, s)),
