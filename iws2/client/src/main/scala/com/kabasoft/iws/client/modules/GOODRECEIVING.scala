@@ -70,19 +70,31 @@ object GOODRECEIVING {
     }
     def runCB (item:Goodreceiving[LineGoodreceiving]) = Callback {
       IWSCircuit.dispatch(Update(item))
-      $.modState(s => s.copy(item =Some(item))).runNow()
+      val ro = item.getLines.filter(_.created ==true).map( e => item.replaceLine( e.copy(created = false).copy(modified =false)))
+      val setLineID = ro.head.copy(lines = Some( item.getLines map ( e => if(e.tid != 0 ) e else  e.copy(tid = -1))))
+      $.modState(s => s.copy(item =Some(setLineID))).runNow()
     }
+
     def delete(item:Goodreceiving[LineGoodreceiving]) = {
       Callback.log("PurchaseOrder deleted>>>>> ${item}  ${s}")
       $.props >>= (_.proxy.dispatch(Delete(item)))
       //$.modState(s => s.copy(item = None)).runNow()
     }
+    def runDelete(item1:Goodreceiving[LineGoodreceiving]) =   {
+      log.debug(s"  Purchase order to delete line from  >>>>>  ${item1}")
+      IWSCircuit.dispatch(Update(item1))
+      Callback {
+        $.modState(s => s.copy(item = Some(item1))).runNow()
+      }
+    }
     def deleteLine(line1:LineGoodreceiving) = {
       val  deleted =line1.copy(deleted = true)
       val k =$.state.runNow().item.getOrElse(Goodreceiving[LineGoodreceiving]())
       val k2 = k.replaceLine(deleted)
-       runCB(k2)
+      edited(k2)
+      //runDelete(k2)
     }
+
     def AddNewLine(line:LineGoodreceiving) = {
       val  created =line.copy(created = true)
       log.debug(s"New Line Purchase order before  edit>>>>>  ${line}")
