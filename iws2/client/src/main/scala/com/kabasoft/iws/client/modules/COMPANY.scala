@@ -1,6 +1,6 @@
 package com.kabasoft.iws.client.modules
 
-import com.kabasoft.iws.client.components.{CompanyList, CustomerList}
+import com.kabasoft.iws.client.components.CompanyList
 import com.kabasoft.iws.gui.Utils._
 import com.kabasoft.iws.gui._
 import diode.react.ReactPot._
@@ -10,12 +10,9 @@ import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.prefix_<^._
 import com.kabasoft.iws.gui.macros.Bootstrap._
 import com.kabasoft.iws.gui.logger._
-import com.kabasoft.iws.gui.macros.IWSList
 import com.kabasoft.iws.gui.services.IWSCircuit
 
-//import com.kabasoft.iws.gui.macros.MasterDetails
 import com.kabasoft.iws.shared._
-//import com.kabasoft.iws.shared.Lenses._
 import com.kabasoft.iws.gui.macros.{TabComponent, _}
 import com.kabasoft.iws.gui.macros.TabItem
 import scalacss.ScalaCssReact._
@@ -31,7 +28,6 @@ object COMPANY {
      def mounted(props: Props) =
        Callback {
          IWSCircuit.dispatch(Refresh(Company()))
-         //Callback.when(props.proxy().isEmpty)(props.proxy.dispatch(Refresh(Customer())))
        }
       def edit(itemx:Option[Company]) = {
       $.modState(s => s.copy(item = itemx))
@@ -94,8 +90,17 @@ object COMPANY {
 
      def  m :(String , COMPANY.State) =>  COMPANY.State = (p, s) => s.copy(s.item.map( z => z.copy(id = p)))
 
-      def buildForm(s:State): ReactElement =
-        //<.div(bss.formGroup,
+     def buildFormTab(p: Props, s: State, items:List[Company]): Seq[ReactElement] =
+       List(<.div(bss.formGroup,
+         TabComponent(Seq(
+           TabItem("vtab1", "List", "#vtab1", true,
+             CompanyList(items, item => edit(Some(item)), item => p.proxy.dispatch(Delete(item)))),
+           TabItem("vtab2", "Form", "#vtab2", false, buildForm(s))
+         ))
+       )
+       )
+      def buildForm(s:State) =
+        <.div(bss.formGroup,
           <.table(^.className := "table-responsive table-condensed", ^.tableLayout := "fixed",
             <.tbody(
               <.tr(^.height := 20,
@@ -126,28 +131,19 @@ object COMPANY {
               )
             )
           )
+        )
 
-     def render(p: Props, s: State) ={
+     def render(p: Props, s: State) = {
        val items =  IWSCircuit.zoom(_.store.get.models.get(10)).eval(IWSCircuit.getRootModel).get.get.items.asInstanceOf[List[Company]]
        def saveButton = Button(Button.Props(edited(s.item.getOrElse(Company())), addStyles = Seq(bss.pullRight, bss.buttonXS,
          bss.buttonOpt(CommonStyle.success))), Icon.circleO, "Save")
        def newButton =  Button(Button.Props(edit(Some(Company())), addStyles = Seq(bss.pullRight, bss.buttonXS)), Icon.plusSquare, "New")
-       Panel(Panel.Props("Company"), <.div(^.className := "panel-heading",^.padding :=0), <.div(^.padding :=0,
-         p.proxy().renderFailed(ex => "Error loading"),
-         p.proxy().renderPending(_ > 500, _ => "Loading..."),
-         AccordionPanel("Edit", Seq(buildForm(s)), List(newButton,saveButton)),
-        // p.proxy().render(
-         CompanyList(items,
-             item => edit(Some(item)),
-             item => p.proxy.dispatch(Delete(item))))
-         //TabComponent(Seq(item1, item2, item3)))
-       )
+         BasePanel("Company", buildFormTab(p,s, items), List(newButton,saveButton))
      }
 
   }
 
   val component = ReactComponentB[Props]("Company")
-    //.initialState(State(name="Customer"))
     .initialState(State())
     .renderBackend[Backend]
     .componentDidMount(scope => scope.backend.mounted(scope.props))
