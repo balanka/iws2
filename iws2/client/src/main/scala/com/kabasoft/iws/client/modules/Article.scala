@@ -92,8 +92,9 @@ object ARTICLE {
      val subArticles = s.item.getOrElse(Article()).articles.getOrElse(List.empty[Article])
       List(<.div(bss.formGroup,
         TabComponent(Seq(
-          TabItem("vtab1", "Form", "#vtab1", true,buildFormTable(s,items)),
-          TabItem("vtab2", "sub account", "#vtab2", false, ArticleList(subArticles))))
+          TabItem("vtab1", "List", "#vtab1", true,ArticleList(items, Some(item => edit(Some(item))), Some(item => p.proxy.dispatch(Delete[Article](item))))),
+          TabItem("vtab2", "Form", "#vtab2", false,buildFormTable(s,items)),
+          TabItem("vtab3", "group", "#vtab3", false, ArticleList(subArticles))))
         )
       )
     }
@@ -126,22 +127,12 @@ object ARTICLE {
 
     def render(p: Props, s: State) ={
         val article_items =  IWSCircuit.zoom(_.store.get.models.get(7)).eval(IWSCircuit.getRootModel).get.get.items.asInstanceOf[List[Article]].toSet
-
       def saveButton = Button(Button.Props(edited(s.item.getOrElse(Article())), addStyles = Seq(bss.pullRight, bss.buttonXS,
         bss.buttonOpt(CommonStyle.success))), Icon.circleO, "Save")
       def newButton =  Button(Button.Props(edit(Some(Article())), addStyles = Seq(bss.pullRight, bss.buttonXS)), Icon.plusSquare, "New")
-
       val items = article_items.toList.sorted
-      Panel(Panel.Props("Article"), <.div(^.className := "panel-heading",^.padding :=0.px), <.div(^.padding :=0.px,
-        p.proxy().renderFailed(ex => "Error loading"),
-        p.proxy().renderPending(_ > 500, _ => "Loading..."),
-        AccordionPanel("Edit", buildFormTab(p,s, items), List(saveButton, newButton)),
-        AccordionPanel("List",
-          List(ArticleList(items,
-            Some(item => edit(Some(item))),
-            Some(item => p.proxy.dispatch(Delete[Article](item))))))
-       )
-      )
+        BasePanel("Article", buildFormTab(p,s, items), List(saveButton, newButton))
+
     }
   }
 

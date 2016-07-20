@@ -97,8 +97,7 @@ object COMPANY {
              CompanyList(items, item => edit(Some(item)), item => p.proxy.dispatch(Delete(item)))),
            TabItem("vtab2", "Form", "#vtab2", false, buildForm(s))
          ))
-       )
-       )
+       ))
       def buildForm(s:State) =
         <.div(bss.formGroup,
           <.table(^.className := "table-responsive table-condensed", ^.tableLayout := "fixed",

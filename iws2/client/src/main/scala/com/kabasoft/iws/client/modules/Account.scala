@@ -86,42 +86,24 @@ object ACCOUNT {
         <.table(^.className := "table-responsive table-condensed", ^.tableLayout := "fixed",
           <.tbody(
             <.tr(bss.formGroup, ^.height := 20,
-              buildWItem("id", s.item.map(_.id), updateId),
-              buildWItem("name", s.item.map(_.name), updateName),
-              buildWItem("description", s.item.map(_.description), updateDescription)),
+              buildWItem("id", s.item.map(_.id), "", updateId),
+              buildWItem("name", s.item.map(_.name), "", updateName),
+              buildWItem("description", s.item.map(_.description),"", updateDescription)),
             <.tr(bss.formGroup, ^.height := 20,
-              buildWItem("group", s.item.map(_.groupId.getOrElse("groupId")), noAction),
-              buildSItem("group", itemsx = buildIdNameList(items), defValue = "-1", evt = updateGroupId)
+              buildWItem("group", s.item.map(_.groupId.getOrElse("groupId")), "groupId", noAction),
+              buildSItem("group", itemsx = buildIdNameList(items), defValue = "-1",  evt = updateGroupId)
             )
            )
          )
 
-    def buildWItem[A](id:String , value:Option[String],evt:ReactEventI=> Callback) =
-     List( <.td(<.label(^.`for` := id, id)),
-           <.td(<.input.text(bss.formControl, ^.id := id, ^.value := value,
-                   ^.placeholder := id),  ^.onChange ==> evt, ^.paddingLeft := 10))
-
-    def buildItem(id:String , value:String) =
-      List( <.td(<.label(^.`for` := id, id)),
-            <.td(<.input.text(bss.formControl, ^.id := id, ^.value := value,
-                               ^.placeholder := id),^.paddingLeft := 1))
     def render(p: Props, s: State) ={
     val itemsx =  IWSCircuit.zoom(_.store.get.models.get(9)).eval(IWSCircuit.getRootModel).get.get.items.asInstanceOf[List[Account]].toSet
     val saveButton = Button(Button.Props(edited(s.item.getOrElse(Account())),
         addStyles = Seq(bss.pullRight, bss.buttonXS, bss.buttonOpt(CommonStyle.success))), Icon.circleO, " Save")
     val newButton=Button(Button.Props(edit(Some(Account())), addStyles = Seq(bss.pullRight, bss.buttonXS)), Icon.plusSquare, " New")
     val items = itemsx.toList.sorted
+     BasePanel("Account", buildFormTab(p,s,items), List(saveButton, newButton))
 
-      Panel(Panel.Props("Account"), <.div(^.className := "panel-heading",^.padding :=0),
-        <.div(^.padding :=0,
-            p.proxy().renderFailed(ex => "Error loading"),
-            p.proxy().renderPending(_ > 500, _ => "Loading..."),
-            AccordionPanel("Edit", buildFormTab(p,s,items), List(saveButton, newButton))
-//        AccordionPanel("List",
-//          List(AccountList(items,
-//            Some(item => edit(Some(item))),
-//            Some(item => p.proxy.dispatch(Delete[Account](item))))))
-      ))
      }
   }
 
