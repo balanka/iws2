@@ -67,7 +67,7 @@ object BusinessPartnerUIMacro {
 
       class Backend(b: BackendScope[Props, State]) {
         def mounted(props: Props) =
-          Callback.ifTrue(props.proxy().isEmpty, props.proxy.dispatch(Refresh(props.iws)))
+          Callback.when(props.proxy().isEmpty)(props.proxy.dispatch(Refresh(props.iws)))
 
         def edit(item:Option[$t]) = {
           b.modState(s => s.copy(selectedItem = item))

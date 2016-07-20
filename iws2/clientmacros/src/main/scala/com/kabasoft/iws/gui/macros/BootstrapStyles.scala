@@ -2,7 +2,7 @@ package com.kabasoft.iws.gui.macros
 
 import scalacss.Defaults._
 import scalacss.mutable
-import  com.kabasoft.iws.gui.macros.Bootstrap.CommonStyle._
+import com.kabasoft.iws.gui.macros.Bootstrap.CommonStyle._
 
 class BootstrapStyles(implicit r: mutable.Register) extends StyleSheet.Inline()(r) {
 
@@ -68,6 +68,11 @@ class BootstrapStyles(implicit r: mutable.Register) extends StyleSheet.Inline()(
   val listGroupItem = styleWrap("btn list-group-item")
 
 
+  val td =
+    styleF.int(0 to 100)(i => styleS(
+      width(i .%%)
+    ))
+  //val td =styleWrap("tdx")
 
   val labelAsBadge = style(addClassName("label-as-badge"), borderRadius(1.em))
 

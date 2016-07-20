@@ -34,7 +34,8 @@ object ACCOUNT {
       $.modState(s => s.copy(item = item))
     }
     def edited(item:Account) = {
-      $.props >>= (_.proxy.dispatch(Update[Account](item)))
+     // $.props >>= (_.proxy.dispatch(Update[Account](item)))
+      Callback {IWSCircuit.dispatch(Update(item))}
      }
 
     def delete(item:Account) = {
@@ -72,8 +73,12 @@ object ACCOUNT {
       val subAccounts = s.item.getOrElse(Account()).accounts.getOrElse(List.empty[Account])
       List(<.div(bss.formGroup,
         TabComponent(Seq(
-          TabItem("vtab1", "Form", "#vtab1", true,buildFormTable(s,items)),
-          TabItem("vtab2", "sub account", "#vtab2", false, AccountList(subAccounts))))
+          TabItem("vtab1", "List", "#vtab1", true,
+            AccountList(items, Some(item => edit(Some(item))), Some(item => p.proxy.dispatch(Delete[Account](item))))),
+          TabItem("vtab2", "Form", "#vtab2", false,buildFormTable(s,items)),
+          TabItem("vtab3", "sub", "#vtab3", false, AccountList(subAccounts))
+
+        ))
        )
      )
     }
@@ -107,14 +112,15 @@ object ACCOUNT {
     val newButton=Button(Button.Props(edit(Some(Account())), addStyles = Seq(bss.pullRight, bss.buttonXS)), Icon.plusSquare, " New")
     val items = itemsx.toList.sorted
 
-      Panel(Panel.Props("Account"), <.div(^.className := "panel-heading",^.padding :=0), <.div(^.padding :=0,
-        p.proxy().renderFailed(ex => "Error loading"),
-        p.proxy().renderPending(_ > 500, _ => "Loading..."),
-        AccordionPanel("Edit", buildFormTab(p,s,items), List(saveButton, newButton)),
-        AccordionPanel("List",
-          List(AccountList(items,
-            Some(item => edit(Some(item))),
-            Some(item => p.proxy.dispatch(Delete[Account](item))))))
+      Panel(Panel.Props("Account"), <.div(^.className := "panel-heading",^.padding :=0),
+        <.div(^.padding :=0,
+            p.proxy().renderFailed(ex => "Error loading"),
+            p.proxy().renderPending(_ > 500, _ => "Loading..."),
+            AccordionPanel("Edit", buildFormTab(p,s,items), List(saveButton, newButton))
+//        AccordionPanel("List",
+//          List(AccountList(items,
+//            Some(item => edit(Some(item))),
+//            Some(item => p.proxy.dispatch(Delete[Account](item))))))
       ))
      }
   }

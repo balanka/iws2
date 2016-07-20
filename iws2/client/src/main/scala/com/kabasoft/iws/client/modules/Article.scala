@@ -19,7 +19,7 @@ import scalacss.ScalaCssReact._
 object ARTICLE {
 
   @inline private def bss = GlobalStyles.bootstrapStyles
-  @inline private def iwsStyles = GlobalStyles.IWSStyles
+
 
   implicit def orderingById[A <: Article]: Ordering[A] = {Ordering.by(e => (e.id, e.id))}
   case class Props(proxy: ModelProxy[Pot[Data]])

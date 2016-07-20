@@ -10,4 +10,7 @@ object GlobalStyles extends StyleSheet.Inline {
   )
 
   val bootstrapStyles = new BootstrapStyles
+
+
+
 }

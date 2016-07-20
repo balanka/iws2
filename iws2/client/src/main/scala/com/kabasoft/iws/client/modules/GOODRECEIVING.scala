@@ -6,14 +6,16 @@ import com.kabasoft.iws.gui.Utils._
 import com.kabasoft.iws.gui.logger._
 import com.kabasoft.iws.gui.macros.Bootstrap._
 import com.kabasoft.iws.gui.macros._
-import com.kabasoft.iws.gui.services.IWSCircuit
+import com.kabasoft.iws.gui.services.{IWSCircuit, RootModel}
 import com.kabasoft.iws.shared._
+import diode.ModelR
 import diode.data.{Pot, Ready}
 import diode.react.ReactPot._
 import diode.react._
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.prefix_<^._
 
+import scala.scalajs.js
 import scalacss.ScalaCssReact._
 
 object GOODRECEIVING {
@@ -22,10 +24,19 @@ object GOODRECEIVING {
 
   case class Props(proxy: ModelProxy[Pot[Data]])
   case class State(item: Option[Goodreceiving[LineGoodreceiving]] = None)
+  @volatile var gitems = Set.empty[Goodreceiving[LineGoodreceiving]]
 
   class Backend($: BackendScope[Props, State]) {
+   // @volatile var poitems = Set.empty[PurchaseOrder[LinePurchaseOrder]]
     implicit def orderingById[A <: Goodreceiving[LineGoodreceiving]]: Ordering[A] = {Ordering.by(e => (e.tid, e.tid))}
     def mounted(props: Props) = {
+//      def listener(cursor: ModelR[RootModel[IWS,IWS], Pot[ContainerT[IWS,IWS]]]): Unit = {
+//       gitems = collection.immutable.SortedSet [Goodreceiving[LineGoodreceiving]]() ++
+//        IWSCircuit.zoom(_.store.get.models.get(104)).eval(IWSCircuit.getRootModel).get.get.items.asInstanceOf[Seq[Goodreceiving[LineGoodreceiving]]].toSet
+//      log.debug(s" Goodreceiving Listener ${gitems}")
+//      render(props,$.state.runNow())
+//    }
+//    IWSCircuit.subscribe(IWSCircuit.zoom(_.store.get.models.get(101).get)) (listener)
       Callback {
         IWSCircuit.dispatch(Refresh(Supplier()))
         IWSCircuit.dispatch(Refresh(Store()))
@@ -38,8 +49,10 @@ object GOODRECEIVING {
     }
 
     def updateOid(e: ReactEventI) = {
+      e.preventDefault()
       val l =e.target.value.toLong
       log.debug(s"Oid is "+l)
+
       $.modState(s => s.copy(item = s.item.map(_.copy(oid = l))))
     }
 
@@ -56,7 +69,7 @@ object GOODRECEIVING {
     }
 
     def edited(order:Goodreceiving[LineGoodreceiving]) = {
-      //$.modState(s => s.copy(item =Some(order)))
+      $.modState(s => s.copy(item =Some(order)))
       Callback {IWSCircuit.dispatch(Update(order))}
       //$.props >>= (_.proxy.dispatch(Update(order)))
     }
@@ -76,12 +89,12 @@ object GOODRECEIVING {
     }
 
     def delete(item:Goodreceiving[LineGoodreceiving]) = {
-      Callback.log("PurchaseOrder deleted>>>>> ${item}  ${s}")
+      Callback.log("Goodreceiving deleted>>>>> ${item}  ${s}")
       $.props >>= (_.proxy.dispatch(Delete(item)))
       //$.modState(s => s.copy(item = None)).runNow()
     }
     def runDelete(item1:Goodreceiving[LineGoodreceiving]) =   {
-      log.debug(s"  Purchase order to delete line from  >>>>>  ${item1}")
+      log.debug(s"  Goodreceiving to delete line from  >>>>>  ${item1}")
       IWSCircuit.dispatch(Update(item1))
       Callback {
         $.modState(s => s.copy(item = Some(item1))).runNow()
@@ -97,7 +110,7 @@ object GOODRECEIVING {
 
     def AddNewLine(line:LineGoodreceiving) = {
       val  created =line.copy(created = true)
-      log.debug(s"New Line Purchase order before  edit>>>>>  ${line}")
+      log.debug(s"New Line Goodreceiving  created>>>>>  ${line}")
       $.modState(s => s.copy(item = s.item.map(_.add(line.copy(transid=
                 s.item.getOrElse(Goodreceiving[LineGoodreceiving]()).tid)))))
     }
@@ -111,14 +124,19 @@ object GOODRECEIVING {
         addStyles = Seq(bss.pullRight, bss.buttonXS, bss.buttonOpt(CommonStyle.success))), Icon.circleO, " Save")
       def newButton = Button(Button.Props(edit(Some(Goodreceiving[LineGoodreceiving]())),
         addStyles = Seq(bss.pullRight, bss.buttonXS)), Icon.plusSquare, " New")
-      val items = IWSCircuit.zoom(_.store.get.models.get(104)).eval(IWSCircuit.getRootModel).get.get.items.asInstanceOf[List[Goodreceiving[LineGoodreceiving]]].toSet
+
+      if( gitems.filter(_.tid != 0).size <=1) {
+        gitems = IWSCircuit.zoom(_.store.get.models.get(104)).eval(IWSCircuit.getRootModel).get.get.items.asInstanceOf[List[Goodreceiving[LineGoodreceiving]]].toSet
+      }
+      val items = gitems.toList.sorted
+     // val items = IWSCircuit.zoom(_.store.get.models.get(104)).eval(IWSCircuit.getRootModel).get.get.items.asInstanceOf[List[Goodreceiving[LineGoodreceiving]]].toSet
       Panel(Panel.Props("Goodreceiving"), <.div(^.className := "panel-heading"),
         <.div(^.padding := 0,
           p.proxy().renderFailed(ex => "Error loading"),
           p.proxy().renderPending(_ > 500, _ => "Loading..."),
           AccordionPanel("Edit", buildForm(p, s), List(saveButton, newButton)),
           AccordionPanel("Display",
-            List(GoodreceivingList(items.toList,
+            List(GoodreceivingList(  "GOODRECEIVING",  {"104"},items.toList,
             item => edit(Some(item)), item => p.proxy.dispatch(Delete(item)))))
         )
       )
@@ -141,7 +159,7 @@ object GOODRECEIVING {
             )
           )
         ),
-        LineGoodreceivingList(porder, AddNewLine, saveLine, deleteLine)
+        LineGoodreceivingList("GOODRECEIVING", {"104"},porder, AddNewLine, saveLine, deleteLine)
       )
       )
     }
@@ -153,5 +171,5 @@ object GOODRECEIVING {
     .componentDidMount(scope => scope.backend.mounted(scope.props))
     .build
 
-  def apply(proxy: ModelProxy[Pot[Data]]) = component(Props(proxy))
+  def apply(ref: js.UndefOr[String] = "GOODRECEIVING", key: js.Any = {"104"}, proxy: ModelProxy[Pot[Data]]) = component.set(key, ref)(Props(proxy))
 }

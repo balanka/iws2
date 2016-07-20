@@ -109,7 +109,7 @@ object IWSBackend extends IWSBackendTrait [ArticleGroup]{
    case class State(selectedItem: Option[ArticleGroup] = None, showForm: Boolean = false)
   class Backend($: BackendScope[Props, State]) {
     def mounted(props: Props) =
-      Callback.ifTrue(props.proxy().isEmpty, props.proxy.dispatch(Refresh[ArticleGroup](props.iws)))
+      Callback.when(props.proxy().isEmpty)(props.proxy.dispatch(Refresh[ArticleGroup](props.iws)))
 
     def edit(item: Option[ArticleGroup]) =
       $.modState(s => s.copy(selectedItem = item, showForm = true))

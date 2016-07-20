@@ -107,13 +107,17 @@ object LinePurchaseOrderList {
       def buildArticleList [A<:Article](list: List[A]): List[String]= list map (iws =>(iws.id+":"+iws.name +":"+iws.qttyUnit  +":"+iws.vat.getOrElse("0")))
 
       def editFormLine : Seq [TagMod]=List(
+          <.tr(
               buildSItem("item", itemsx = buildArticleList(items), defValue = "0001", evt = updateItem),
+//              buildWItem[BigDecimal]("price", s.item.map(_.price), 0.0, updatePrice(_, s)),
+//              buildWItem[BigDecimal]("quantity", s.item.map(_.quantity), 0.0, updateQuantity),
+              buildSItem("q.unit", itemsx = buildIdNameList(qttyUnit), defValue = "KG", evt = updateUnit),
+              buildSItem("Vat", itemsx = buildIdNameList(vat), defValue = "7", evt = updateVat) ),
+            <.tr( bss.formGroup, ^.height := 10,
               buildWItem[BigDecimal]("price", s.item.map(_.price), 0.0, updatePrice(_, s)),
               buildWItem[BigDecimal]("quantity", s.item.map(_.quantity), 0.0, updateQuantity),
-              buildSItem("q.unit", itemsx = buildIdNameList(qttyUnit), defValue = "KG", evt = updateUnit),
-              buildSItem("Vat", itemsx = buildIdNameList(vat), defValue = "7", evt = updateVat),
               buildWItem[String]("duedate", s.item.map( e =>(fmt(e.duedate.getOrElse(new Date())))),
-                fmt(new Date()), updateDuedate), saveButton, newButton)
+                fmt(new Date()), updateDuedate), saveButton, newButton))
       <.div(bss.formGroup,
         //<.ul(style.listGroup)(all.filter(p.predicate (_,s.search)).sortBy(_.tid)(Ordering[Long].reverse) map (e =>renderItem(e,p))),
         <.ul(style.listGroup)(its.sortBy(_.tid)(Ordering[Long].reverse) map (e =>renderItem(e,p, s))),

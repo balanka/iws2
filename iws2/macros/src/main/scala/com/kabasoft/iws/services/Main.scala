@@ -32,6 +32,8 @@ object Main  {
   pickler.addConcreteType[LinePurchaseOrder]
   pickler.addConcreteType[PurchaseOrder[LinePurchaseOrder]].addConcreteType[LinePurchaseOrder]
   pickler.addConcreteType[Vat]
+  pickler.addConcreteType[Bank]
+  pickler.addConcreteType[BankAccount]
   pickler.addConcreteType[MStore]
 
      println( "Running Line purchaseorder2  com.kabasoft.iws.services.Main:")

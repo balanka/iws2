@@ -5,9 +5,8 @@ import java.util.Date
 
 import japgolly.scalajs.react.vdom.prefix_<^._
 import com.kabasoft.iws.gui.logger._
-import com.kabasoft.iws.gui.macros.GlobalStyles.IWSStyles
 import com.kabasoft.iws.gui.macros.GlobalStyles
-import com.kabasoft.iws.shared.Masterfile
+import com.kabasoft.iws.shared._
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.prefix_<^._
 
@@ -17,8 +16,6 @@ import org.widok.moment._
 
 object Utils {
   @inline private def bss = GlobalStyles.bootstrapStyles
-  @inline private def bss1 = GlobalStyles.IWSStyles
-  val r = IWSStyles.td(10).htmlClass
 
   def fmt(t:Date) = Moment(t.getTime).format("DD.MM.YYYY")
   def fmt(m:BigDecimal) = "%06.2f".format(m)
@@ -29,6 +26,7 @@ object Utils {
   def noAction(e: ReactEventI):Callback = Callback {}
 
   def buildIdNameList [A<:Masterfile](list: List[A]): List[String]= list map (iws =>(iws.id+":"+iws.name))
+  def buildTransIdList [A<:IWS](list: List[A]): List[String]= list map (iws =>(iws.id))
 
   def buildDItem[A](id:String , value:Option[A], defValue:A, evt:ReactKeyboardEventI=> Option[Callback]) = {
     val m = value getOrElse defValue
@@ -61,6 +59,17 @@ object Utils {
         ^.placeholder := id), ^.onChange ==> evt, ^.maxHeight:=2.px, ^.paddingLeft := 10.px,  ^.autoFocus := true))
     //^.placeholder := id), ^.onChange ==> evt, ^.maxHeight:=2.px, ^.paddingLeft := 10.px,  ^.autoFocus := true))
   }
+  def buildLabel(id:String , value:Option[String], defValue:String) = {
+    val m = value getOrElse  defValue
+    List(<.td(<.label(^.`for` := id, id), ^.maxHeight:=2.px ,  ^.paddingLeft := 10.px),
+        <.td(<.label(^.`for` := m, m), ^.maxHeight:=2.px ,  ^.paddingLeft := 10.px))
+  }
+  def buildLabel(id:String , value:Option[Integer], defValue:Integer) = {
+    val m = value getOrElse  defValue
+    List(<.td(<.label(^.`for` := id, id), ^.maxHeight:=2.px ,  ^.paddingLeft := 10.px),
+      <.td(<.input.text(^.id := id, ^.value := m.toString,
+        ^.placeholder := id), ^.maxHeight:=2.px,  ^.paddingLeft := 10.px))
+  }
 
   def buildItem[A](id:String , value:Option[A], defValue:A) = {
     val m = value getOrElse  defValue
@@ -69,7 +78,6 @@ object Utils {
         ^.placeholder := id), ^.maxHeight:=2.px,  ^.paddingLeft := 10.px))
   }
 
-  //def buildIdNameList (list: List[Masterfile]): List[String]= list map (iws =>(iws.id+" "+iws.name))
   def buildSItem(id:String,  itemsx:List[String], defValue:String, evt:String => Callback) =
     List(
      <.td(<.label(^.`for` := id, id), ^.maxHeight:=20.px),

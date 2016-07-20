@@ -132,7 +132,7 @@ object BackendMacro {
         case class State(selectedItem: Option[$t] = None, showForm: Boolean = false)
         class Backend($$: BackendScope[Props, State]) {
           def mounted(props: Props) =
-            Callback.ifTrue(props.proxy().isEmpty, props.proxy.dispatch(Refresh[$t](props.iws)))
+            Callback.when(props.proxy().isEmpty) (props.proxy.dispatch(Refresh[$t](props.iws)))
 
           def edit(item: Option[$t]) =
             $$.modState(s => s.copy(selectedItem = item, showForm = true))

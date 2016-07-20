@@ -27,6 +27,7 @@ object CustomerList {
           <.span(item.city ,^.paddingLeft:=10),
           <.span(item.state ,^.paddingLeft:=10),
           <.span(item.zip ,^.paddingLeft:=10),
+          <.span(item.accountId ,^.paddingLeft:=10),
           editButton,deleteButton
           )
       }

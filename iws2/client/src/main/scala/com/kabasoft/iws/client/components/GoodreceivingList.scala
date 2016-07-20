@@ -7,6 +7,7 @@ import com.kabasoft.iws.shared._
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.prefix_<^._
 
+import scala.scalajs.js
 import scalacss.ScalaCssReact._
 
 object GoodreceivingList {
@@ -52,8 +53,8 @@ object GoodreceivingList {
     })
     .build
 
-  def apply(items: Seq[Goodreceiving[LineGoodreceiving]],
+  def apply(ref: js.UndefOr[String] = "GOODRECEIVINGLIST", key: js.Any = {"1041"}, items: Seq[Goodreceiving[LineGoodreceiving]],
             edit:Goodreceiving[LineGoodreceiving] => Callback,
-            delete:Goodreceiving[LineGoodreceiving] => Callback) = goodreceivingList(Props(items, edit, delete))
+            delete:Goodreceiving[LineGoodreceiving] => Callback) = goodreceivingList.set(key, ref)(Props(items, edit, delete))
 
 }

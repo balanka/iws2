@@ -13,6 +13,7 @@ import japgolly.scalajs.react.vdom.prefix_<^._
 import org.scalajs.dom.ext.KeyCode
 import org.widok.moment.Moment
 
+import scala.scalajs.js
 import scalacss.ScalaCssReact._
 
 object LineGoodreceivingList {
@@ -160,9 +161,9 @@ object LineGoodreceivingList {
       .componentDidMount(scope => scope.backend.mounted(scope.props))
       .build
 
-  def apply( porder:Goodreceiving[LineGoodreceiving],
+  def apply( ref: js.UndefOr[String] = "LINEGOODRECEIVING", key: js.Any = {"105"}, porder:Goodreceiving[LineGoodreceiving],
              newLine:LineGoodreceiving =>Callback,
              saveLine:LineGoodreceiving =>Callback,
              deleteLine:LineGoodreceiving => Callback) =
-             component(Props(porder, newLine, saveLine, deleteLine))
+             component.set(key, ref)(Props(porder, newLine, saveLine, deleteLine))
 }
