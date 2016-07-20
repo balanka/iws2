@@ -136,7 +136,7 @@ object PURCHASEORDER {
                  buildItem[String]("id", s.item.map(_.id), "id"),
                  //buildLabel("id", s.item.map(_.id), "id"),
                 //buildWItem[Long]("oid", s.item.map(_.oid), 1L, updateOid),
-                buildSItem("oid", itemsx = buildTransIdList(items) , defValue = "001", evt = updateStore),
+                buildSItem("oid", itemsx = buildTransIdList(items) , defValue = "001", evt = updateOid),
                 buildSItem("store", itemsx = storeList , defValue = "001", evt = updateStore),
                 buildSItem("supplier", itemsx = supplierList , defValue = "70000", evt = updateSupplier)
               )
