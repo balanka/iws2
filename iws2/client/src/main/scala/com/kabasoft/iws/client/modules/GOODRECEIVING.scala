@@ -1,7 +1,7 @@
 package com.kabasoft.iws.client.modules
 
 import com.kabasoft.iws.client.components.{GoodreceivingList, LineGoodreceivingList}
-import com.kabasoft.iws.gui.AccordionPanel
+import com.kabasoft.iws.gui.BasePanel
 import com.kabasoft.iws.gui.Utils._
 import com.kabasoft.iws.gui.logger._
 import com.kabasoft.iws.gui.macros.Bootstrap._
@@ -48,12 +48,10 @@ object GOODRECEIVING {
       $.modState(s => s.copy(item = Some(d)))
     }
 
-    def updateOid(e: ReactEventI) = {
-      e.preventDefault()
-      val l =e.target.value.toLong
-      log.debug(s"Oid is "+l)
-
-      $.modState(s => s.copy(item = s.item.map(_.copy(oid = l))))
+    def updateOid(idx:String) = {
+      // val oId = idx.substring(0, idx.indexOf("|"))
+      //  log.debug(s"oid is "+oId)
+      $.modState(s => s.copy(item = s.item.map(_.copy(oid = idx.toLong))))
     }
 
     def updateStore(idx:String) = {
@@ -118,6 +116,15 @@ object GOODRECEIVING {
     def filterWith(line:LineGoodreceiving, search:String) =
       line.item.getOrElse("").contains(search)
 
+    def buildFormTab(p: Props, s: State, items:List[Goodreceiving[LineGoodreceiving]]): Seq[ReactElement] =
+      List(<.div(bss.formGroup,
+        TabComponent(Seq(
+          TabItem("vtab1", "List", "#vtab1", true,
+            GoodreceivingList("GOODRECEIVING",  {"104"}, items, item => edit(Some(item)), item => p.proxy.dispatch(Delete(item)))),
+          TabItem("vtab2", "Form", "#vtab2", false, buildForm(p, s, items))
+        ))
+      )
+      )
     def render(p: Props, s: State) = {
 
       def saveButton = Button(Button.Props(edited(s.item.getOrElse(Goodreceiving[LineGoodreceiving]())),
@@ -129,38 +136,28 @@ object GOODRECEIVING {
         gitems = IWSCircuit.zoom(_.store.get.models.get(104)).eval(IWSCircuit.getRootModel).get.get.items.asInstanceOf[List[Goodreceiving[LineGoodreceiving]]].toSet
       }
       val items = gitems.toList.sorted
-     // val items = IWSCircuit.zoom(_.store.get.models.get(104)).eval(IWSCircuit.getRootModel).get.get.items.asInstanceOf[List[Goodreceiving[LineGoodreceiving]]].toSet
-      Panel(Panel.Props("Goodreceiving"), <.div(^.className := "panel-heading"),
-        <.div(^.padding := 0,
-          p.proxy().renderFailed(ex => "Error loading"),
-          p.proxy().renderPending(_ > 500, _ => "Loading..."),
-          AccordionPanel("Edit", buildForm(p, s), List(saveButton, newButton)),
-          AccordionPanel("Display",
-            List(GoodreceivingList(  "GOODRECEIVING",  {"104"},items.toList,
-            item => edit(Some(item)), item => p.proxy.dispatch(Delete(item)))))
-        )
-      )
+      BasePanel("Goodreceiving", buildFormTab(p, s, items), List(saveButton, newButton))
     }
 
-    def buildForm (p: Props, s:State): Seq[ReactElement] = {
+    def buildForm (p: Props, s:State, items:List[Goodreceiving[LineGoodreceiving]]) = {
       val supplier =  IWSCircuit.zoom(_.store.get.models.get(1)).eval(IWSCircuit.getRootModel).getOrElse(Ready(Data(List.empty[Supplier]))).get.items.asInstanceOf[List[Supplier]].toSet
       val store =  IWSCircuit.zoom(_.store.get.models.get(2)).eval(IWSCircuit.getRootModel).getOrElse(Ready(Data(List.empty[Store]))).get.items.asInstanceOf[List[Store]].toSet
       val porder = s.item.getOrElse(Goodreceiving[LineGoodreceiving]().add(LineGoodreceiving(item = Some("4711"))))
       val  storeList=store.toList.filter(_.id !="-1") map (iws =>(iws.id+"|"+iws.name))
       val  supplierList=supplier.toList.filter(_.id !="-1") map (iws =>(iws.id+"|"+iws.name))
-      List(<.div(bss.formGroup,
+        <.div(bss.formGroup,
         <.table(^.className := "table-responsive table-condensed", ^.tableLayout := "fixed",
           <.tbody(
             <.tr(bss.formGroup, ^.height := 10.px,
               buildItem[String]("id", s.item.map(_.id), "id"),
-              buildWItem[Long]("oid", s.item.map(_.oid), 1L, updateOid),
+              //buildWItem[Long]("oid", s.item.map(_.oid), 1L, updateOid),
+              buildSItem("oid", itemsx = buildTransIdList(items) , defValue = "001", evt = updateStore),
               buildSItem("store", itemsx=storeList,defValue = "0001", evt = updateStore),
               buildSItem("supplier", itemsx = supplierList, defValue = "KG", evt = updateAccount)
             )
           )
         ),
         LineGoodreceivingList("GOODRECEIVING", {"104"},porder, AddNewLine, saveLine, deleteLine)
-      )
       )
     }
   }
