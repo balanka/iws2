@@ -1,27 +1,20 @@
 package com.kabasoft.iws.client.modules
 
-import com.kabasoft.iws.client.components.{CustomerList, StoreList}
-import com.kabasoft.iws.gui.macros.IWSList.customerList
+import com.kabasoft.iws.client.components.StoreList
 import com.kabasoft.iws.gui.Utils._
 import com.kabasoft.iws.gui._
-import diode.react.ReactPot._
 import diode.react._
 import diode.data.Pot
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.prefix_<^._
 import com.kabasoft.iws.gui.macros.Bootstrap._
 import com.kabasoft.iws.gui.logger._
-import com.kabasoft.iws.gui.macros.IWSList
 import com.kabasoft.iws.gui.services.{IWSCircuit, RootModel}
 import diode.ModelR
-
-//import com.kabasoft.iws.gui.macros.MasterDetails
 import com.kabasoft.iws.shared._
-//import com.kabasoft.iws.shared.Lenses._
 import com.kabasoft.iws.gui.macros.{TabComponent, _}
 import com.kabasoft.iws.gui.macros.TabItem
 import scalacss.ScalaCssReact._
-//import monocle.macros.GenLens
 
 object STORE {
 
@@ -42,7 +35,6 @@ object STORE {
        }
        Callback {
          IWSCircuit.dispatch(Refresh(Store()))
-         //Callback.when(props.proxy().isEmpty)(props.proxy.dispatch(Refresh(Store())))
        }
      }
 
@@ -114,10 +106,13 @@ object STORE {
                  )
             )
           )
-
-     def render(p: Props, s: State) ={
-      // val items =  IWSCircuit.zoom(_.store.get.models.get(2)).eval(IWSCircuit.getRootModel).get.get.items.asInstanceOf[List[Store]]
-
+     def buildFormTab(p: Props, s: State, items:List[Store]): Seq[ReactElement] =
+       List(<.div(bss.formGroup,
+         TabComponent(Seq(
+           TabItem("vtab1", "List", "#vtab1", true, StoreList(items, item => edit(Some(item.asInstanceOf[Store])), item => p.proxy.dispatch(Delete(item)))),
+           TabItem("vtab2", "Form", "#vtab2", false,buildForm(s))))
+       ))
+     def render(p: Props, s: State) = {
        def saveButton = Button(Button.Props(edited(s.item.getOrElse(Store())), addStyles = Seq(bss.pullRight, bss.buttonXS,
          bss.buttonOpt(CommonStyle.success))), Icon.circleO, "Save")
        def newButton =  Button(Button.Props(edit(Some(Store())), addStyles = Seq(bss.pullRight, bss.buttonXS)), Icon.plusSquare, "New")
@@ -125,18 +120,7 @@ object STORE {
          itemsx = IWSCircuit.zoom(_.store.get.models.get(2)).eval(IWSCircuit.getRootModel).get.get.items.asInstanceOf[List[Store]].toSet
        }
        val items = itemsx.toList.sorted
-       log.debug(s"itemsitemsitemsitemsitemsitemsitemsitems is ${items}")
-       Panel(Panel.Props("Store"), <.div(^.className := "panel-heading",^.padding :=0), <.div(^.padding :=0,
-         p.proxy().renderFailed(ex => "Error loading"),
-         p.proxy().renderPending(_ > 500, _ => "Loading..."),
-
-         AccordionPanel("Edit", Seq(buildForm(s)), List(newButton,saveButton)),
-           StoreList(items,
-              item => edit(Some(item.asInstanceOf[Store])),
-              item => p.proxy.dispatch(Delete(item)))
-         )
-         //TabComponent(Seq(item1, item2, item3)))
-       )
+       BasePanel("Store", buildFormTab(p, s,items), List(newButton,saveButton))
      }
 
   }
