@@ -10,16 +10,14 @@ import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.prefix_<^._
 import com.kabasoft.iws.gui.macros.Bootstrap._
 import com.kabasoft.iws.gui.logger._
-import com.kabasoft.iws.gui.macros.IWSList
+
 import com.kabasoft.iws.gui.services.IWSCircuit
 
-//import com.kabasoft.iws.gui.macros.MasterDetails
 import com.kabasoft.iws.shared._
-//import com.kabasoft.iws.shared.Lenses._
 import com.kabasoft.iws.gui.macros.{TabComponent, _}
 import com.kabasoft.iws.gui.macros.TabItem
 import scalacss.ScalaCssReact._
-//import monocle.macros.GenLens
+
 
 object CUSTOMER {
 
@@ -31,7 +29,6 @@ object CUSTOMER {
      def mounted(props: Props) =
        Callback {
          IWSCircuit.dispatch(Refresh(Customer()))
-         //Callback.when(props.proxy().isEmpty)(props.proxy.dispatch(Refresh(Customer())))
        }
       def edit(item:Option[Customer]) = {
       $.modState(s => s.copy(selectedItem = item))
@@ -52,7 +49,6 @@ object CUSTOMER {
         $.props >>= (_.proxy.dispatch(Delete(item)))
        cb >> $.modState(s => s.copy(name = "Customer"))
     }
-
 
     def updateIt(e: ReactEventI, set: (String, CUSTOMER.State ) =>  CUSTOMER.State) = {
       val r = e.target.value
@@ -83,8 +79,7 @@ object CUSTOMER {
       val r4 = e.target.value
       $.modState(s => s.copy(s.selectedItem.map( z => z.copy(zip = r4))))
     }
-    
-    
+     
     case class Address(id:String, street:String ="", zipCode:String ="", city:String ="", country:String="DE", route:String, title:String)
      def renderItem(item: Customer) : ReactElement =
         <.li(bss.listGroup.itemOpt(CommonStyle.success),^.fontSize:=12,^.fontWeight:=50,^.maxHeight:=30,^.height:=30, ^.tableLayout:="fixed",
@@ -114,27 +109,24 @@ object CUSTOMER {
             )
           )
 
+     def buildFormTab(p: Props, s: State, items:List[Customer]): Seq[ReactElement] = {
+       List(<.div(bss.formGroup,
+         TabComponent(Seq(
+           TabItem("vtab1", "List", "#vtab1", true,CustomerList(items, item => edit(Some(item)), item => p.proxy.dispatch(Delete(item)))),
+           TabItem("vtab2", "Form", "#vtab2", false,buildForm(s))))
+       ))
+     }
      def render(p: Props, s: State) ={
        val items =  IWSCircuit.zoom(_.store.get.models.get(3)).eval(IWSCircuit.getRootModel).get.get.items.asInstanceOf[List[Customer]]
        def saveButton = Button(Button.Props(edited(s.selectedItem.getOrElse(Customer())), addStyles = Seq(bss.pullRight, bss.buttonXS,
          bss.buttonOpt(CommonStyle.success))), Icon.circleO, "Save")
        def newButton =  Button(Button.Props(edit(Some(Customer())), addStyles = Seq(bss.pullRight, bss.buttonXS)), Icon.plusSquare, "New")
-       Panel(Panel.Props("Customer"), <.div(^.className := "panel-heading",^.padding :=0), <.div(^.padding :=0,
-         p.proxy().renderFailed(ex => "Error loading"),
-         p.proxy().renderPending(_ > 500, _ => "Loading..."),
-         AccordionPanel("Edit", Seq(buildForm(s)), List(newButton,saveButton)),
-        // p.proxy().render(
-           CustomerList(items,
-             item => edit(Some(item.asInstanceOf[Customer])),
-             item => p.proxy.dispatch(Delete[Customer](item.asInstanceOf[Customer]))))
-         //TabComponent(Seq(item1, item2, item3)))
-       )
+         BasePanel("Customer", buildFormTab(p,s, items), List(newButton,saveButton))
      }
 
   }
 
   val component = ReactComponentB[Props]("Customer")
-    //.initialState(State(name="Customer"))
     .initialState(State())
     .renderBackend[Backend]
     .componentDidMount(scope => scope.backend.mounted(scope.props))
