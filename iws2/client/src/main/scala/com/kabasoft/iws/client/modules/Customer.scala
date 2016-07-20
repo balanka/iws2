@@ -79,7 +79,7 @@ object CUSTOMER {
       val r4 = e.target.value
       $.modState(s => s.copy(s.selectedItem.map( z => z.copy(zip = r4))))
     }
-     
+
     case class Address(id:String, street:String ="", zipCode:String ="", city:String ="", country:String="DE", route:String, title:String)
      def renderItem(item: Customer) : ReactElement =
         <.li(bss.listGroup.itemOpt(CommonStyle.success),^.fontSize:=12,^.fontWeight:=50,^.maxHeight:=30,^.height:=30, ^.tableLayout:="fixed",
@@ -109,13 +109,13 @@ object CUSTOMER {
             )
           )
 
-     def buildFormTab(p: Props, s: State, items:List[Customer]): Seq[ReactElement] = {
+     def buildFormTab(p: Props, s: State, items:List[Customer]): Seq[ReactElement] =
        List(<.div(bss.formGroup,
          TabComponent(Seq(
            TabItem("vtab1", "List", "#vtab1", true,CustomerList(items, item => edit(Some(item)), item => p.proxy.dispatch(Delete(item)))),
            TabItem("vtab2", "Form", "#vtab2", false,buildForm(s))))
        ))
-     }
+
      def render(p: Props, s: State) ={
        val items =  IWSCircuit.zoom(_.store.get.models.get(3)).eval(IWSCircuit.getRootModel).get.get.items.asInstanceOf[List[Customer]]
        def saveButton = Button(Button.Props(edited(s.selectedItem.getOrElse(Customer())), addStyles = Seq(bss.pullRight, bss.buttonXS,

@@ -6,17 +6,13 @@ import com.kabasoft.iws.gui._
 import com.kabasoft.iws.gui.macros.Bootstrap._
 import com.kabasoft.iws.gui.services.IWSCircuit
 import diode.data.Pot
-import diode.react.ReactPot._
 import diode.react._
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.prefix_<^._
-
 import com.kabasoft.iws.shared._
-//import com.kabasoft.iws.shared.Lenses._
 import com.kabasoft.iws.gui.macros._
-
 import scalacss.ScalaCssReact._
-//import monocle.macros.GenLens
+
 
 object BANKACCOUNT {
 
@@ -69,7 +65,6 @@ object BANKACCOUNT {
        $.modState(s => s.copy(s.item.map( z => z.copy(bic = r1))))
      }
 
-
      def renderItem(item: Bank) : ReactElement =
         <.li(bss.listGroup.itemOpt(CommonStyle.success),^.fontSize:=12,^.fontWeight:=50,^.maxHeight:=30,^.height:=30, ^.tableLayout:="fixed",
           <.span(item.id),
@@ -77,9 +72,7 @@ object BANKACCOUNT {
           <.span(item.description ,^.paddingLeft:=5)
         )
 
-     def  m :(String , BANKACCOUNT.State) =>  BANKACCOUNT.State = (p, s) => s.copy(s.item.map(z => z.copy(id = p)))
-
-      def buildForm(s:State): ReactElement =
+        def buildForm(s:State): ReactElement =
         //<.div(bss.formGroup,
           <.table(^.className := "table-responsive table-condensed", ^.tableLayout := "fixed",
             <.tbody(
@@ -94,29 +87,24 @@ object BANKACCOUNT {
                  )
             )
           )
-
-     def render(p: Props, s: State) ={
+     def buildFormTab(p: Props, s: State, items:List[BankAccount]): Seq[ReactElement] =
+       List(<.div(bss.formGroup,
+         TabComponent(Seq(
+           TabItem("vtab1", "List", "#vtab1", true,BankAccountList(items, Some(item => edit(Some(item))), Some(item => p.proxy.dispatch(Delete(item))))),
+           TabItem("vtab2", "Form", "#vtab2", false,buildForm(s))))
+       ))
+     def render(p: Props, s: State) = {
        val items =  IWSCircuit.zoom(_.store.get.models.get(12)).eval(IWSCircuit.getRootModel).get.get.items.asInstanceOf[List[BankAccount]]
        def saveButton = Button(Button.Props(edited(s.item.getOrElse(BankAccount())), addStyles = Seq(bss.pullRight, bss.buttonXS,
          bss.buttonOpt(CommonStyle.success))), Icon.circleO, "Save")
        def newButton =  Button(Button.Props(edit(Some(BankAccount())), addStyles = Seq(bss.pullRight, bss.buttonXS)), Icon.plusSquare, "New")
-       Panel(Panel.Props("BankAccount"), <.div(^.className := "panel-heading",^.padding :=0), <.div(^.padding :=0,
-         p.proxy().renderFailed(ex => "Error loading"),
-         p.proxy().renderPending(_ > 500, _ => "Loading..."),
-         AccordionPanel("Edit", Seq(buildForm(s)), List(newButton,saveButton)),
-        // p.proxy().render(
-          BankAccountList(items,
-            Some(item => edit(Some(item))),
-            Some(item => p.proxy.dispatch(Delete(item))))
-         //TabComponent(Seq(item1, item2, item3)))
-        )
-       )
+         BasePanel("BankAccount", buildFormTab(p,s, items), List(newButton,saveButton))
+
      }
 
   }
 
   val component = ReactComponentB[Props]("BankAccount")
-    //.initialState(State(name="Customer"))
     .initialState(State())
     .renderBackend[Backend]
     .componentDidMount(scope => scope.backend.mounted(scope.props))
