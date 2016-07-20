@@ -16,9 +16,27 @@ import com.kabasoft.iws.shared.Model._
 
 object Queries  {
 
-   type ACCOUNT_TYPE =(String, String, Int, String, String,  Date, Date)
+  type ACCOUNT_TYPE =(String, String, Int, String, String,  Date, Date)
   type ARTICLE_TYPE =(String, String, Int, String, scala.math.BigDecimal, scala.math.BigDecimal, scala.math.BigDecimal,String, String, String, String)
+
   def create: Update0 = createSchema.update
+  def bankInsertSQL= "INSERT INTO Bank (id, name, modelId, description)  VALUES (?, ?, ?, ?)"
+  def bankSelect =  sql"SELECT * FROM Bank".query[Bank]
+  def bankIdSelect(id:String) = sql"SELECT  *FROM Bank where id =$id".query[Bank]
+  def bankSelectSome = {id:String =>sql"SELECT  * FROM Bank where id =$id".query[Bank]}
+  def bankSelectByGroupId = {id:String =>sql"SELECT  *  FROM Bank where groupid =$id".query[Bank]}
+  def bankUpdateName = {(model:Bank) =>sql"Update bank set id = ${model.id}, name =${model.name},  description=${model.description} where id =${model.id}".update}
+  def bankDelete = {id:String =>sql"Delete FROM bank where id =$id".update}
+
+  def bankAccountInsertSQL= "INSERT INTO BankAccount (id, name, modelId, description, bic, debit, credit )  VALUES (?, ?, ?, ?, ?, ?, ?)"
+  def bankAccountSelect =  sql"SELECT * FROM bankAccount".query[BankAccount]
+  def bankAccountIdSelect(id:String) = sql"SELECT  * FROM bankAccount where id =$id".query[BankAccount]
+  def bankAccountSelectSome = {id:String =>sql"SELECT  * FROM bankAccount where id =$id".query[BankAccount]}
+  def bankAccountSelectByGroupId = {id:String =>sql"SELECT  *  FROM bankAccount where groupid =$id".query[BankAccount]}
+  def bankAccountUpdateName = {(model:BankAccount) =>sql"Update bankAccount set id = ${model.id}, name =${model.name},  description=${model.description}, bic =${model.bic}, debit = ${model.debit} , credit = ${model.credit} where id =${model.id}".update}
+  def bankAccountDelete = {id:String =>sql"Delete FROM bankAccount where id =$id".update}
+
+
   def accountInsertSQL= "INSERT INTO account VALUES (?, ?, ?, ?, ?, ?, ?)"
   def accountSelect =  sql"SELECT * FROM account".query[ACCOUNT_TYPE]
   def accountIdSelect(id:String) = sql"SELECT * FROM account where id =$id".query[ACCOUNT_TYPE]
@@ -49,29 +67,38 @@ object Queries  {
   def costCenterSelectSome = { id:String =>sql"SELECT * FROM costcenter where id =$id".query[CostCenter]}
   def costCenterUpdateName= {(model:CostCenter) =>sql"Update costcenter set  name =${model.name},description=${model.description} where id =${model.id}".update}
   def costCenterDelete = {id:String =>sql"Delete FROM costcenter where id =$id".update}
+  def companyInsertSQL = "INSERT INTO (id, name, modelId,street, city,state,zip,bankAccountId, purchasingClearingAccountId, " +
+    "salesClearingAccountId, paymentClearingAccountId, settlementClearingAccountId, periode, nextPeriode, taxCode, vatCode )" +
+    " company VALUES (?, ?,?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?,?,?)"
+  def companySelect = sql"SELECT * FROM company".query[Company]
+  def companyIdSelect(id:String)  = sql"SELECT * FROM customer where id =$id".query[Company]
+  def companySelect1 = sql"SELECT *  FROM company".query[Company]
+  def companySelectSome  = { id:String =>sql"SELECT * FROM company where id =$id".query[Company]}
+  def companyUpdateName= {(model:Company) =>sql"Update company set  name =${model.name},  street=${model.street}, city=${model.city}, zip=${model.zip}, state =${model.state},  bankAccountId = ${model.bankAccountId}, purchasingClearingAccountId =${model.purchasingClearingAccountId}, salesClearingAccountId =${model.salesClearingAccountId}, paymentClearingAccountId =${model.paymentClearingAccountId}, settlementClearingAccountId =${model.settlementClearingAccountId}, periode = ${model.periode}, nextPeriode =${model.nextPeriode},taxCode =${model.taxCode}, vatCode =${model.vatId} where id =${model.id}".update}
+  def companyDelete = {id:String =>sql"Delete FROM company where id =$id".update}
 
-  def customerInsertSQL = "INSERT INTO customer VALUES (?, ?,?, ?, ?, ?, ?)"
-  def customerSelect = sql"SELECT id, name, modelId, street, city, state,zip FROM customer".query[Customer]
-  def customerIdSelect(id:String)  = sql"SELECT * FROM customer where id =$id".query[Customer]
-  def customerSelect1 = sql"SELECT id, name, street, city, state, zip FROM customer".query[Customer]
+  def customerInsertSQL = "INSERT INTO (id, name, modelId,accountId,street, city,state,zip) customer VALUES (?, ?,?, ?, ?, ?, ?, ?)"
+  def customerSelect = sql"SELECT id, name, modelId,accountId,street, city,state,zip FROM customer".query[Customer]
+  def customerIdSelect(id:String)  = sql"SELECT id, name, modelId,accountId,street, city,state,zip FROM customer where id =$id".query[Customer]
+  def customerSelect1 = sql"SELECT *  FROM customer".query[Customer]
   def customerSelectSome  = { id:String =>sql"SELECT * FROM customer where id =$id".query[Customer]}
-  def customerUpdateName= {(model:Customer) =>sql"Update customer set  name =${model.name},street=${model.street}, city=${model.city}, zip=${model.zip}, state =${model.state}where id =${model.id}".update}
+  def customerUpdateName= {(model:Customer) =>sql"Update customer set  name =${model.name}, accountId=${model.accountId}, street=${model.street}, city=${model.city}, zip=${model.zip}, state =${model.state} where id =${model.id}".update}
   def customerDelete = {id:String =>sql"Delete FROM customer where id =$id".update}
 
-  def supplierInsertSQL = "INSERT INTO suppliers VALUES (?, ?, ?, ?, ?, ?, ?)"
-  def supplierSelect = sql"SELECT id, name, modelId, street, city, state,zip FROM supplier".query[Supplier]
+  def supplierInsertSQL = "INSERT INTO suppliers (id, name, modelId,accountId,  street, city,state,zip) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
+  def supplierSelect = sql"SELECT id, name, modelId,accountId,street, city,state,zip FROM supplier".query[Supplier]
   def supplierIdSelect(id:String)  = sql"SELECT * FROM supplier where id =$id".query[Supplier]
-  def supplierSelect1 = sql"SELECT id, name, street, city, state, zip FROM supplier".query[Supplier]
+  def supplierSelect1 = sql"SELECT id, name, modelId,accountId,street, city,state,zip  FROM supplier".query[Supplier]
   def supplierSelectSome  = { id:String =>sql"SELECT * FROM supplier where id =$id".query[Supplier]}
-  def supplierUpdateName= {(model:Supplier) =>sql"Update supplier set  name =${model.name},street=${model.street}, city=${model.city}, zip=${model.zip}, state =${model.state} where id =${model.id}".update}
+  def supplierUpdateName= {(model:Supplier) =>sql"Update supplier set  name =${model.name}, accountId=${model.accountId},street=${model.street}, city=${model.city}, zip=${model.zip}, state =${model.state} where id =${model.id}".update}
   def supplierDelete = {id:String =>sql"Delete FROM supplier where id =$id".update}
 
-  def storeInsertSQL = "INSERT INTO store (id, name, modelId, street, city,state,zip)  VALUES (?, ?, ?, ?, ?, ?, ?)"
-  def storeSelect = sql"SELECT id, name, modelId, street, city, state,zip FROM store".query[Store]
-  def storeIdSelect(id:String)  = sql"SELECT * FROM store where id =$id".query[Store]
-  def storeSelect1 = sql"SELECT id, name, street, city, state, zip FROM store".query[Store]
+  def storeInsertSQL = "INSERT INTO store (id, name, modelId,accountId,  street, city,state,zip)  VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
+  def storeSelect = sql"SELECT id, name, modelId, accountId, street, city, state,zip FROM store".query[Store]
+  def storeIdSelect(id:String)  = sql"SELECT id, name, modelId, accountId, street, city, state,zip FROM store where id =$id".query[Store]
+  def storeSelect1 = sql"SELECT id, name, modelId, accountId, street, city, state,zip FROM store".query[Store]
   def storeSelectSome  = { id:String =>sql"SELECT * FROM store where id =$id".query[Store]}
-  def storeUpdateName= {(model:Store) =>sql"Update store  set name =${model.name},street=${model.street}, city=${model.city},zip=${model.zip}, state =${model.state} where id =${model.id}".update}
+  def storeUpdateName= {(model:Store) =>sql"Update store  set name =${model.name}, accountId=${model.accountId}, street=${model.street}, city=${model.city},zip=${model.zip}, state =${model.state} where id =${model.id}".update}
   def storeDelete = {id:String =>sql"Delete FROM store where id =$id".update}
 
   def categoryInsertSQL = "INSERT INTO category  VALUES (?, ?, ?, ?)"
@@ -82,12 +109,29 @@ object Queries  {
   def categoryUpdateName= {(model:ArticleGroup) =>sql"Update category set  name =${model.name}, description=${model.description} where id =${model.id}".update}
   def categoryDelete = {id:String =>sql"Delete FROM category where id =$id".update}
 
-  def vatInsertSQL = "INSERT INTO vat VALUES (?, ?, ?, ?, ?)"
-  def vatSelect = sql"SELECT id, name, modelId, description, percent FROM vat".query[Vat]
+  def periodicAccountBalanceInsertSQL = "INSERT INTO PeriodicAccountBalance  VALUES (?, ?, ?, ?)"
+  def periodicAccountBalanceSelect = sql"SELECT * FROM PeriodicAccountBalance".query[PeriodicAccountBalance]
+  def periodicAccountBalanceIdSelect(id:String)  = sql"SELECT * FROM PeriodicAccountBalance where id =$id".query[PeriodicAccountBalance]
+  def periodicAccountBalanceSelect1 = sql"SELECT * FROM PeriodicAccountBalance ".query[PeriodicAccountBalance]
+  def periodicAccountBalanceSelectSome  = { id:String =>sql"SELECT * FROM PeriodicAccountBalance where id =$id".query[PeriodicAccountBalance]}
+  def periodicAccountBalanceUpdateName= {(model:PeriodicAccountBalance) =>sql"Update PeriodicAccountBalance set  debit =${model.debit}, credit=${model.credit} where id =${model.id}".update}
+  def periodicAccountBalanceDelete = {id:String =>sql"Delete FROM PeriodicAccountBalance where id =$id".update}
+
+  def stockInsertSQL = "INSERT INTO stock  VALUES (?, ?, ?, ?)"
+  def stockSelect = sql"SELECT id, name, modelId, description, itemId, storeId, quantity, minStock FROM stock".query[Stock]
+  def stockIdSelect(id:String)  = sql"SELECT * FROM stock where id =$id".query[Stock]
+  def stockSelect1 = sql"SELECT id, name, description FROM stock ".query[Stock]
+  def stockSelectSome  = { id:String =>sql"SELECT * FROM stock where id =$id".query[Stock]}
+  def stockUpdateName= {(model:Stock) =>sql"Update stock set  quantity =${model.quantity}, minStock=${model.minStock} where id =${model.id}".update}
+  def stockDelete = {id:String =>sql"Delete FROM stock where id =$id".update}
+
+
+  def vatInsertSQL = "INSERT INTO vat (id, name, description, modelId,percent, inputVatAccountId, outputVatAccountId,revenueAccountId, stockAccountId, expenseAccountId ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+  def vatSelect = sql"SELECT * FROM vat".query[Vat]
   def vatIdSelect(id:String)  = sql"SELECT * FROM vat where id =$id".query[Vat]
-  def vatSelect1 = sql"SELECT id, name, description, percent FROM vat".query[Vat]
+  def vatSelect1 = sql"SELECT * FROM vat".query[Vat]
   def vatSelectSome  = { id:String =>sql"SELECT * FROM vat where id =$id".query[Vat]}
-  def vatUpdateName= {(model:Vat) =>sql"Update vat set  name =${model.name}, description=${model.description} where id =${model.id}".update}
+  def vatUpdateName= {(model:Vat) =>sql"Update vat set  name =${model.name}, description=${model.description},percent=${model.percent}, inputVatAccountId=${model.inputVatAccountId},  outputVatAccountId=${model.outputVatAccountId},  revenueAccountId=${model.revenueAccountId}, stockAccountId=${model.stockAccountId},  expenseAccountId=${model.expenseAccountId}, where id =${model.id}".update}
   def vatDelete = {id:String =>sql"Delete FROM vat where id =$id".update}
    type LinePurchaseOrder_TYPE = (Long,Long,Int, String,String,BigDecimal,BigDecimal,String, Date, String)
   def linePurchaseOrderInsertSQL = "INSERT INTO LinePurchaseOrder ( id, transid, modelId, item, unit,price, quantity, vat, duedate, text)  VALUES (?, ?, ?,?,?,?,?,?,?,?)"
@@ -133,6 +177,45 @@ object Queries  {
   def getSequence (tablename:String,columnname:String) = sql"SELECT nextval(pg_get_serial_sequence( ${tablename}, ${columnname}))".query[Long]
 
 
+  val createBank=sql"""
+  DROP TABLE IF EXISTS bank;
+     CREATE TABLE bank(
+    id VARCHAR NOT NULL PRIMARY KEY,
+    name   VARCHAR NOT NULL,
+    modelId int NOT NULL,
+    description     VARCHAR NOT NULL
+  );""".update
+  val createBankAccount=sql"""
+  DROP TABLE IF EXISTS bankAccount;
+     CREATE TABLE bankAccount(
+    id VARCHAR NOT NULL PRIMARY KEY,
+    name   VARCHAR NOT NULL,
+    modelId int NOT NULL,
+    description     VARCHAR NOT NULL,
+    bic VARCHAR NOT NULL,
+    debit DECIMAL(20,2),
+    credit DECIMAL(20,2)
+  );""".update
+  val createCompany=sql"""
+  DROP TABLE IF EXISTS Company CASCADE;
+  CREATE TABLE Company (
+    id   VARCHAR     NOT NULL PRIMARY KEY,
+    name VARCHAR NOT NULL,
+    modelId int NOT NULL,
+    street   VARCHAR NOT NULL,
+    city     VARCHAR NOT NULL,
+    state    VARCHAR NOT NULL,
+    zip      VARCHAR NOT NULL,
+   bankAccountId  VARCHAR NOT NULL,
+   purchasingClearingAccountId  VARCHAR NOT NULL,
+   salesClearingAccountId  VARCHAR NOT NULL,
+   paymentClearingAccountId  VARCHAR NOT NULL,
+   settlementClearingAccountId  VARCHAR NOT NULL,
+   periode int NOT NULL,
+   nextPeriode int NOT NULL,
+   taxCode VARCHAR NOT NULL,
+   vatCode VARCHAR NOT NULL
+  );""".update
   val createGoodreceiving=sql"""
            DROP SEQUENCE IF EXISTS GoodreceivingId_seq;
            CREATE SEQUENCE GoodreceivingId_seq
@@ -306,11 +389,102 @@ object Queries  {
     name VARCHAR NOT NULL,
     modelId int NOT NULL,
     description   VARCHAR NOT NULL,
-    percent       DECIMAL(5,2) NOT NULL
+    percent       DECIMAL(5,2) NOT NULL,
+   inputVatAccountId VARCHAR NOT NULL,
+   outputVatAccountId VARCHAR NOT NULL,
+   revenueAccountId VARCHAR NOT NULL,
+   stockAccountId VARCHAR NOT NULL,
+   expenseAccountId VARCHAR NOT NULL
   );""".update
 
 
+  val createStock=sql"""
+  DROP TABLE IF EXISTS stock CASCADE;
+  CREATE TABLE stock (
+    id   VARCHAR     NOT NULL PRIMARY KEY,
+    name VARCHAR DEFAULT "",
+    modelId int NOT NULL,
+    description   VARCHAR DEFAULT "",
+   itemId       VARCHAR  NOT NULL,
+   storeId      VARCHAR NOT NULL,
+    quantity DECIMAL(8,2) NOT NULL,
+    minStock  DECIMAL (8, 2) DEFAULT 0.0
+  );""".update
+
+  val createPeriodicAccountBalance = sql"""
+  DROP TABLE IF EXISTS PeriodicAccountBalance CASCADE;
+  CREATE TABLE PeriodicAccountBalance (
+    id   VARCHAR     NOT NULL PRIMARY KEY,
+    name VARCHAR DEFAULT "",
+    modelId int NOT NULL,
+    description   VARCHAR DEFAULT "",
+   accountId       VARCHAR  NOT NULL,
+   periode      int NOT NULL,
+   debit DECIMAL(8,2) NOT NULL,
+   credit  DECIMAL (8, 2)  NOT NULL
+  );""".update
+
   val createSchema =sql"""
+      DROP TABLE IF EXISTS Company CASCADE;
+      CREATE TABLE Company (
+        id   VARCHAR     NOT NULL PRIMARY KEY,
+        name VARCHAR NOT NULL,
+        modelId int NOT NULL,
+        street   VARCHAR NOT NULL,
+        city     VARCHAR NOT NULL,
+        state    VARCHAR NOT NULL,
+        zip      VARCHAR NOT NULL,
+        bankAccountId  VARCHAR NOT NULL,
+        purchasingClearingAccountId  VARCHAR NOT NULL,
+        salesClearingAccountId  VARCHAR NOT NULL,
+        paymentClearingAccountId  VARCHAR NOT NULL,
+        settlementClearingAccountId  VARCHAR NOT NULL,
+        periode int NOT NULL,
+        nextPeriode int NOT NULL,
+        taxCode VARCHAR NOT NULL,
+        vatCode VARCHAR NOT NULL
+      );
+        DROP TABLE IF EXISTS bank;
+        CREATE TABLE bank(
+         id VARCHAR NOT NULL PRIMARY KEY,
+          name   VARCHAR NOT NULL,
+          modelId int NOT NULL,
+          description VARCHAR NOT NULL
+          );
+        DROP TABLE IF EXISTS bankAccount;
+        CREATE TABLE bankAccount(
+          id VARCHAR NOT NULL PRIMARY KEY,
+          name   VARCHAR NOT NULL,
+          modelId int NOT NULL,
+          description VARCHAR NOT NULL,
+          bic VARCHAR NOT NULL,
+          debit DECIMAL(20,2),
+          credit DECIMAL(20,2)
+         );
+  DROP TABLE IF EXISTS stock CASCADE;
+      CREATE TABLE stock (
+        id   VARCHAR     NOT NULL PRIMARY KEY,
+        name VARCHAR,
+        modelId int NOT NULL,
+        description   VARCHAR,
+        itemId       VARCHAR  NOT NULL,
+        storeId      VARCHAR NOT NULL,
+        quantity DECIMAL(8,2) NOT NULL,
+        minStock  DECIMAL (8, 2) DEFAULT 0.0
+      );
+
+      DROP TABLE IF EXISTS PeriodicAccountBalance CASCADE;
+      CREATE TABLE PeriodicAccountBalance (
+        id   VARCHAR     NOT NULL PRIMARY KEY,
+        name VARCHAR,
+        modelId int NOT NULL,
+        description   VARCHAR DEFAULT "",
+        accountId       VARCHAR  NOT NULL,
+        periode      int NOT NULL,
+        debit DECIMAL(8,2) NOT NULL,
+        credit  DECIMAL (8, 2)  NOT NULL
+        );
+
            DROP TABLE IF EXISTS account;
            CREATE TABLE account(
                 id VARCHAR NOT NULL PRIMARY KEY,
@@ -352,6 +526,7 @@ object Queries  {
           id   VARCHAR     NOT NULL PRIMARY KEY,
           name VARCHAR NOT NULL,
           modelId int NOT NULL,
+          accountId VARCHAR NOT NULL,
           street   VARCHAR NOT NULL,
           city     VARCHAR NOT NULL,
           state    VARCHAR NOT NULL,
@@ -362,6 +537,7 @@ object Queries  {
          id   VARCHAR     NOT NULL PRIMARY KEY,
          name VARCHAR NOT NULL,
          modelId int NOT NULL,
+         accountId VARCHAR NOT NULL,
          street   VARCHAR NOT NULL,
          city     VARCHAR NOT NULL,
          state    VARCHAR NOT NULL,
@@ -372,6 +548,7 @@ object Queries  {
          id   VARCHAR     NOT NULL PRIMARY KEY,
          name VARCHAR NOT NULL,
          modelId int NOT NULL,
+         accountId VARCHAR NOT NULL,
          street   VARCHAR NOT NULL,
          city     VARCHAR NOT NULL,
          state    VARCHAR NOT NULL,
@@ -383,7 +560,12 @@ object Queries  {
           name VARCHAR NOT NULL,
           modelId int NOT NULL,
           description   VARCHAR NOT NULL,
-          percent       DECIMAL(5,2) NOT NULL
+          percent       DECIMAL(5,2) NOT NULL,
+          inputVatAccountId VARCHAR NOT NULL,
+           outputVatAccountId VARCHAR NOT NULL,
+           revenueAccountId VARCHAR NOT NULL,
+           stockAccountId VARCHAR NOT NULL,
+           expenseAccountId VARCHAR NOT NULL
          );
 
            DROP SEQUENCE IF EXISTS PurchaseOrderId_seq;
@@ -423,8 +605,8 @@ object Queries  {
                 duedate      DATE NOT NULL,
                 text  VARCHAR
 
-                );
-      """
+                );"""
+
   /*
 insert into account values ('100','IWS Masterfiles','IWS Masterfiles','2015/01/01','2015/12/31',0.0);
 insert into account values ('200','IWS Sales','IWS Sales','2015/01/01','2015/12/31',0.0);

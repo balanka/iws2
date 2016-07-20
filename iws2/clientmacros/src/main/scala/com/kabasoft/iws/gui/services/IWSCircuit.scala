@@ -64,6 +64,9 @@ class IWSHandler[M](modelRW: ModelRW[M, Pot[DStore[IWS,IWS]]]) extends ActionHan
    pickler.addConcreteType[PurchaseOrder[LinePurchaseOrder]].addConcreteType[LinePurchaseOrder]
    pickler.addConcreteType[Goodreceiving[LineGoodreceiving]].addConcreteType[LineGoodreceiving]
    pickler.addConcreteType[Vat]
+   pickler.addConcreteType[Bank]
+   pickler.addConcreteType[BankAccount]
+   pickler.addConcreteType[Company]
    pickler.addConcreteType[MStore]
    //pickler.addConcreteType[String]
 
@@ -81,12 +84,12 @@ class IWSHandler[M](modelRW: ModelRW[M, Pot[DStore[IWS,IWS]]]) extends ActionHan
      // val r =value.get.models.get(xx.modelId).get.get
       //log.info("+++++++++aaaa0000000"+ a +"<<<<<<<<<<<"+ all)
       val r =value.get.models.get(xx.modelId).get.get.asInstanceOf[Data].items
-     // log.info("+++++++++rrrrr<<<<<<<<<<<"+(all++r))
+      log.info("+++++++++rrrrr<<<<<<<<<<<"+(all++r))
 
       val x = Map(xx.modelId ->Ready(Data(all++r)))
       updated(Ready(value.get.updatedAll(x)))
     case Update(item:IWS) =>
-      //log.debug("+++++++++<<<<<<<<<<< UpdateTodo: "+item)
+      log.debug("+++++++++<<<<<<<<<<< Update: "+item)
       updated(Ready(value.get.updated(item)), Effect(AjaxClient[Api].update(item).call().map(UpdateAll[IWS])))
     case FindAll(item:IWS) =>
       log.info("+++++++++<<<<<<<<<<< FindAll : "+item)
@@ -114,7 +117,10 @@ object IWSCircuit extends Circuit[RootModel[IWS,IWS]] with ReactConnector[RootMo
       6 -> Ready(Data(Seq.empty[CostCenter])),
       7 -> Ready(Data(Seq.empty[Article])),
       9 -> Ready(Data(Seq.empty[Account])),
-      8 -> Ready(Data(Seq.empty[ArticleGroup])),
+      10 -> Ready(Data(Seq.empty[Company])),
+      11 -> Ready(Data(Seq.empty[Bank])),
+      12 -> Ready(Data(Seq.empty[BankAccount])),
+
      101 -> Ready(Data(Seq.empty[PurchaseOrder[LinePurchaseOrder]])),
      104 -> Ready(Data(Seq.empty[Goodreceiving[LineGoodreceiving]]))
 

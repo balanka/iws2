@@ -29,23 +29,25 @@ import scalacss.ScalaCssReact._
 @JSExport("SPAMain")
 object IWSMain extends js.JSApp {
 
-  val v1=  MenuItem("001","Masterfile", "#Masterfile" ,
+  val v1 =  MenuItem("001","Masterfile", "#Masterfile" ,
              List(MenuItem("002","Account","#acc"),
                   MenuItem("003","Article","#art"),
                   MenuItem("004","Customer","#cust"),
                   MenuItem("005","Supplier","#sup"),
-                  //MenuItem("006","Article group","#cat"),
-                  MenuItem("007","Quantity unit","#qty"),
-                  MenuItem("010","Cost center","#cost"),
-                  MenuItem("011","Store","#sto")
+                  MenuItem("006","Bank","#bank"),
+                  MenuItem("007","BankAccount","#bacc"),
+                  MenuItem("008","Quantity unit","#qty"),
+                  MenuItem("009","Cost center","#cost"),
+                  MenuItem("010","Store","#sto"),
+                  MenuItem("011","Company","#comp")
   ))
 
-  val v2=MenuItem("008","Purchasing", "#Purchasing" ,
-          List(MenuItem("009","Purchase order","#ord"),
-               MenuItem("030","Goodreceiving","#good")
+  val v2 = MenuItem("020","Purchasing", "#Purchasing" ,
+          List(MenuItem("021","Purchase order","#ord"),
+               MenuItem("022","Goodreceiving","#good")
     ))
-  val v3=MenuItem("020","Dashboard", "#Dashboard" ,
-    List(MenuItem("021","Dashboard","#scalacss"))
+  val v3 = MenuItem("030","Dashboard", "#Dashboard" ,
+    List(MenuItem("031","Dashboard","#scalacss"))
 
     )
   val vm=MenuItem("000","IWS", "#IWS" ,List(v1,v2,v3))
@@ -70,6 +72,9 @@ object IWSMain extends js.JSApp {
     val x7 =  IWSCircuit.connect(_.store.get.models.get(7).get,"Article")
     //val x8 =  IWSCircuit.connect(_.store.get.models.get(8).get)
     val x9 =  IWSCircuit.connect(_.store.get.models.get(9).get)
+    val x10 =  IWSCircuit.connect(_.store.get.models.get(10).get)
+    val x11 =  IWSCircuit.connect(_.store.get.models.get(11).get)
+    val x12 =  IWSCircuit.connect(_.store.get.models.get(12).get)
     val x101 = IWSCircuit.connect(_.store.get.models.get(101).get, "POrder")
     val x104 = IWSCircuit.connect(_.store.get.models.get(104).get, "Goodreceiving")
 
@@ -79,14 +84,16 @@ object IWSMain extends js.JSApp {
       | staticRoute("#art", ArticlePage$) ~> renderR(ctl => x7(p7 => ARTICLE(p7.asInstanceOf[ModelProxy[Pot[Data]]])))
        | staticRoute("#sto", StorePage$) ~> renderR(ctl => x2(p2 => STORE(p2.asInstanceOf[ModelProxy[Pot[Data]]])))
       |staticRoute("#ord", POrderPage$) ~> renderR(ctl => x101(proxy101 => PURCHASEORDER(proxy101.asInstanceOf[ModelProxy[Pot[Data]]])))
-       |staticRoute("#good", GoodreceivingPage$) ~> renderR(ctl => x104(proxy104 => GOODRECEIVING(proxy104.asInstanceOf[ModelProxy[Pot[Data]]])))
+       |staticRoute("#good", GoodreceivingPage$) ~> renderR(ctl => x104(proxy104 => GOODRECEIVING("GOODRECEIVING",  {"104"},proxy104.asInstanceOf[ModelProxy[Pot[Data]]])))
       | staticRoute("#qty", QuantityUnitPage$) ~> renderR(ctl => x4(p4=>(z4(p4.asInstanceOf[ModelProxy[Pot[Data]]]))))
       | staticRoute("#vat", VatPage$) ~> renderR(ctl => x5(p5=>(z5(p5.asInstanceOf[ModelProxy[Pot[Data]]]))))
       | staticRoute("#acc", AccountPage$) ~> renderR(ctl => x9(p9 =>(ACCOUNT(p9.asInstanceOf[ModelProxy[Pot[Data]]]))))
       | staticRoute("#cust", CustomerPage$) ~> renderR(ctl => x3(p3 =>(CUSTOMER(p3.asInstanceOf[ModelProxy[Pot[Data]]]))))
-      //| staticRoute("#cat", CategoryPage$) ~> renderR(ctl => x8(p8 => (z8(p8.asInstanceOf[ModelProxy[Pot[Data]]]))))
+      | staticRoute("#comp", CompanyPage$) ~> renderR(ctl => x10(p10 => (COMPANY(p10.asInstanceOf[ModelProxy[Pot[Data]]]))))
       | staticRoute("#sup", SupplierPage$) ~> renderR(ctl => x1(p1 =>(z1(p1.asInstanceOf[ModelProxy[Pot[Data]]]))))
       | staticRoute("#cost", CostCenterPage$) ~> renderR(ctl => x6(p6 =>(z6(p6.asInstanceOf[ModelProxy[Pot[Data]]]))))
+      | staticRoute("#bank", BankPage$) ~> renderR(ctl => x11(p11 =>(BANK(p11.asInstanceOf[ModelProxy[Pot[Data]]]))))
+       | staticRoute("#bacc", BankAccountPage$) ~> renderR(ctl => x12(p12 =>(BANKACCOUNT(p12.asInstanceOf[ModelProxy[Pot[Data]]]))))
       ).notFound(redirectToPage(DashboardPage$)(Redirect.Replace))
    // ).notFound(redirectToPage(Home)(Redirect.Replace))
   }.renderWith(layout)

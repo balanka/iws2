@@ -74,6 +74,31 @@ object DAOObjects  {
       Article(x._1, x._2, x._3, x._4, x._5, x._6, x._7,  x._8, x._9, Some(x._10), Some(x._11)).copy(articles = Some(findSome2(x._1))))
   }
 
+  implicit def bankDAO = new DAO[Bank]
+  {
+    def insert(model: List[Bank]) :Int =  Update[Bank](Queries.bankInsertSQL).updateMany(model).transact(xa).run
+    def create = Queries.createBank.run.transact(xa).run
+    def update(model:Bank) = Queries.bankUpdateName(model).run.transact(xa).run
+    def delete(id:String):Int = Queries.bankDelete(id).run.transact(xa).run
+    def all= Queries.bankSelect.process.list.transact(xa).run
+    def find(id:String) : List[Bank] = Queries.bankIdSelect(id).process.list.transact(xa).run
+    def findSome(id:String) = Queries.bankSelectSome(id).process.list.transact(xa).run
+    def findSome1(id:Long) = Queries.bankSelectSome(id+"").process.list.transact(xa).run
+  }
+
+  implicit def bankAccountDAO = new DAO[BankAccount]
+  {
+    def insert(model: List[BankAccount]) :Int =  Update[BankAccount](Queries.bankAccountInsertSQL).updateMany(model).transact(xa).run
+    def create = Queries.createBankAccount.run.transact(xa).run
+    def update(model:BankAccount) = Queries.bankAccountUpdateName(model).run.transact(xa).run
+    def delete(id:String):Int = Queries.bankAccountDelete(id).run.transact(xa).run
+    def all= Queries.bankAccountSelect.process.list.transact(xa).run
+    def find(id:String) : List[BankAccount] = Queries.bankAccountIdSelect(id).process.list.transact(xa).run
+    def findSome(id:String) = Queries.bankAccountSelectSome(id).process.list.transact(xa).run
+    def findSome1(id:Long) = Queries.bankAccountSelectSome(id+"").process.list.transact(xa).run
+  }
+
+
   implicit def categoryDAO = new DAO[ArticleGroup]
   {
     def insert( model: List[ArticleGroup]) :Int = Update[ArticleGroup] (Queries.categoryInsertSQL).updateMany(model).transact(xa).run
@@ -85,6 +110,18 @@ object DAOObjects  {
     def findSome(id:String) = Queries.categorySelectSome(id).process.list.transact(xa).run
     def findSome1(id:Long) = Queries.categorySelectSome(id+"").process.list.transact(xa).run
   }
+  implicit def companyDAO = new DAO[Company]
+  {
+    def insert(model: List[Company]) :Int =  Update[Company](Queries.companyInsertSQL).updateMany(model).transact(xa).run
+    def create = Queries.createCompany.run.transact(xa).run
+    def update(model:Company) = Queries.companyUpdateName(model).run.transact(xa).run
+    def delete(id:String):Int = Queries.companyDelete(id).run.transact(xa).run
+    def all= Queries.companySelect.process.list.transact(xa).run
+    def find(id:String) : List[Company] = Queries.companyIdSelect(id).process.list.transact(xa).run
+    def findSome(id:String) = Queries.companySelectSome(id).process.list.transact(xa).run
+    def findSome1(id:Long) = Queries.companySelectSome(id+"").process.list.transact(xa).run
+  }
+
   implicit def customerDAO = new DAO[Customer]
   {
     def insert(model: List[Customer]) :Int =  Update[Customer](Queries.customerInsertSQL).updateMany(model).transact(xa).run
@@ -96,7 +133,6 @@ object DAOObjects  {
     def findSome(id:String) = Queries.customerSelectSome(id).process.list.transact(xa).run
     def findSome1(id:Long) = Queries.customerSelectSome(id+"").process.list.transact(xa).run
   }
-  
   implicit def supplierDAO = new DAO[Supplier]
   {
     def insert(model: List[Supplier]) :Int =  Update[Supplier](Queries.supplierInsertSQL).updateMany(model).transact(xa).run
@@ -153,7 +189,28 @@ object DAOObjects  {
     def findSome(id:String) = Queries.vatSelectSome(id).process.list.transact(xa).run
     def findSome1(id:Long) = Queries.vatSelectSome(id+"").process.list.transact(xa).run
   }
-
+  implicit def periodicAccountBalanceDAO = new DAO[PeriodicAccountBalance]
+  {
+    def insert(model: List[PeriodicAccountBalance]) :Int =  Update[PeriodicAccountBalance](Queries.periodicAccountBalanceInsertSQL).updateMany(model).transact(xa).run
+    def create = Queries.createPeriodicAccountBalance.run.transact(xa).run
+    def update(model:PeriodicAccountBalance) = Queries.periodicAccountBalanceUpdateName(model).run.transact(xa).run
+    def delete(id:String):Int = Queries.periodicAccountBalanceDelete(id).run.transact(xa).run
+    def all = Queries.periodicAccountBalanceSelect.process.list.transact(xa).run
+    def find(id:String)  : List[PeriodicAccountBalance] = Queries.periodicAccountBalanceIdSelect(id).process.list.transact(xa).run
+    def findSome(id:String) = Queries.periodicAccountBalanceSelectSome(id).process.list.transact(xa).run
+    def findSome1(id:Long) = Queries.periodicAccountBalanceSelectSome(id+"").process.list.transact(xa).run
+  }
+  implicit def stockDAO = new DAO[Stock]
+  {
+    def insert(model: List[Stock]) :Int =  Update[Stock](Queries.stockInsertSQL).updateMany(model).transact(xa).run
+    def create = Queries.createStock.run.transact(xa).run
+    def update(model:Stock) = Queries.stockUpdateName(model).run.transact(xa).run
+    def delete(id:String):Int = Queries.stockDelete(id).run.transact(xa).run
+    def all = Queries.stockSelect.process.list.transact(xa).run
+    def find(id:String)  : List[Stock] = Queries.stockIdSelect(id).process.list.transact(xa).run
+    def findSome(id:String) = Queries.stockSelectSome(id).process.list.transact(xa).run
+    def findSome1(id:Long) = Queries.stockSelectSome(id+"").process.list.transact(xa).run
+  }
     implicit def linePurchaseOrderDAO = new DAO[LinePurchaseOrder]{
     def insert(model: List[LinePurchaseOrder]) :Int = {
       println(s" inserting ${model}  items")
@@ -179,7 +236,7 @@ object DAOObjects  {
 implicit def purchaseOrderDAO = new DAO[PurchaseOrder[LinePurchaseOrder]]{ 
   def predicate(p:LinePurchaseOrder) = p.id==0
   def insert(model: List[PurchaseOrder[LinePurchaseOrder]]) :Int = {
-      val tid:Long = Queries.getSequence ("purchaseorder", "id").unique.transact(xa).run;      
+      val tid:Long = Queries.getSequence ("purchaseorder", "id").unique.transact(xa).run;
       val ret= doobie.imports.Update[(Long,Long, Int, String,String)](Queries.purchaseOrderInsertSQL).updateMany(model.map(
                      x=>(tid, x.oid, x.modelId, x.store.get,x.account.get))).transact(xa).run;
       model.map( x=>implicitly[DAO[LinePurchaseOrder]].insert(x.lines.getOrElse(List[LinePurchaseOrder]()).map( z => z.copy(transid=tid))))

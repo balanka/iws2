@@ -36,6 +36,9 @@ object Application extends Controller {
    pickler.addConcreteType[PurchaseOrder[LinePurchaseOrder]].addConcreteType[LinePurchaseOrder]
   pickler.addConcreteType[Goodreceiving[LineGoodreceiving]].addConcreteType[LineGoodreceiving]
    pickler.addConcreteType[Vat]
+  pickler.addConcreteType[Bank]
+  pickler.addConcreteType[BankAccount]
+  pickler.addConcreteType[Company]
    pickler.addConcreteType[MStore]
 
   val apiService = new ApiService()

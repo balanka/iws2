@@ -16,6 +16,9 @@ class ApiService extends Api {
 
   def create(item:IWS) ={
    item match {
+     case _: Bank =>MakeService.make[Bank].create
+     case _: BankAccount =>MakeService.make[BankAccount].create
+     case _: Company =>MakeService.make[Company].create
      case _: Account =>MakeService.make[Account].create
      case _: Article => MakeService.make[Article].create
      case _: Supplier => MakeService.make[Supplier].create
@@ -30,7 +33,11 @@ class ApiService extends Api {
    }
  }
   def insert(item:IWS) ={
+    println(s"  got insert  call for  ${item}  as request")
    item match {
+     case _: Bank =>MakeService.make[Bank].insert(List(item.asInstanceOf[Bank]))
+     case _: BankAccount =>MakeService.make[BankAccount].insert(List(item.asInstanceOf[BankAccount]))
+     case _: Company =>MakeService.make[Company].insert(List(item.asInstanceOf[Company]))
      case _: Account =>MakeService.make[Account].insert(List(item.asInstanceOf[Account]))
      case _: Article => MakeService.make[Article].insert(List(item.asInstanceOf[Article]))
      case _: Supplier => MakeService.make[Supplier].insert(List(item.asInstanceOf[Supplier]))
@@ -49,6 +56,9 @@ class ApiService extends Api {
  }
   def find(item:IWS) ={
    item match {
+     case _: Bank =>MakeService.make[Bank].find(item.id)
+     case _: BankAccount =>MakeService.make[BankAccount].find(item.id)
+     case _: Company =>MakeService.make[Company].find(item.id)
      case _: Account =>MakeService.make[Account].find(item.id)
      case _: Article => MakeService.make[Article].find(item.id)
      case _: Supplier => MakeService.make[Supplier].find(item.id)
@@ -66,6 +76,9 @@ class ApiService extends Api {
  }
    def findSome(item:IWS) = {
     item match {
+    case _: Bank  => MakeService.make[Bank].findSome(item.id)
+    case _: BankAccount  => MakeService.make[BankAccount].findSome(item.id)
+    case _: Company  => MakeService.make[Company].findSome(item.id)
     case _: Account  => MakeService.make[Account].findSome(item.id)
     case _: Supplier => MakeService.make[Supplier].findSome(item.id)
     case _: Customer => MakeService.make[Customer].findSome(item.id)
@@ -82,8 +95,11 @@ class ApiService extends Api {
     }
   }
    def all(item:IWS) ={
-   println(s"got  ${item}  as request")
+   println(s"  got all  call for  ${item}  as request")
     item match {
+      case _: Bank => MakeService.make[Bank].all
+      case _: BankAccount => MakeService.make[BankAccount].all
+      case _: Company => MakeService.make[Company].all
       case _: Account => MakeService.make[Account].all
       case _: Supplier => MakeService.make[Supplier].all
       case _: Customer => MakeService.make[Customer].all
@@ -100,8 +116,11 @@ class ApiService extends Api {
     }
   }
    def update(item:IWS) = {
-    println(s"get ${item} items")
+    println(s" update ${item} items")
     item match {
+      case _: Bank  => {MakeService.make[Bank].update(item.asInstanceOf[Bank]); find(item)}
+      case _: BankAccount  => {MakeService.make[BankAccount].update(item.asInstanceOf[BankAccount]); find(item)}
+      case _: Company  => {MakeService.make[Company].update(item.asInstanceOf[Company]); find(item)}
       case _: Account  => {MakeService.make[Account].update(item.asInstanceOf[Account]); find(item)}
       case _: Supplier => {MakeService.make[Supplier].update(item.asInstanceOf[Supplier]); find(item)}
       case _: Customer => {MakeService.make[Customer].update(item.asInstanceOf[Customer]); find(item)}
@@ -119,8 +138,11 @@ class ApiService extends Api {
   }
 
    def delete(item: IWS) = {
-     println(s"get ${item} items")
+     println(s"delete ${item} items")
     item match {
+      case _: Bank  => {MakeService.make[Bank].delete(item.id); all(item)}
+      case _: BankAccount  => {MakeService.make[BankAccount].delete(item.id); all(item)}
+      case _: Company  => {MakeService.make[Company].delete(item.id); all(item)}
       case _: Account  => {MakeService.make[Account].delete(item.id); all(item)}
       case _: Article  => {MakeService.make[Article].delete(item.id); all(item)}
       case _: Supplier => {MakeService.make[Supplier].delete(item.id); all(item)}

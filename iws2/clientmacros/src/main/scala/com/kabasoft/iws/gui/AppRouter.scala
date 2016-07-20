@@ -16,6 +16,9 @@ object AppRouter {
   case object CustomerPage$ extends Page
   case object VatPage$ extends Page
   case object StorePage$ extends Page
+  case object BankPage$ extends Page
+  case object BankAccountPage$ extends Page
+  case object CompanyPage$ extends Page
   case object SupplierPage$ extends Page
   case object ScalaCSSDoc extends Page
   case object Components2Doc  extends Page

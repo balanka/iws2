@@ -175,16 +175,28 @@ case class Article(id:String ="-1", name:String ="", modelId:Int = 7, descriptio
                    articles:Option[List[Article]] = None) extends IWS with Masterfile
 case class QuantityUnit(id:String ="-1",name:String ="", modelId:Int = 4 ,description:String ="") extends IWS with Masterfile
 case class ArticleGroup(id:String ="-1", name:String ="", modelId:Int = 8, description:String ="") extends IWS with Masterfile
-abstract class BusinessPartner(id: String ="-1", name: String ="", modelId:Int, street: String ="", city: String ="", state: String ="", zip: String ="") extends IWS
-case class Supplier(id: String ="-1", name: String ="" , modelId:Int = 1, street: String ="", city: String ="", state: String ="", zip: String ="") extends
-BusinessPartner (id: String, name: String, modelId:Int, street: String, city: String, state: String , zip: String )
-case class Store(id: String ="-1", name: String ="",  modelId:Int = 2, street: String ="", city: String ="", state: String ="", zip: String ="") extends
-BusinessPartner (id: String, name: String ,modelId:Int, street: String, city: String, state: String , zip: String )
-case class Customer(id: String ="-1", name: String ="", modelId:Int = 3, street: String ="", city: String ="", state: String ="", zip: String ="") extends
-BusinessPartner (id: String, name: String , modelId:Int, street: String, city: String, state: String , zip: String )
+abstract class BusinessPartner(id: String ="-1", name: String ="", modelId:Int, accountId:String, street: String ="", city: String ="", state: String ="", zip: String ="") extends IWS
+case class Supplier(id: String ="-1", name: String ="" , modelId:Int = 1, accountId:String ="", street: String ="", city: String ="", state: String ="", zip: String ="") extends
+BusinessPartner (id: String, name: String, modelId:Int,  street: String, city: String, state: String , zip: String )
+case class Store(id: String ="-1", name: String ="",  modelId:Int = 2, accountId:String ="", street: String ="", city: String ="", state: String ="", zip: String ="") extends
+BusinessPartner (id: String, name: String ,modelId:Int,   street: String, city: String, state: String , zip: String )
+case class Customer(id: String ="-1", name: String ="", modelId:Int = 3, accountId:String ="", street: String ="", city: String ="", state: String ="", zip: String ="") extends
+BusinessPartner (id: String, name: String , modelId:Int,  street: String, city: String, state: String , zip: String )
 
+case class Company(id: String ="-1", name: String ="", modelId:Int =10, street: String ="", city: String ="", state: String ="", zip: String ="",
+                   bankAccountId:String ="", purchasingClearingAccountId:String ="", salesClearingAccountId:String ="", paymentClearingAccountId:String ="", settlementClearingAccountId:String ="",
+                   periode:Int =0, nextPeriode:Int =0, taxCode:String ="", vatId:String ="") extends
+  BusinessPartner (id: String, name: String , modelId:Int, street: String, city: String, state: String , zip: String )
 
-case class Vat(id:String ="-1",name:String ="", modelId:Int = 5 ,description:String ="", percent:Amount =0) extends Masterfile
+case class Bank(id:String ="-1",name:String ="", modelId:Int = 11 ,description:String ="" ) extends Masterfile
+case class BankAccount(id:String ="-1",name:String ="", modelId:Int = 12 ,description:String ="" , bic:String ="", debit:Amount =0.0, credit:Amount =0.0) extends Masterfile {
+   def iban =id
+
+}
+case class Vat(id:String ="-1",name:String ="", modelId:Int = 5 ,description:String ="", percent:Amount =0, inputVatAccountId:String ="", outputVatAccountId:String ="",
+               revenueAccountId:String ="", stockAccountId:String ="", expenseAccountId:String ="" ) extends Masterfile
+case class PeriodicAccountBalance (id:String, name:String ="", modelId:Int = 106, description:String ="", accountId:String, periode:Int, debit:Amount, credit:Amount) extends Masterfile
+case class Stock (id:String, name:String ="", modelId:Int = 107, description:String ="", itemId:String, storeId:String, quantity:Amount, minStock:Amount) extends Masterfile
 case class LinePurchaseOrder  (tid:Long = 0L, transid:Long =0, modelId:Int = 102,item:Option[String] = None, unit:Option[String] = None, price: Amount = 0,
                                quantity:Amount = 0,vat:Option[String] = None, duedate:Option[Date] = Some(new Date()),text:String ="txt",
                                modified:Boolean= false, created:Boolean= false, deleted:Boolean= false) extends LineInventoryTransaction {
@@ -233,8 +245,8 @@ case class PurchaseOrder[LinePurchaseOrder] (tid:Long = 0L,oid:Long = 0L, modelI
  def add(line:LinePurchaseOrder) = copy(lines = Some(getLines ++: List(line)))
  def getLines = lines.getOrElse(List.empty[LinePurchaseOrder])
  def getLinesWithId(id:Long) = getLines.filter(equals(_,id))
- def replaceLine( newLine:LinePurchaseOrder) = copy(lines = Some( getLines map ( old => if (newLine.equals(old))  newLine else old )))
-
+ def replaceLine( newLine:LinePurchaseOrder) = copy(lines = Some( getLines map ( old => if (newLine.equals(old)) newLine else old )))
+// def replaceLine( newLines: List[LinePurchaseOrder]):PurchaseOrder[LinePurchaseOrder] = (newLines map replaceLine).head
   override def  canEqual(a: Any) = a.isInstanceOf[PurchaseOrder[LinePurchaseOrder]]
   override def equals(that: Any): Boolean =
     that match {
@@ -248,7 +260,9 @@ case class Goodreceiving[LineGoodreceiving] (tid:Long = 0L,oid:Long = 0L, modelI
   def add(line:LineGoodreceiving) = copy(lines = Some(getLines ++: List(line)))
   def getLines:List[LineGoodreceiving] = lines.getOrElse(List.empty[LineGoodreceiving])
   def getLinesWithId(id:Long) = getLines.filter(equals(_,id))
+
   def replaceLine( newLine:LineGoodreceiving) = copy(lines = Some( getLines map ( old => if (newLine.equals(old))  newLine else old )))
+ // def setLineID = copy(lines = Some( getLines map ( e => if(e.tid != 0 ) e else  e.copy(tid = -1))))
   override def  canEqual(a: Any) = a.isInstanceOf[Goodreceiving[LineGoodreceiving]]
   override def equals(that: Any): Boolean =
     that match {
@@ -267,6 +281,7 @@ case class Goodreceiving[LineGoodreceiving] (tid:Long = 0L,oid:Long = 0L, modelI
 //N°d'ordre	Date	Prénoms et nom des prévenus	Parti Civil	Prévention	Date et n°de jugement	Origine de Juridiction	Conservation
 //  Registre des affaires criminelles
 //N°d'ordre	Date d'entrée	1ère autorité saisie	Identité complète des accusés		Date des Faits	Nature et lieux des infractions	Suite Donnée	Partie civil
+/*
 case class  GeneralRegister(id:String ="", modelId:Int=1000,appelandId:String ="", intimeId:String ="", enterdate:Option[Date]=Some(new Date())
                             ,reason:String ="", origin:String="") extends IWS
 case class  CAD(id:String ="", modelId:Int=1002, registerId:String ="", openingDate:Option[Date]=Some(new Date()), enterdate:Option[Date]=Some(new Date()),
@@ -278,22 +293,31 @@ case class  CorrectionalRegister(id:String ="", modelId:Int=1001, appelandId:Str
 case class  CrimeRegister(id:String ="", modelId:Int=1003,name:String ="", enterdate:Option[Date]=Some(new Date()),
                           parties:Seq[String]=Seq.empty[String], prevention:String="",jugementdate:Option[Date]=Some(new Date()),
                           jugementId:String ="",origin:String="",conservation:String ="" ) extends IWS
+ */
 
-object  Supplier_{ def unapply (in:Supplier) =Some(in.id,in.name,in.modelId, in.street,in.city,in.state,in.zip)}
-object  Customer_{ def unapply (in:Customer) =Some(in.id,in.name,in.modelId, in.street,in.city,in.state,in.zip)}
-object  Store_{ def unapply (in:Store) =Some(in.id,in.name, in.modelId, in.street,in.city,in.state,in.zip)}
-object  Vat_{ def unapply (in:Vat) =Some(in.id,in.name, in.modelId, in.description,in.percent)}
-object  CostCenter_{ def unapply (in:CostCenter) =Some(in.id,in.name,in.description)}
+object  Company_{ def unapply (in:Company) =Some(in.id,in.name,in.modelId,  in.street,in.city,in.state,in.zip,
+  in.bankAccountId, in.purchasingClearingAccountId, in.salesClearingAccountId, in.paymentClearingAccountId,
+  in.settlementClearingAccountId, in.periode, in.nextPeriode, in.taxCode, in.vatId)}
+object  Supplier_{ def unapply (in:Supplier) =Some(in.id,in.name,in.modelId, in.accountId, in.street,in.city,in.state,in.zip)}
+object  Customer_{ def unapply (in:Customer) =Some(in.id,in.name,in.modelId, in.accountId, in.street,in.city,in.state,in.zip)}
+object  Store_{ def unapply (in:Store) =Some(in.id,in.name, in.modelId, in.accountId, in.street,in.city,in.state,in.zip)}
+object  Vat_{ def unapply (in:Vat) =Some(in.id,in.name, in.modelId, in.description,in.percent, in.inputVatAccountId,
+                                  in.outputVatAccountId, in.revenueAccountId, in.stockAccountId, in.expenseAccountId)}
+object  CostCenter_{ def unapply (in:CostCenter) =Some(in.id,in.name, in.modelId, in.description)}
 object  QuantityUnit_{ def unapply (in:QuantityUnit) =Some(in.id,in.name,in.modelId, in.description)}
+object  Bank_{ def unapply (in:Bank) =Some(in.id,in.name,in.modelId, in.description)}
+object  BankAccount_{ def unapply (in:BankAccount) =Some(in.id,in.name,in.modelId, in.description, in.bic, in.debit, in.credit)}
 object  Account_{ def unapply (in:Account) =Some(in.id,in.name,in.modelId, in.description, in.groupId, in.accounts, in.dateOfOpen,in.dateOfClose,in.balance)}
 object  Article_{ def unapply (in:Article) =Some(in.id,in.name, in.modelId, in.description, in.price,
   in.avgPrice, in.salesPrice, in.qttyUnit, in.packUnit, in.vat, in.articles)}
+object  PeriodicAccountBalance_{ def unapply (in:PeriodicAccountBalance) =Some(in.id,in.name,in.description, in.accountId, in.periode, in.debit, in.credit)}
+object  Stock_{ def unapply (in:Stock) =Some(in.id,in.name,in.description, in.itemId, in.storeId, in.quantity, in.minStock)}
 object  ArticleGroup_{ def unapply (in:ArticleGroup) =Some(in.id,in.name,in.modelId, in.description)}
 object  LinePurchaseOrder_{ def unapply (in:LinePurchaseOrder) = Some(in.tid,in.transid, in.modelId, in.item, in.unit, in.price, in.quantity, in.vat, in.duedate, in.text)}
 object  PurchaseOrder_{ def unapply (in:PurchaseOrder[LinePurchaseOrder]) = Some(in.tid,in.oid, in.modelId, in.store, in.account, in.lines)}
 object  LineGoodreceiving_{ def unapply (in:LineGoodreceiving) = Some(in.tid,in.transid, in.modelId, in.item, in.unit, in.price, in.quantity, in.vat, in.duedate, in.text)}
 object  Goodreceiving_{ def unapply (in:Goodreceiving[LineGoodreceiving]) = Some(in.tid,in.oid, in.modelId, in.store, in.account, in.lines)}
-object  GeneralRegister_{ def unapply (in:GeneralRegister) = Some(in.id, in.modelId, in.appelandId, in.intimeId, in.enterdate,in.reason,in.origin)}
+//object  GeneralRegister_{ def unapply (in:GeneralRegister) = Some(in.id, in.modelId, in.appelandId, in.intimeId, in.enterdate,in.reason,in.origin)}
 //implicit def PurchaseOrderOrdering: Ordering[PurchaseOrder[LinePurchaseOrder]] = Ordering.fromLessThan(_.tid > _.tid)
 //implicit def orderingById[A <: PurchaseOrder[LinePurchaseOrder]]: Ordering[A] = Ordering.by(e => (e.tid, e.tid))
 
