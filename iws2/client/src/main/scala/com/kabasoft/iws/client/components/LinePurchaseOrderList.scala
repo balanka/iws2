@@ -9,7 +9,6 @@ import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.prefix_<^._
 import com.kabasoft.iws.shared._
 import java.util.Date
-
 import scalacss.ScalaCssReact._
 import org.widok.moment.{Moment, _}
 
@@ -54,7 +53,6 @@ object LinePurchaseOrderList {
 
     def updateUnit(id:String) = {
       val qtyUnit = id.substring(0, id.indexOf("|"))
-      //log.debug(s" Unit is ${qtyUnit}")
       $.modState(s => s.copy(item = s.item.map(_.copy(unit = Some(qtyUnit)))))>>
         setModfied
     }
@@ -109,15 +107,15 @@ object LinePurchaseOrderList {
       def editFormLine : Seq [TagMod]=List(
           <.tr(
               buildSItem("item", itemsx = buildArticleList(items), defValue = "0001", evt = updateItem),
-//              buildWItem[BigDecimal]("price", s.item.map(_.price), 0.0, updatePrice(_, s)),
-//              buildWItem[BigDecimal]("quantity", s.item.map(_.quantity), 0.0, updateQuantity),
               buildSItem("q.unit", itemsx = buildIdNameList(qttyUnit), defValue = "KG", evt = updateUnit),
               buildSItem("Vat", itemsx = buildIdNameList(vat), defValue = "7", evt = updateVat) ),
             <.tr( bss.formGroup, ^.height := 10,
               buildWItem[BigDecimal]("price", s.item.map(_.price), 0.0, updatePrice(_, s)),
               buildWItem[BigDecimal]("quantity", s.item.map(_.quantity), 0.0, updateQuantity),
               buildWItem[String]("duedate", s.item.map( e =>(fmt(e.duedate.getOrElse(new Date())))),
-                fmt(new Date()), updateDuedate), saveButton, newButton))
+                fmt(new Date()), updateDuedate), saveButton, newButton)
+         )
+
       <.div(bss.formGroup,
         //<.ul(style.listGroup)(all.filter(p.predicate (_,s.search)).sortBy(_.tid)(Ordering[Long].reverse) map (e =>renderItem(e,p))),
         <.ul(style.listGroup)(its.sortBy(_.tid)(Ordering[Long].reverse) map (e =>renderItem(e,p, s))),
@@ -137,9 +135,10 @@ object LinePurchaseOrderList {
       def deleteButton = Button(Button.Props(delete (item,p.deleteLine), addStyles = Seq(bss.pullRight, bss.buttonXS,
                             bss.buttonOpt(CommonStyle.danger))), Icon.trashO, "")
       val style = bss.listGroup
-      <.li(style.itemOpt(CommonStyle.warning), ^.fontSize:=12.px, ^.fontWeight:=50.px, ^.maxHeight:=30.px,
-                                               ^.height:=30.px, ^.alignContent:="center", ^.tableLayout:="fixed",
-
+      <.li(style.itemOpt(CommonStyle.warning),
+        ^.fontSize:=12.px, ^.fontWeight:=50.px,
+        ^.maxHeight:=30.px, ^.height:=30.px,
+        ^.alignContent:="center", ^.tableLayout:="fixed",
         <.span(deleteButton , ^.alignContent:="left"),
         <.span(item.id,^.paddingLeft:=10.px),
         <.span(item.item ,^.paddingLeft:=10.px),

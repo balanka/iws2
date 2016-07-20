@@ -2,7 +2,7 @@ package com.kabasoft.iws.client.modules
 
 
 import com.kabasoft.iws.client.components.{LinePurchaseOrderList, PurchaseOrderList}
-import com.kabasoft.iws.gui.AccordionPanel
+import com.kabasoft.iws.gui.BasePanel
 import diode.react.ReactPot._
 import diode.react._
 import diode.data.{Pot, Ready}
@@ -51,11 +51,6 @@ object PURCHASEORDER {
       $.modState(s => s.copy(item = Some(d)))
     }
 
-//    def updateOid(e: ReactEventI) = {
-//      val l =e.target.value.toLong
-//      log.debug(s"Oid is "+l)
-//      $.modState(s => s.copy(item = s.item.map(_.copy(oid = l))))
-//    }
     def updateOid(idx:String) = {
      // val oId = idx.substring(0, idx.indexOf("|"))
      //  log.debug(s"oid is "+oId)
@@ -109,8 +104,6 @@ object PURCHASEORDER {
     }
     def AddNewLine(line:LinePurchaseOrder) = $.modState(s => s.copy(item = s.item.map(_.add(line.copy(transid =
                                                      s.item.getOrElse(PurchaseOrder[LinePurchaseOrder]()).tid)))))
-
-
     def filterWith(line:LinePurchaseOrder, search:String) = line.item.getOrElse("").contains(search)
 
     def render(p: Props, s: State) = {
@@ -127,7 +120,6 @@ object PURCHASEORDER {
          ))
        )
       )
-
 
       def buildForm (p: Props, s:State, items:List[PurchaseOrder[LinePurchaseOrder]]) = {
         val supplier =  IWSCircuit.zoom(_.store.get.models.get(1)).eval(IWSCircuit.getRootModel).getOrElse(Ready(Data(List.empty[Supplier]))).get.items.asInstanceOf[List[Supplier]].toSet
@@ -158,17 +150,8 @@ object PURCHASEORDER {
         poitems = IWSCircuit.zoom(_.store.get.models.get(101)).eval(IWSCircuit.getRootModel).get.get.items.asInstanceOf[List[PurchaseOrder[LinePurchaseOrder]]].toSet
       }
       val items = poitems.toList.sorted
-      Panel(Panel.Props("Purchase Order"), <.div(^.className := "panel-heading"),
-        <.div(^.padding := 0,
-          p.proxy().renderFailed(ex => "Error loading"),
-          p.proxy().renderPending(_ > 500, _ => "Loading..."),
-          AccordionPanel("Edit", buildFormTab(p, s, items), List(saveButton, newButton))
-        )
-      )
-
+      BasePanel("Purchase Order", buildFormTab(p, s, items), List(saveButton, newButton))
     }
-
-
   }
 
   val component = ReactComponentB[Props]("PURCHASEORDER")
