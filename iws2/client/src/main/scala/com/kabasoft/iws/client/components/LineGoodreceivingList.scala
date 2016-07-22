@@ -61,8 +61,17 @@ object LineGoodreceivingList {
     }
 
     def updateDuedate(e: ReactEventI) = {
-      val l =e.target.value.toLong
-      $.modState(s => s.copy(item = s.item.map(_.copy(duedate = Some(new Date(l))))))>>setModfied
+      val l = e.target.value
+      Moment.locale("de_DE")
+      val m = Moment(l)
+      val _date=m.toDate()
+      val _helsenkiOffset = 2*60*60000;//maybe 3 [h*60*60000 = ms]
+      val _userOffset = _date.getTimezoneOffset()*60000; // [min*60000 = ms]
+      val _helsenkiTime = new Date((_date.getTime()+_helsenkiOffset+_userOffset).toLong);
+
+      // log.debug(s" Duedate is ${l} _helsenkiTime:${ Moment(_helsenkiTime.getTime).format("DD.MM.YYYY HH:mm:ss")} ")
+      $.modState(s => s.copy(item = s.item.map(_.copy(duedate = Some(_helsenkiTime)))))>>
+        setModfied
     }
     def updateText(e: ReactEventI) = {
       val l =e.target.value
@@ -115,13 +124,17 @@ object LineGoodreceivingList {
       def buildIdNameList [A<:Masterfile](list: List[A]): List[String]= list.filter(_.id !="-1") map (iws =>(iws.id+"|"+iws.name))
       def buildArticleList [A<:Article](list: List[A]): List[String]= list.filter(_.id !="-1") map (iws =>(iws.id+":"+iws.name +":"+iws.qttyUnit  +":"+iws.vat.getOrElse("0")))
       def editFormLine : Seq [TagMod]=List(
-              buildSItem("item", itemsx = buildArticleList(items), defValue = "0001", evt = updateItem),
-              buildDItem[String]("price", s.item.map(_.price.toString()), "0,0", updatePrice),
-              buildDItem[String]("quantity", s.item.map(_.quantity.toString()), "0,0", updateQuantity),
-              buildSItem("q.unit", itemsx = buildIdNameList(qttyUnit), defValue = "KG", evt = updateUnit),
-              buildSItem("Vat", itemsx = buildIdNameList(vat), defValue = "7", evt = updateVat),
-              buildWItem[String]("duedate", s.item.map( e =>(fmt(e.duedate.getOrElse(new Date())))),
-               fmt(new Date()), updateDuedate), saveButton, newButton)
+        <.tr(
+          buildSItem("Item", itemsx = buildArticleList(items), defValue = "0001", evt = updateItem),
+          buildSItem("Q.unit", itemsx = buildIdNameList(qttyUnit), defValue = "KG", evt = updateUnit),
+          buildSItem("Vat", itemsx = buildIdNameList(vat), defValue = "7", evt = updateVat), saveButton, newButton),
+        <.tr( bss.formGroup, ^.height := 10,
+          buildDItem[String]("Price", s.item.map(_.price.toString()), "0,0", updatePrice),
+          buildDItem[String]("Quantity", s.item.map(_.quantity.toString()), "0,0", updateQuantity),
+          buildDate("Duedate", s.item.map(_.duedate.getOrElse(new Date())), new Date(), updateDuedate))
+          //saveButton, newButton)
+         )
+
       <.div(bss.formGroup,
         //<.ul(style.listGroup)(all.filter(p.predicate (_,s.search)).sortBy(_.tid)(Ordering[Long].reverse) map (e =>renderItem(e,p))),
         <.ul(style.listGroup)(its.sortBy(_.tid)(Ordering[Long].reverse) map (e =>renderItem(e,p))),
