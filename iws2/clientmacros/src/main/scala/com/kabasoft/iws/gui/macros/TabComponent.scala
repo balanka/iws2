@@ -12,8 +12,8 @@ object TabComponent {
     <.div(^.cls:="container-fluid",
       <.div(^.cls:="row", ^.padding:=2.px,
         <.div(^.cls:="col-sm-2",  ^.padding:=1.px,
-            buildTabHeader(items)),
-            buildTabContent(items))
+          buildTabHeader(items)),
+        buildTabContent(items))
     )
 
   def buildIt(item:TabItem) ={
@@ -24,12 +24,11 @@ object TabComponent {
   def buildTabContent( tabItems: Seq[TabItem])=
     <.div(^.cls := "col-sm-10", ^.padding:=1.px,
       <.div(^.cls := "tab-content",  tabItems map (item => buildIt(item))
+      )
     )
-   )
 
   def buildTabHeader( tabItems: Seq[TabItem])=
     <.ul(^.id:="nav-tabs-wrapper", ^.cls:="nav nav-tabs nav-pills nav-stacked well",
-    //<.ul(^.id:="nav-tabs-wrapper", ^.cls:="nav nav-tabs nav-pills nav-stacked col-sm-3 col-sm-push-9",
       tabItems map (item =>
         if(item.active)
           <.li(^.cls := "active", <.a(^.href :=item.route, "data-toggle".reactAttr := "tab", item.title))
@@ -37,14 +36,56 @@ object TabComponent {
           <.li(<.a(^.href:=item.route, "data-toggle".reactAttr:="tab", item.title)))
     )
 
-
   val tab = ReactComponentB[Props]("Tab")
-    .render_P { p =>
-      buildTab(p.items)
-
-    }
+    .render_P (p => buildTab(p.items))
     .build
 
   def apply(items: Seq[TabItem]) = tab(Props(items))
-  //def apply2(items2: Seq[TabItem2]) = Tab2(Props2(items2))
+
+}
+object TabComponent2 {
+
+  case class Props(title:String, items: Seq[TabItem],  header:Seq[ReactElement] = Seq.empty[ReactElement])
+
+  def buildTab (p:Props ):ReactElement  =
+    <.div(^.cls:="container-fluid",
+      <.div(^.cls:="row", ^.padding:=2.px,
+        <.div(^.cls:= "col-md-12",
+           <.div(^.cls:= "panel with-nav-tabs panel-default", ^.padding:=2.px,
+          //<.div(^.cls:= "panel with-nav-tabs panel-warning", ^.padding:=2.px,
+            buildTabHeader(p),
+            buildTabContent(p.items)
+          )
+      )
+    )
+  )
+
+  def buildIt(item:TabItem) ={
+    var titleTag = "tab-pane fade"
+    if (item.active) titleTag = "tab-pane fade in active"
+    <.div(^.role := "tabpanel", ^.cls := titleTag,  ^.id := item.id, item.content)
+  }
+  def buildTabContent( tabItems: Seq[TabItem])=
+    <.div(^.cls := "panel-body",
+      <.div(^.cls := "tab-content",  tabItems map (item => buildIt(item)))
+   )
+
+  def buildTabHeader( p:Props) =
+    <.div(^.cls := "panel-heading ",
+      <.h2(^.cls := "pull-left panel-title",  p.title,  ^.fontWeight:=10,^.fontSize:=12, ^.maxHeight:=10,^.paddingRight:=20.px),
+      <.span(^.cls := "btn pull-right", p.header),
+      <.ul(^.cls:= "nav nav-tabs", p.items  map (item =>
+        if(item.active)
+          <.li(^.cls := "active", <.a(^.href :=item.route, "data-toggle".reactAttr := "tab", item.title))
+        else
+          <.li(<.a(^.href:=item.route, "data-toggle".reactAttr:="tab", item.title)))
+     )
+    )
+
+  val tab = ReactComponentB[Props]("Tab")
+    .render_P (p => buildTab(p))
+    .build
+
+  def apply(title:String, items: Seq[TabItem],header: Seq[ReactElement]) = tab(Props(title, items,header))
+
 }
