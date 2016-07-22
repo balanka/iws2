@@ -14,10 +14,10 @@ import org.widok.moment.{Moment, _}
 
 object LinePurchaseOrderList {
   @inline private def bss = GlobalStyles.bootstrapStyles
-  case class State(item: Option[LinePurchaseOrder]= None,  search:String="", vatList:Option[List[String]] = None)
+  case class State(item: Option[LinePurchaseOrder]= None,  search:String="", edit:Boolean = false)
   case class Props(porder: PurchaseOrder[LinePurchaseOrder],
                    newLine:LinePurchaseOrder =>Callback,
-                   saveLine:LinePurchaseOrder =>Callback,
+                   editedOrderCB: PurchaseOrder[LinePurchaseOrder] =>Callback,
                    deleteLine:LinePurchaseOrder =>Callback)
 
 
@@ -31,7 +31,7 @@ object LinePurchaseOrderList {
 
     def edit(line:LinePurchaseOrder) = {
       //log.debug(s" order to edit Line is ${line}")
-       $.modState(s => s.copy(item = Some(line)))
+       $.modState(s => s.copy(item = Some(line)).copy(edit = true))
     }
     def updateItem(id: String) = {
       val r =id.split(":")
@@ -58,8 +58,17 @@ object LinePurchaseOrderList {
     }
 
     def updateDuedate(e: ReactEventI) = {
-      val l = e.target.value.toLong
-      $.modState(s => s.copy(item = s.item.map(_.copy(duedate = Some(new Date(l))))))>>
+      log.debug(s" Duedate is  mm${e.target.value}")
+      val l = e.target.value
+      Moment.locale("de_DE")
+      val m = Moment(l)
+      val _date=m.toDate()
+      val _helsenkiOffset = 2*60*60000;//maybe 3 [h*60*60000 = ms]
+      val _userOffset = _date.getTimezoneOffset()*60000; // [min*60000 = ms]
+      val _helsenkiTime = new Date((_date.getTime()+_helsenkiOffset+_userOffset).toLong);
+
+     // log.debug(s" Duedate is ${l} _helsenkiTime:${ Moment(_helsenkiTime.getTime).format("DD.MM.YYYY HH:mm:ss")} ")
+      $.modState(s => s.copy(item = s.item.map(_.copy(duedate = Some(_helsenkiTime)))))>>
         setModfied
     }
     def updateText(e: ReactEventI) = {
@@ -82,11 +91,18 @@ object LinePurchaseOrderList {
 
     def delete(line:LinePurchaseOrder, deleteLineCallback:LinePurchaseOrder =>Callback) =
       Callback.log(s"LinePurchaseOrder deleted>>>>>  ${line}") >> deleteLineCallback(line)
-    def save(line:LinePurchaseOrder, saveLineCB:LinePurchaseOrder =>Callback) = saveLineCB(line.copy(modified = true))
+
+    def save(line:LinePurchaseOrder, p:Props) = {
+      val linex:LinePurchaseOrder = line.copy(modified = true).copy(transid = p.porder.tid)
+      val item = p.porder.replaceLine( line.copy(modified = true).copy(transid = p.porder.tid))
+      //log.debug(s"  linex ${linex } order ${p.porder}  ======+++++++ Item  is ${item}")
+      p.editedOrderCB(item)
+
+    }
+
 
     def setModfied = Callback {$.modState(s => s.copy(item = s.item.map(_.copy(modified = true)))).runNow() }
     def newLine(line:LinePurchaseOrder, newLineCallback:LinePurchaseOrder =>Callback) = {
-      log.debug(s" newLine called with   ${line}")
      newLineCallback(line)>> edit(line)
     }
 
@@ -97,23 +113,22 @@ object LinePurchaseOrderList {
       def qttyUnit =  IWSCircuit.zoom(_.store.get.models.get(4)).eval(IWSCircuit.getRootModel).get.get.items.asInstanceOf[List[QuantityUnit]]
       def vat =  IWSCircuit.zoom(_.store.get.models.get(5)).eval(IWSCircuit.getRootModel).get.get.items.asInstanceOf[List[Vat]]
 
-      def saveButton = Button(Button.Props(save(s.item.getOrElse(LinePurchaseOrder()),p.saveLine),
+      def saveButton = Button(Button.Props(save(s.item.getOrElse(LinePurchaseOrder()),p),
         addStyles = Seq(bss.pullRight, bss.buttonXS, bss.buttonOpt(CommonStyle.success))), Icon.circleO, "")
-      def newButton = Button(Button.Props( newLine(LinePurchaseOrder( created = true),p.newLine),
+      def newButton = Button(Button.Props( newLine(LinePurchaseOrder(created = true),p.newLine),
         addStyles = Seq(bss.pullRight, bss.buttonXS)), Icon.plusSquare, "")
       def buildIdNameList [A<:Masterfile](list: List[A]): List[String]= list map (iws =>(iws.id+"|"+iws.name))
       def buildArticleList [A<:Article](list: List[A]): List[String]= list map (iws =>(iws.id+":"+iws.name +":"+iws.qttyUnit  +":"+iws.vat.getOrElse("0")))
 
-      def editFormLine : Seq [TagMod]=List(
-          <.tr(
-              buildSItem("item", itemsx = buildArticleList(items), defValue = "0001", evt = updateItem),
-              buildSItem("q.unit", itemsx = buildIdNameList(qttyUnit), defValue = "KG", evt = updateUnit),
-              buildSItem("Vat", itemsx = buildIdNameList(vat), defValue = "7", evt = updateVat) ),
-            <.tr( bss.formGroup, ^.height := 10,
-              buildWItem[BigDecimal]("price", s.item.map(_.price), 0.0, updatePrice(_, s)),
-              buildWItem[BigDecimal]("quantity", s.item.map(_.quantity), 0.0, updateQuantity),
-              buildWItem[String]("duedate", s.item.map( e =>(fmt(e.duedate.getOrElse(new Date())))),
-                fmt(new Date()), updateDuedate), saveButton, newButton)
+      def editFormLine : Seq [TagMod] = List(
+          <.div(^.cls :="row",
+            buildSItemN("Item", itemsx = buildArticleList(items), defValue = "0001", evt = updateItem, "col-xs-2"),
+            buildSItemN("Q.unit", itemsx = buildIdNameList(qttyUnit), defValue = "KG", evt = updateUnit, "col-xs-2"),
+            buildSItemN("Vat", itemsx = buildIdNameList(vat), defValue = "7", evt = updateVat, "col-xs-2"),
+            buildWItemN[BigDecimal]("Price", s.item.map(_.price), 0.0, updatePrice(_, s),"col-xs-2"),
+            buildWItemN[BigDecimal]("Quantity", s.item.map(_.quantity), 0.0, updateQuantity,"col-xs-2"),
+            buildDateN("Duedate", s.item.map(_.duedate.getOrElse(new Date())), new Date(), updateDuedate,"col-xs-2"),
+              saveButton, newButton)
          )
 
       <.div(bss.formGroup,
@@ -134,11 +149,14 @@ object LinePurchaseOrderList {
                             bss.buttonOpt(CommonStyle.success))), Icon.edit, "")
       def deleteButton = Button(Button.Props(delete (item,p.deleteLine), addStyles = Seq(bss.pullRight, bss.buttonXS,
                             bss.buttonOpt(CommonStyle.danger))), Icon.trashO, "")
-      val style = bss.listGroup
-      <.li(style.itemOpt(CommonStyle.warning),
-        ^.fontSize:=12.px, ^.fontWeight:=50.px,
-        ^.maxHeight:=30.px, ^.height:=30.px,
-        ^.alignContent:="center", ^.tableLayout:="fixed",
+       val style = bss.listGroup
+       val defaultL = LinePurchaseOrder()
+       val cond = item.tid==s.item.getOrElse(defaultL).tid
+      log.debug(s"  Condition  ${cond}")
+       val stylex = if(cond) style.itemOpt(CommonStyle.warning) else style.itemOpt(CommonStyle.success)
+
+      <.li( stylex,
+        ^.fontSize:=12.px, ^.fontWeight:=50.px, ^.maxHeight:=30.px, ^.height:=30.px, ^.alignContent:="center", ^.tableLayout:="fixed",
         <.span(deleteButton , ^.alignContent:="left"),
         <.span(item.id,^.paddingLeft:=10.px),
         <.span(item.item ,^.paddingLeft:=10.px),
@@ -160,7 +178,8 @@ object LinePurchaseOrderList {
 
   def apply( porder:PurchaseOrder[LinePurchaseOrder],
              newLine:LinePurchaseOrder =>Callback,
-             saveLine:LinePurchaseOrder =>Callback,
+             //saveLine:LinePurchaseOrder =>Callback,
+             editedOrderCB: PurchaseOrder[LinePurchaseOrder] =>Callback,
              deleteLine:LinePurchaseOrder => Callback) =
-             component(Props(porder, newLine, saveLine, deleteLine))
+             component(Props(porder, newLine, editedOrderCB, deleteLine))
 }
