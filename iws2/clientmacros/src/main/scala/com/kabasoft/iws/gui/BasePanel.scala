@@ -11,8 +11,9 @@ object BasePanel {
   class Backend($: BackendScope[Props, Unit]) {
     def render(p: Props) =
      // <.div(^.className := "panel-group",^.id:="accordion", ^.fontWeight:=10,^.fontSize:=12,
-      <.div(^.className := "panel panel-primary",
-        <.div(^.className := "panel-heading",
+     // <.div(^.className := " panel with-nav-tabs  panel-primary",
+      <.div(^.className := " panel with-nav-tabs  panel-default",
+        <.div(^.className := "panel-heading clearfix",
           <.h4(^.className := "panel-title", ^.fontWeight:=10,^.fontSize:=12, ^.maxHeight:=10,
             <.a("data-toggle".reactAttr := "collapse","data-parent".reactAttr :="accordion", ^.href:= "#accordion"+p.name,  p.name),
                p.header)),
