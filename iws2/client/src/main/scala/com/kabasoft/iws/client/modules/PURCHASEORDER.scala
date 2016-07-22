@@ -76,7 +76,8 @@ object PURCHASEORDER {
       Callback {
          if( !m.isEmpty) {
            IWSCircuit.dispatch(Update(order))
-           $.modState(s => s.copy(item = Some(order))).runNow()
+          // $.modState(s => s.copy(item = Some(order))).runNow()
+           postProcess(order)
            log.debug(s" saved account ${order}")
              } else log.debug(s" account ${ order.account.getOrElse("")}  and or store  ${ order.store.getOrElse("")} is  empty ")
       }
@@ -86,16 +87,7 @@ object PURCHASEORDER {
       $.modState(s => s.copy(item =Some(order))).runNow()
     }
 
-    def saveLine(linex:LinePurchaseOrder) = {
-      //val line = linex.copy(modified=true)
-      val k = $.state.runNow().item.getOrElse(PurchaseOrder[LinePurchaseOrder]())
-      val k2 = k.replaceLine( linex.copy(transid = k.tid))
-      runCB(k2)
-
-    }
-    def runCB (item:PurchaseOrder[LinePurchaseOrder]) = Callback {
-      IWSCircuit.dispatch(Update(item))
-      //val line =item.getLines.filter(_.created ==true)
+    def postProcess (item:PurchaseOrder[LinePurchaseOrder]) =  {
       val ro = item.getLines.filter(_.created ==true).map( e => item.replaceLine( e.copy(created = false).copy(modified =false)))
       val setLineID = ro.head.copy(lines = Some( item.getLines map ( e => if(e.tid != 0 ) e else  e.copy(tid = -1))))
       $.modState(s => s.copy(item =Some(setLineID))).runNow()
