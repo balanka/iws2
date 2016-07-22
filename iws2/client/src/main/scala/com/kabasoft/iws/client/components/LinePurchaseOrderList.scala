@@ -96,11 +96,12 @@ object LinePurchaseOrderList {
       val linex:LinePurchaseOrder = line.copy(modified = true).copy(transid = p.porder.tid)
       val item = p.porder.replaceLine( line.copy(modified = true).copy(transid = p.porder.tid))
       //log.debug(s"  linex ${linex } order ${p.porder}  ======+++++++ Item  is ${item}")
-      p.editedOrderCB(item)
+      p.editedOrderCB(item)>>resetState
 
     }
 
 
+  def resetState =  $.modState(s => s.copy(item = None).copy(edit = false))
     def setModfied = Callback {$.modState(s => s.copy(item = s.item.map(_.copy(modified = true)))).runNow() }
     def newLine(line:LinePurchaseOrder, newLineCallback:LinePurchaseOrder =>Callback) = {
      newLineCallback(line)>> edit(line)
