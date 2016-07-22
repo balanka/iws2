@@ -84,7 +84,7 @@ class IWSHandler[M](modelRW: ModelRW[M, Pot[DStore[IWS,IWS]]]) extends ActionHan
      // val r =value.get.models.get(xx.modelId).get.get
       //log.info("+++++++++aaaa0000000"+ a +"<<<<<<<<<<<"+ all)
       val r =value.get.models.get(xx.modelId).get.get.asInstanceOf[Data].items
-      log.info("+++++++++rrrrr<<<<<<<<<<<"+(all++r))
+     // log.info("+++++++++rrrrr<<<<<<<<<<<"+(all++r))
 
       val x = Map(xx.modelId ->Ready(Data(all++r)))
       updated(Ready(value.get.updatedAll(x)))
