@@ -1,11 +1,11 @@
 package com.kabasoft.iws.gui
 
-import com.kabasoft.iws.gui.AccordionMenu.MenuItem
+
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.prefix_<^._
 import scala.language.implicitConversions
 
-
+case class MenuItem(id:String, title:String, route:String, menuItems:Seq[MenuItem]=List.empty[MenuItem])
 object TabAccordionMenu {
 
   case class Props(menuItem:MenuItem)
