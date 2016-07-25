@@ -123,21 +123,20 @@ object LineGoodreceivingList {
         addStyles = Seq(bss.pullRight, bss.buttonXS)), Icon.plusSquare, "")
       def buildIdNameList [A<:Masterfile](list: List[A]): List[String]= list.filter(_.id !="-1") map (iws =>(iws.id+"|"+iws.name))
       def buildArticleList [A<:Article](list: List[A]): List[String]= list.filter(_.id !="-1") map (iws =>(iws.id+":"+iws.name +":"+iws.qttyUnit  +":"+iws.vat.getOrElse("0")))
-      def editFormLine : Seq [TagMod]=List(
-        <.tr(
-          buildSItem("Item", itemsx = buildArticleList(items), defValue = "0001", evt = updateItem),
-          buildSItem("Q.unit", itemsx = buildIdNameList(qttyUnit), defValue = "KG", evt = updateUnit),
-          buildSItem("Vat", itemsx = buildIdNameList(vat), defValue = "7", evt = updateVat), saveButton, newButton),
-        <.tr( bss.formGroup, ^.height := 10,
-          buildDItem[String]("Price", s.item.map(_.price.toString()), "0,0", updatePrice),
-          buildDItem[String]("Quantity", s.item.map(_.quantity.toString()), "0,0", updateQuantity),
-          buildDate("Duedate", s.item.map(_.duedate.getOrElse(new Date())), new Date(), updateDuedate))
-          //saveButton, newButton)
+      def editFormLine : Seq [TagMod]= List(
+        <.div(^.cls :="row",
+          buildSItemN("Item", itemsx = buildArticleList(items), defValue = "0001", evt = updateItem, "col-xs-2"),
+          buildSItemN("Q.unit", itemsx = buildIdNameList(qttyUnit), defValue = "KG", evt = updateUnit, "col-xs-2"),
+          buildSItemN("Vat", itemsx = buildIdNameList(vat), defValue = "7", evt = updateVat, "col-xs-2"),
+          buildDItem2[String]("Price", s.item.map(_.price.toString()), "0,0", updatePrice,"col-xs-2"),
+          buildDItem2[String]("Quantity", s.item.map(_.quantity.toString()), "0,0", updateQuantity,"col-xs-2"),
+          buildDateN2("Duedate", s.item.map(_.duedate.getOrElse(new Date())), new Date(), updateDuedate,"col-xs-2"),
+          saveButton, newButton)
          )
 
       <.div(bss.formGroup,
         //<.ul(style.listGroup)(all.filter(p.predicate (_,s.search)).sortBy(_.tid)(Ordering[Long].reverse) map (e =>renderItem(e,p))),
-        <.ul(style.listGroup)(its.sortBy(_.tid)(Ordering[Long].reverse) map (e =>renderItem(e,p))),
+        <.ul(style.listGroup)(its.sortBy(_.tid)(Ordering[Long].reverse) map (e =>renderItem(e,p,s))),
         <.table(^.className := "table-responsive table-condensed", ^.tableLayout := "fixed",
           <.tbody(
             <.tr(bss.formGroup, ^.height :=30.px, ^.maxHeight:=30.px,
@@ -147,23 +146,28 @@ object LineGoodreceivingList {
         )
      )
     }
-
-    def renderItem(item:LineGoodreceiving, p: Props) = {
+    def renderItem(item:LineGoodreceiving, p: Props, s:State) = {
       def editButton =  Button(Button.Props(edit(item), addStyles = Seq(bss.pullRight, bss.buttonXS,
-                            bss.buttonOpt(CommonStyle.success))), Icon.edit, "")
+        bss.buttonOpt(CommonStyle.success))), Icon.edit, "")
       def deleteButton = Button(Button.Props(delete (item,p.deleteLine), addStyles = Seq(bss.pullRight, bss.buttonXS,
-                            bss.buttonOpt(CommonStyle.danger))), Icon.trashO, "")
+        bss.buttonOpt(CommonStyle.danger))), Icon.trashO, "")
       val style = bss.listGroup
-      <.li(style.itemOpt(CommonStyle.warning), ^.fontSize:=12.px, ^.fontWeight:=50.px, ^.maxHeight:=30.px,
-                                               ^.height:=30.px, ^.alignContent:="center", ^.tableLayout:="fixed",
-        <.span(item.id),
+      val defaultL = LinePurchaseOrder()
+      val cond = item.tid==s.item.getOrElse(defaultL).tid
+      //log.debug(s"  Condition  ${cond}")
+      val stylex = if(cond) style.itemOpt(CommonStyle.warning) else style.itemOpt(CommonStyle.success)
+
+      <.li( stylex,
+        ^.fontSize:=12.px, ^.fontWeight:=50.px, ^.maxHeight:=30.px, ^.height:=30.px, ^.alignContent:="center", ^.tableLayout:="fixed",
+        <.span(deleteButton , ^.alignContent:="left"),
+        <.span(item.id,^.paddingLeft:=10.px),
         <.span(item.item ,^.paddingLeft:=10.px),
         <.span("%06.2f".format(item.price.bigDecimal),^.paddingLeft:=10.px),
         <.span("%6.2f".format(item.quantity.bigDecimal),^.paddingLeft:=10.px),
         <.span(item.unit ,^.paddingLeft:=10.px),
         <.span(item.vat ,^.paddingLeft:=10.px),
         <.span( Moment(item.duedate.get.getTime).format("DD.MM.YYYY"),^.paddingLeft:=10),
-        <.span(editButton, deleteButton,^.alignContent:="center")
+        <.span(editButton,^.alignContent:="center")
       )
     }
   }
