@@ -2,7 +2,6 @@ package com.kabasoft.iws.client.modules
 
 
 import com.kabasoft.iws.client.components.{LinePurchaseOrderList, PurchaseOrderList}
-import com.kabasoft.iws.gui.BasePanel
 import diode.react.ReactPot._
 import diode.react._
 import diode.data.{Pot, Ready}
@@ -67,30 +66,52 @@ object PURCHASEORDER {
      // log.debug(s"accountId is "+accountId)
       $.modState(s => s.copy(item = s.item.map(_.copy(account = Some(accountId)))))
     }
-    def edited(order:PurchaseOrder[LinePurchaseOrder]) = {
-      //$.modState(s => s.copy(item =Some(order)))
-     // $.props >>= (_.proxy.dispatch(Update(order)))
-    val m = order.account.getOrElse("").concat(order.store.getOrElse(""))
-      log.debug(s" mmmmmmmmm${order} m ${m}")
+    def edited(order:PurchaseOrder[LinePurchaseOrder]) =  Callback { dispatch1(order)}
 
-      Callback {
-         if( !m.isEmpty) {
-           IWSCircuit.dispatch(Update(order))
-          // $.modState(s => s.copy(item = Some(order))).runNow()
-           postProcess(order)
-           log.debug(s" saved account ${order}")
-             } else log.debug(s" account ${ order.account.getOrElse("")}  and or store  ${ order.store.getOrElse("")} is  empty ")
+
+  def dispatch1 (order:PurchaseOrder[LinePurchaseOrder]) = {
+    val m: String = order.account.getOrElse("").concat(order.store.getOrElse(""))
+    log.debug(s"mmmmmmmmmmmmmmmmmm is "+m)
+    if (!m.isEmpty) {
+      IWSCircuit.dispatch(Update(order))
+      $.modState(s => s.copy(item = Some(order)))
+    }
+
+  }
+
+    def saveLine(line:LinePurchaseOrder) = {
+     // val line = linex.copy(modified=true)
+      val k = $.state.runNow().item.getOrElse(PurchaseOrder[LinePurchaseOrder]())
+      val k2 = k.replaceLine( line.copy(transid = k.tid))
+       log.debug(s"purchaseOrder to save is ZZZZZZZZZZ" + k2)
+      Callback {runCB(k2)}
+
+    }
+    def condition(line:LinePurchaseOrder) = line.created == true|| line.modified == true
+    def runCB (item:PurchaseOrder[LinePurchaseOrder]) =  {
+      val m: String = item.account.getOrElse("").concat(item.store.getOrElse(""))
+      log.debug(s"mmmmmmmmm ${m} is !m.empty ${!m.isEmpty}")
+      if (!m.isEmpty) {
+        IWSCircuit.dispatch(Update(item))
+        //dispatch(item)
+        log.debug(s"purchaseOrder saved is ZZZZZZZZZZ" + item)
+        val ro = item.getLines.filter(condition).map(e => item.replaceLine(e.copy(created = false).copy(modified = false)))
+        val setLineID = ro.head.copy(lines = Some(item.getLines map (e => if (e.tid != 0) e else e.copy(tid = -1))))
+        $.modState(s => s.copy(item = Some(setLineID))) //.runNow()
       }
     }
 
-    def updateState(order:PurchaseOrder[LinePurchaseOrder]) = Callback {
-      $.modState(s => s.copy(item =Some(order))).runNow()
+    def updateState(item:PurchaseOrder[LinePurchaseOrder]) = {
+      val ro = item.getLines.filter(condition).map(e => item.replaceLine( e.copy(created = false).copy(modified =false)))
+      val setLineID = ro.head.copy(lines = Some( item.getLines map ( e => if(e.tid != 0 ) e else  e.copy(tid = -1))))
+      $.modState(s => s.copy(item = Some(setLineID)))
     }
 
+
     def postProcess (item:PurchaseOrder[LinePurchaseOrder]) =  {
-      val ro = item.getLines.filter(_.created ==true).map( e => item.replaceLine( e.copy(created = false).copy(modified =false)))
+      val ro = item.getLines.filter(condition).map(e => item.replaceLine( e.copy(created = false).copy(modified = false)))
       val setLineID = ro.head.copy(lines = Some( item.getLines map ( e => if(e.tid != 0 ) e else  e.copy(tid = -1))))
-      $.modState(s => s.copy(item =Some(setLineID))).runNow()
+       $.modState(s => s.copy(item =Some(setLineID)))
     }
 
 
@@ -114,8 +135,8 @@ object PURCHASEORDER {
         addStyles = Seq(bss.pullRight, bss.buttonXS, bss.buttonOpt(CommonStyle.success))), Icon.circleO, " Save")
       def newButton = Button(Button.Props(edit(Some(PurchaseOrder[LinePurchaseOrder]())),
         addStyles = Seq(bss.pullRight, bss.buttonXS)), Icon.plusSquare, " New")
+
      def buildFormTab(p: Props, s: State, items:List[PurchaseOrder[LinePurchaseOrder]], header:Seq[ReactElement]): ReactElement =
-      // List(
          <.div(bss.formGroup,
          TabComponent2("Purchase Order", Seq(
            TabItem("vtab1", "List", "#vtab1", true,
@@ -123,7 +144,6 @@ object PURCHASEORDER {
            TabItem("vtab2", "Form", "#vtab2", false, buildForm(p, s, items))),
          header)
        )
-     // )
 
       def buildForm (p: Props, s:State, items:List[PurchaseOrder[LinePurchaseOrder]]) = {
         val supplier =  IWSCircuit.zoom(_.store.get.models.get(1)).eval(IWSCircuit.getRootModel).getOrElse(Ready(Data(List.empty[Supplier]))).get.items.asInstanceOf[List[Supplier]].toSet
@@ -143,7 +163,7 @@ object PURCHASEORDER {
               )
             )
           ),
-          LinePurchaseOrderList(porder, AddNewLine, edited, deleteLine)
+          LinePurchaseOrderList(porder, AddNewLine, saveLine, deleteLine)
         )
       }
 

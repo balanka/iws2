@@ -17,7 +17,8 @@ object LinePurchaseOrderList {
   case class State(item: Option[LinePurchaseOrder]= None,  search:String="", edit:Boolean = false)
   case class Props(porder: PurchaseOrder[LinePurchaseOrder],
                    newLine:LinePurchaseOrder =>Callback,
-                   editedOrderCB: PurchaseOrder[LinePurchaseOrder] =>Callback,
+                   saveLine:LinePurchaseOrder =>Callback,
+                   //editedOrderCB: PurchaseOrder[LinePurchaseOrder] =>Callback,
                    deleteLine:LinePurchaseOrder =>Callback)
 
 
@@ -63,12 +64,11 @@ object LinePurchaseOrderList {
       Moment.locale("de_DE")
       val m = Moment(l)
       val _date=m.toDate()
-      val _helsenkiOffset = 2*60*60000;//maybe 3 [h*60*60000 = ms]
-      val _userOffset = _date.getTimezoneOffset()*60000; // [min*60000 = ms]
-      val _helsenkiTime = new Date((_date.getTime()+_helsenkiOffset+_userOffset).toLong);
+      val _helsenkiOffset = 2*60*60000 //maybe 3 [h*60*60000 = ms]
+      val _userOffset = _date.getTimezoneOffset()*60000  // [min*60000 = ms]
+      val _helsenkiTime = new Date((_date.getTime()+_helsenkiOffset+_userOffset).toLong)
 
-     // log.debug(s" Duedate is ${l} _helsenkiTime:${ Moment(_helsenkiTime.getTime).format("DD.MM.YYYY HH:mm:ss")} ")
-      $.modState(s => s.copy(item = s.item.map(_.copy(duedate = Some(_helsenkiTime)))))>>
+       $.modState(s => s.copy(item = s.item.map(_.copy(duedate = Some(_helsenkiTime)))))>>
         setModfied
     }
     def updateText(e: ReactEventI) = {
@@ -91,17 +91,19 @@ object LinePurchaseOrderList {
 
     def delete(line:LinePurchaseOrder, deleteLineCallback:LinePurchaseOrder =>Callback) =
       Callback.log(s"LinePurchaseOrder deleted>>>>>  ${line}") >> deleteLineCallback(line)
-
-    def save(line:LinePurchaseOrder, p:Props) = {
-      val linex:LinePurchaseOrder = line.copy(modified = true).copy(transid = p.porder.tid)
-      val item = p.porder.replaceLine( line.copy(modified = true).copy(transid = p.porder.tid))
-      //log.debug(s"  linex ${linex } order ${p.porder}  ======+++++++ Item  is ${item}")
-      p.editedOrderCB(item)>>resetState
-
+    def save(line:LinePurchaseOrder, saveLineCB:LinePurchaseOrder =>Callback) = {
+      saveLineCB(line) >> $.modState(s => s.copy(item = None).copy(edit = false))
+        //>> resetState
     }
 
 
-  def resetState =  $.modState(s => s.copy(item = None).copy(edit = false))
+    def postProcess (item:PurchaseOrder[LinePurchaseOrder]) =  Callback {
+      val ro = item.getLines.filter(_.created ==true).map( e => item.replaceLine( e.copy(created = false).copy(modified =false)))
+      val setLineID = ro.head.copy(lines = Some( item.getLines map ( e => if(e.tid != 0 ) e else  e.copy(tid = -1))))
+      // $.modState(s => s.copy(item = Some(setLineID)))
+    }
+
+  def resetState =   $.modState(s => s.copy(item = None).copy(edit = false))
     def setModfied = Callback {$.modState(s => s.copy(item = s.item.map(_.copy(modified = true)))).runNow() }
     def newLine(line:LinePurchaseOrder, newLineCallback:LinePurchaseOrder =>Callback) = {
      newLineCallback(line)>> edit(line)
@@ -114,9 +116,9 @@ object LinePurchaseOrderList {
       def qttyUnit =  IWSCircuit.zoom(_.store.get.models.get(4)).eval(IWSCircuit.getRootModel).get.get.items.asInstanceOf[List[QuantityUnit]]
       def vat =  IWSCircuit.zoom(_.store.get.models.get(5)).eval(IWSCircuit.getRootModel).get.get.items.asInstanceOf[List[Vat]]
 
-      def saveButton = Button(Button.Props(save(s.item.getOrElse(LinePurchaseOrder()),p),
+      def saveButton = Button(Button.Props(save(s.item.getOrElse(LinePurchaseOrder()),p.saveLine),
         addStyles = Seq(bss.pullRight, bss.buttonXS, bss.buttonOpt(CommonStyle.success))), Icon.circleO, "")
-      def newButton = Button(Button.Props( newLine(LinePurchaseOrder(created = true),p.newLine),
+      def newButton = Button(Button.Props( newLine(LinePurchaseOrder(created = true), p.newLine),
         addStyles = Seq(bss.pullRight, bss.buttonXS)), Icon.plusSquare, "")
       def buildIdNameList [A<:Masterfile](list: List[A]): List[String]= list map (iws =>(iws.id+"|"+iws.name))
       def buildArticleList [A<:Article](list: List[A]): List[String]= list map (iws =>(iws.id+":"+iws.name +":"+iws.qttyUnit  +":"+iws.vat.getOrElse("0")))
@@ -153,7 +155,7 @@ object LinePurchaseOrderList {
        val style = bss.listGroup
        val defaultL = LinePurchaseOrder()
        val cond = item.tid==s.item.getOrElse(defaultL).tid
-      log.debug(s"  Condition  ${cond}")
+       //log.debug(s"  Condition  ${cond}")
        val stylex = if(cond) style.itemOpt(CommonStyle.warning) else style.itemOpt(CommonStyle.success)
 
       <.li( stylex,
@@ -179,8 +181,8 @@ object LinePurchaseOrderList {
 
   def apply( porder:PurchaseOrder[LinePurchaseOrder],
              newLine:LinePurchaseOrder =>Callback,
-             //saveLine:LinePurchaseOrder =>Callback,
-             editedOrderCB: PurchaseOrder[LinePurchaseOrder] =>Callback,
+             saveLine:LinePurchaseOrder =>Callback,
+             //editedOrderCB: PurchaseOrder[LinePurchaseOrder] =>Callback,
              deleteLine:LinePurchaseOrder => Callback) =
-             component(Props(porder, newLine, editedOrderCB, deleteLine))
+             component(Props(porder, newLine, saveLine, deleteLine))
 }
