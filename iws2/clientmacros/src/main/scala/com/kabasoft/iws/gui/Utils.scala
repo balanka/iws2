@@ -41,13 +41,7 @@ object Utils {
         ^.placeholder := id), ^.onChange ==> evt, ^.maxHeight:=2.px, ^.paddingLeft := 10.px,  ^.autoFocus := true))
   }
 
-  def buildDItem[A](id:String , value:Option[A], defValue:A, evt:ReactKeyboardEventI=> Option[Callback]) = {
-    val m = value getOrElse defValue
-    List(<.td(<.label(^.`for` := id, id), ^.maxHeight:=2.px),
-      <.td(<.input.text(bss.formControl, ^.id := id, //^.value := m.toString,
-        ^.placeholder := id), ^.onKeyUp ==>?evt , ^.maxHeight:=2.px, ^.paddingLeft := 10.px,  ^.autoFocus := true))
-    //^.placeholder := id), ^.onChange ==> evt, ^.maxHeight:=2.px, ^.paddingLeft := 10.px,  ^.autoFocus := true))
-  }
+
   def buildDItem1(id:String , value:Option[BigDecimal], defValue:BigDecimal, evt:ReactEventI=> Callback) = {
     val m = (value getOrElse defValue).bigDecimal
     List(<.td(<.label(^.`for` := id, id), ^.maxHeight:=2.px),
@@ -117,6 +111,21 @@ object Utils {
       <.label(^.`for` := id, id),
       <.input.text(bss.formControl, ^.id := id, ^.value := m.toString,
         ^.placeholder := id), ^.onChange ==> evt, ^.maxHeight:=10, ^.autoFocus := true)
+  }
+  def buildDItem2[A](id:String , value:Option[A], defValue:A, evt:ReactKeyboardEventI=> Option[Callback] , offset:String) = {
+  //  val m = value getOrElse defValue
+    <.div( ^.cls := offset,
+       <.label(^.`for` := id, id),
+          <.input.text(bss.formControl, ^.id := id, //^.value := m.toString,
+        ^.placeholder := id), ^.onKeyUp ==>?evt , ^.maxHeight:=2.px, ^.paddingLeft := 10.px,  ^.autoFocus := true)
+  }
+
+  def buildDateN2(id:String, value:Option[Date], defValue:Date, evt:ReactEventI=> Callback, offset:String) = {
+  //  val m = value getOrElse defValue
+    <.div( ^.cls := offset,
+      <.label(^.`for` := id, id),
+      <.input.date(bss.formControl, ^.id := id, //^.value := m,
+        ^.placeholder := id), ^.onChange ==> evt,   ^.autoFocus := true)
   }
 }
 
