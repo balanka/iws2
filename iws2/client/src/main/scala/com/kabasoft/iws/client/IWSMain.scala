@@ -7,7 +7,7 @@ import diode.react.ModelProxy
 
 import scala.scalajs.js.annotation.JSExport
 import com.kabasoft.iws.client.modules._
-import com.kabasoft.iws.gui.AccordionMenu.MenuItem
+import com.kabasoft.iws.gui.MenuItem
 import com.kabasoft.iws.gui._
 import com.kabasoft.iws.gui.logger._
 import com.kabasoft.iws.gui.macros.{BackendMacro, _}
@@ -101,11 +101,11 @@ object IWSMain extends js.JSApp {
   // base layout for all pages
     def layout(c: RouterCtl[Page], r: Resolution[Page]) = {
       <.div(
-      <.div(^.className := "navbar navbar navbar-fixed-right",
-         <.div(^.className := "collapse navbar-collapse",
-         <.div( ^.className := "col-xs-8", r.render(),^.paddingTop :=0)
+      <.div(^.cls := "navbar navbar navbar-fixed-right",
+         <.div(^.cls := "collapse navbar-collapse",
+         <.div( ^.cls := "col-xs-10", r.render(),^.paddingTop :=0)
          //<.div( ^.className := "col-xs-2", AccordionMenu(vm),^.paddingTop :=1)
-        , <.div( ^.className := "col-xs-2", TabAccordionMenu(vm),^.paddingTop :=0)
+        , <.div( ^.cls := "col-xs-2", TabAccordionMenu(vm),^.paddingTop :=0)
         // ,<.div( ^.className := "col-xs-2", Tab(t1),^.paddingTop :=1)
         )
       ,
