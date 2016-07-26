@@ -32,7 +32,8 @@ object LinePurchaseOrderList {
 
     def edit(line:LinePurchaseOrder) = {
       //log.debug(s" order to edit Line is ${line}")
-       $.modState(s => s.copy(item = Some(line)).copy(edit = true))
+      //$.modState(s => s.copy(item = Some(line)).copy(edit = true))
+       $.modState(s => s.copy(item = Some(line)))
     }
     def updateItem(id: String) = {
       val r =id.split(":")

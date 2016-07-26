@@ -126,8 +126,13 @@ object PURCHASEORDER {
       val k2 = k.replaceLine(deleted)
       edited(k2)
     }
-    def AddNewLine(line:LinePurchaseOrder) = $.modState(s => s.copy(item = s.item.map(_.add(line.copy(transid =
-                                                     s.item.getOrElse(PurchaseOrder[LinePurchaseOrder]()).tid)))))
+//    def AddNewLine(line:LinePurchaseOrder) = $.modState(s => s.copy(item = s.item.map(_.add(line.copy(transid =
+//                                                     s.item.getOrElse(PurchaseOrder[LinePurchaseOrder]()).tid)))))
+    def AddNewLine(line:LinePurchaseOrder) = {
+      val  created =line.copy(created = true)
+      log.debug(s"New  LinePurchaseOrder  created>>>>>  ${line}")
+      $.modState(s => s.copy(item = s.item.map(_.add(line.copy(transid = s.item.getOrElse(PurchaseOrder[LinePurchaseOrder]()).tid)))))
+    }
     def filterWith(line:LinePurchaseOrder, search:String) = line.item.getOrElse("").contains(search)
 
     def render(p: Props, s: State) = {

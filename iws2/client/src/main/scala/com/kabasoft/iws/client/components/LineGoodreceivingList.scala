@@ -119,7 +119,7 @@ object LineGoodreceivingList {
       val vat =  IWSCircuit.zoom(_.store.get.models.get(5)).eval(IWSCircuit.getRootModel).get.get.items.asInstanceOf[List[Vat]]
       def saveButton = Button(Button.Props(save(s.item.getOrElse(LineGoodreceiving()),p.saveLine),
         addStyles = Seq(bss.pullRight, bss.buttonXS, bss.buttonOpt(CommonStyle.success))), Icon.circleO, "")
-      def newButton = Button(Button.Props( newLine(LineGoodreceiving( created = true),p.newLine),
+      def newButton = Button(Button.Props( newLine(LineGoodreceiving(created = true),p.newLine),
         addStyles = Seq(bss.pullRight, bss.buttonXS)), Icon.plusSquare, "")
       def buildIdNameList [A<:Masterfile](list: List[A]): List[String]= list.filter(_.id !="-1") map (iws =>(iws.id+"|"+iws.name))
       def buildArticleList [A<:Article](list: List[A]): List[String]= list.filter(_.id !="-1") map (iws =>(iws.id+":"+iws.name +":"+iws.qttyUnit  +":"+iws.vat.getOrElse("0")))
