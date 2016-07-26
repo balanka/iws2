@@ -11,11 +11,16 @@ import scalacss.ScalaCssReact._
 object StockList {
   @inline private def bss = GlobalStyles.bootstrapStyles
 
-  case class Props(items: Seq[Stock])
+  case class Props(items: Seq[Stock], fields:Seq[String])
 
   private val storeList = ReactComponentB[Props]("StockList")
     .render_P(p => {
       val style = bss.listGroup
+      def renderHeader =
+        <.li(style.itemOpt(CommonStyle.info),^.fontSize:=12,^.fontWeight:=50,^.maxHeight:=30,^.height:=30, ^.tableLayout:="fixed",
+           p.fields.map( field => (<.span(field ,^.paddingLeft:=10)))
+        )
+
       def renderItem(item: Stock) = {
          <.li(style.itemOpt(CommonStyle.success),^.fontSize:=12,^.fontWeight:=50,^.maxHeight:=30,^.height:=30, ^.tableLayout:="fixed",
           <.span(item.id),
@@ -24,9 +29,9 @@ object StockList {
           <.span("%06.2f".format(item.minStock.toDouble),^.paddingLeft:=10.px)
           )
       }
-      <.ul(style.listGroup)(p.items.sortBy(_.id) map renderItem)
+      <.ul(style.listGroup)(renderHeader)(p.items.sortBy(_.id) map renderItem)
     })
     .build
 
-  def apply(items: Seq[Stock]) = storeList(Props(items))
+  def apply(items: Seq[Stock], fields:Seq[String]) = storeList(Props(items, fields))
 }
