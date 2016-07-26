@@ -178,7 +178,7 @@ case class ArticleGroup(id:String ="-1", name:String ="", modelId:Int = 8, descr
 abstract class BusinessPartner(id: String ="-1", name: String ="", modelId:Int, accountId:String, street: String ="", city: String ="", state: String ="", zip: String ="") extends IWS
 case class Supplier(id: String ="-1", name: String ="" , modelId:Int = 1, accountId:String ="", street: String ="", city: String ="", state: String ="", zip: String ="") extends
 BusinessPartner (id: String, name: String, modelId:Int,  street: String, city: String, state: String , zip: String )
-case class Store(id: String ="-1", name: String ="",  modelId:Int = 2, accountId:String ="", street: String ="", city: String ="", state: String ="", zip: String ="") extends
+case class Store(id: String ="-1", name: String ="",  modelId:Int = 2, accountId:String ="", street: String ="", city: String ="", state: String ="", zip: String ="", stocks:Option[List[Stock]] =  Some(List.empty[Stock])) extends
 BusinessPartner (id: String, name: String ,modelId:Int,   street: String, city: String, state: String , zip: String )
 case class Customer(id: String ="-1", name: String ="", modelId:Int = 3, accountId:String ="", street: String ="", city: String ="", state: String ="", zip: String ="") extends
 BusinessPartner (id: String, name: String , modelId:Int,  street: String, city: String, state: String , zip: String )
@@ -300,7 +300,7 @@ object  Company_{ def unapply (in:Company) =Some(in.id,in.name,in.modelId,  in.s
   in.settlementClearingAccountId, in.periode, in.nextPeriode, in.taxCode, in.vatId)}
 object  Supplier_{ def unapply (in:Supplier) =Some(in.id,in.name,in.modelId, in.accountId, in.street,in.city,in.state,in.zip)}
 object  Customer_{ def unapply (in:Customer) =Some(in.id,in.name,in.modelId, in.accountId, in.street,in.city,in.state,in.zip)}
-object  Store_{ def unapply (in:Store) =Some(in.id,in.name, in.modelId, in.accountId, in.street,in.city,in.state,in.zip)}
+object  Store_{ def unapply (in:Store) =Some(in.id,in.name, in.modelId, in.accountId, in.street,in.city,in.state,in.zip, in.stocks)}
 object  Vat_{ def unapply (in:Vat) =Some(in.id,in.name, in.modelId, in.description,in.percent, in.inputVatAccountId,
                                   in.outputVatAccountId, in.revenueAccountId, in.stockAccountId, in.expenseAccountId)}
 object  CostCenter_{ def unapply (in:CostCenter) =Some(in.id,in.name, in.modelId, in.description)}

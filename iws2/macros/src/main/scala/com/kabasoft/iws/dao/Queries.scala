@@ -18,6 +18,7 @@ object Queries  {
 
   type ACCOUNT_TYPE =(String, String, Int, String, String,  Date, Date)
   type ARTICLE_TYPE =(String, String, Int, String, scala.math.BigDecimal, scala.math.BigDecimal, scala.math.BigDecimal,String, String, String, String)
+  type STORE_TYPE = (String, String, Int, String,  String, String, String, String)
 
   def create: Update0 = createSchema.update
   def bankInsertSQL= "INSERT INTO Bank (id, name, modelId, description)  VALUES (?, ?, ?, ?)"
@@ -94,10 +95,10 @@ object Queries  {
   def supplierDelete = {id:String =>sql"Delete FROM supplier where id =$id".update}
 
   def storeInsertSQL = "INSERT INTO store (id, name, modelId,accountId,  street, city,state,zip)  VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
-  def storeSelect = sql"SELECT id, name, modelId, accountId, street, city, state,zip FROM store".query[Store]
-  def storeIdSelect(id:String)  = sql"SELECT id, name, modelId, accountId, street, city, state,zip FROM store where id =$id".query[Store]
-  def storeSelect1 = sql"SELECT id, name, modelId, accountId, street, city, state,zip FROM store".query[Store]
-  def storeSelectSome  = { id:String =>sql"SELECT * FROM store where id =$id".query[Store]}
+  def storeSelect = sql"SELECT id, name, modelId, accountId, street, city, state,zip FROM store".query[STORE_TYPE]
+  def storeIdSelect(id:String)  = sql"SELECT id, name, modelId, accountId, street, city, state,zip FROM store where id =$id".query[STORE_TYPE]
+  def storeSelect1 = sql"SELECT id, name, modelId, accountId, street, city, state,zip FROM store".query[STORE_TYPE]
+  def storeSelectSome  = { id:String =>sql"SELECT * FROM store where id =$id".query[STORE_TYPE]}
   def storeUpdateName= {(model:Store) =>sql"Update store  set name =${model.name}, accountId=${model.accountId}, street=${model.street}, city=${model.city},zip=${model.zip}, state =${model.state} where id =${model.id}".update}
   def storeDelete = {id:String =>sql"Delete FROM store where id =$id".update}
 
@@ -117,11 +118,11 @@ object Queries  {
   def periodicAccountBalanceUpdateName= {(model:PeriodicAccountBalance) =>sql"Update PeriodicAccountBalance set  debit =${model.debit}, credit=${model.credit} where id =${model.id}".update}
   def periodicAccountBalanceDelete = {id:String =>sql"Delete FROM PeriodicAccountBalance where id =$id".update}
 
-  def stockInsertSQL = "INSERT INTO stock  VALUES (?, ?, ?, ?)"
-  def stockSelect = sql"SELECT id, name, modelId, description, itemId, storeId, quantity, minStock FROM stock".query[Stock]
+  def stockInsertSQL = "INSERT INTO stock (id, modelId, itemId, storeId, quantity, minStock) VALUES (?, ?, ?, ?, ?, ?)"
+  def stockSelect = sql"SELECT id, modelId,  itemId, storeId, quantity, minStock FROM stock".query[Stock]
   def stockIdSelect(id:String)  = sql"SELECT * FROM stock where id =$id".query[Stock]
-  def stockSelect1 = sql"SELECT id, name, description FROM stock ".query[Stock]
-  def stockSelectSome  = { id:String =>sql"SELECT * FROM stock where id =$id".query[Stock]}
+  def stockSelect1 = sql"SELECT * FROM stock ".query[Stock]
+  def stockSelectSome  = { id:String =>sql"SELECT * FROM stock where storeId =$id".query[Stock]}
   def stockUpdateName= {(model:Stock) =>sql"Update stock set  quantity =${model.quantity}, minStock=${model.minStock} where id =${model.id}".update}
   def stockDelete = {id:String =>sql"Delete FROM stock where id =$id".update}
 
@@ -402,9 +403,9 @@ object Queries  {
   DROP TABLE IF EXISTS stock CASCADE;
   CREATE TABLE stock (
     id   VARCHAR     NOT NULL PRIMARY KEY,
-    name VARCHAR DEFAULT "",
+    name VARCHAR DEFAULT '',
     modelId int NOT NULL,
-    description   VARCHAR DEFAULT "",
+    description   VARCHAR DEFAULT '',
    itemId       VARCHAR  NOT NULL,
    storeId      VARCHAR NOT NULL,
     quantity DECIMAL(8,2) NOT NULL,
@@ -415,9 +416,9 @@ object Queries  {
   DROP TABLE IF EXISTS PeriodicAccountBalance CASCADE;
   CREATE TABLE PeriodicAccountBalance (
     id   VARCHAR     NOT NULL PRIMARY KEY,
-    name VARCHAR DEFAULT "",
+    name VARCHAR DEFAULT '',
     modelId int NOT NULL,
-    description   VARCHAR DEFAULT "",
+    description   VARCHAR DEFAULT '',
    accountId       VARCHAR  NOT NULL,
    periode      int NOT NULL,
    debit DECIMAL(8,2) NOT NULL,

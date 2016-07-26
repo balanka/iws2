@@ -55,6 +55,7 @@ class IWSHandler[M](modelRW: ModelRW[M, Pot[DStore[IWS,IWS]]]) extends ActionHan
    pickler.addConcreteType[CostCenter]
    pickler.addConcreteType[Balance]
    pickler.addConcreteType[Account]
+   pickler.addConcreteType[Stock]
    pickler.addConcreteType[Article]
    pickler.addConcreteType[Supplier]
    pickler.addConcreteType[Customer]

@@ -144,17 +144,30 @@ object DAOObjects  {
     def findSome(id:String) = Queries.supplierSelectSome(id).process.list.transact(xa).run
     def findSome1(id:Long) = Queries.supplierSelectSome(id+"").process.list.transact(xa).run
   }
+
+  implicit def stockDAO = new DAO[Stock]
+  {
+    def insert(model: List[Stock]) :Int =  Update[Stock](Queries.stockInsertSQL).updateMany(model).transact(xa).run
+    def create = Queries.createStock.run.transact(xa).run
+    def update(model:Stock) = Queries.stockUpdateName(model).run.transact(xa).run
+    def delete(id:String):Int = Queries.stockDelete(id).run.transact(xa).run
+    def all = Queries.stockSelect.process.list.transact(xa).run
+    def find(id:String)  : List[Stock] = Queries.stockIdSelect(id).process.list.transact(xa).run
+    def findSome(id:String) = Queries.stockSelectSome(id).process.list.transact(xa).run
+    def findSome1(id:Long) = Queries.stockSelectSome(id+"").process.list.transact(xa).run
+  }
     implicit def storeDAO = new DAO[Store]
   {
-    def insert(model: List[Store]) :Int =  Update[Store](Queries.storeInsertSQL).updateMany(model).transact(xa).run
+    def insert(model: List[Store]) :Int =  Update[STORE_TYPE](Queries.storeInsertSQL).updateMany( model.map (x => (x.id, x.name, x.modelId, x.accountId,  x.street, x.city, x.state, x.zip))).transact(xa).run
     def create = Queries.createStore.run.transact(xa).run
     def update(model:Store) = {  println(s"sql ${ Queries.storeUpdateName(model)}") ; Queries.storeUpdateName(model).run.transact(xa).run}
     def delete(id:String):Int = Queries.storeDelete(id).run.transact(xa).run
-    def all = Queries.storeSelect.process.list.transact(xa).run
-    def find(id:String) : List[Store] = Queries.storeIdSelect(id).process.list.transact(xa).run
-    def findSome(id:String) = Queries.storeSelectSome(id).process.list.transact(xa).run
-    def findSome1(id:Long) = Queries.storeSelectSome(id+"").process.list.transact(xa).run
-  }
+    def all = Queries.storeSelect.process.list.transact(xa).run.map(x => f(x)) //Store(x.id,x.name, x.modelId, x.accountId,  x.street, x.city, x.state, x.zip).copy (stocks = Some(implicitly[DAO[Stock]].findSome(x._1))))
+    def find(id:String) : List[Store] = Queries.storeIdSelect(id).process.list.transact(xa).run.map(x => f(x))
+    def findSome(id:String) = Queries.storeSelectSome(id).process.list.transact(xa).run.map(x => f(x))
+    def findSome1(id:Long) = Queries.storeSelectSome(id+"").process.list.transact(xa).run.map(x => f(x))
+    def f (x:STORE_TYPE) = Store(x._1,x._2,x._3,x._4,x._5,x._6,x._7,x._8 ).copy (stocks = Some(implicitly[DAO[Stock]].findSome(x._1)))
+    }
 
   implicit def costCenterDAO = new DAO[CostCenter]
   {
@@ -200,17 +213,7 @@ object DAOObjects  {
     def findSome(id:String) = Queries.periodicAccountBalanceSelectSome(id).process.list.transact(xa).run
     def findSome1(id:Long) = Queries.periodicAccountBalanceSelectSome(id+"").process.list.transact(xa).run
   }
-  implicit def stockDAO = new DAO[Stock]
-  {
-    def insert(model: List[Stock]) :Int =  Update[Stock](Queries.stockInsertSQL).updateMany(model).transact(xa).run
-    def create = Queries.createStock.run.transact(xa).run
-    def update(model:Stock) = Queries.stockUpdateName(model).run.transact(xa).run
-    def delete(id:String):Int = Queries.stockDelete(id).run.transact(xa).run
-    def all = Queries.stockSelect.process.list.transact(xa).run
-    def find(id:String)  : List[Stock] = Queries.stockIdSelect(id).process.list.transact(xa).run
-    def findSome(id:String) = Queries.stockSelectSome(id).process.list.transact(xa).run
-    def findSome1(id:Long) = Queries.stockSelectSome(id+"").process.list.transact(xa).run
-  }
+
     implicit def linePurchaseOrderDAO = new DAO[LinePurchaseOrder]{
     def insert(model: List[LinePurchaseOrder]) :Int = {
       println(s" inserting ${model}  items")

@@ -27,6 +27,7 @@ object Application extends Controller {
    pickler.addConcreteType[CostCenter]
    pickler.addConcreteType[Balance]
    pickler.addConcreteType[Account]
+   pickler.addConcreteType[Stock]
    pickler.addConcreteType[Article]
    pickler.addConcreteType[Supplier]
    pickler.addConcreteType[Customer]
