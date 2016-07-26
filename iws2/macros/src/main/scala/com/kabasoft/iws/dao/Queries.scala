@@ -637,6 +637,26 @@ insert into  supplier values ('70002','Metro AG',3,'Universitaetstr .1 ','Duesse
 insert into  supplier values ('70003','Chemec GmbH',3,'Meisen Str 96','Bielefeld','NRW','33607');
 
 
+INSERT INTO stock(id, name, modelid, description, itemid, storeid, quantity, minstock)   VALUES ('1001000', '', 107, '', '1000', '100', 0.0, 0.0);
+INSERT INTO stock(id, name, modelid, description, itemid, storeid, quantity, minstock)   VALUES ('1002000', '', 107, '', '2000', '100', 0.0, 0.0);
+INSERT INTO stock(id, name, modelid, description, itemid, storeid, quantity, minstock)   VALUES ('1004000', '', 107, '', '4000', '100', 0.0, 0.0);
+INSERT INTO stock(id, name, modelid, description, itemid, storeid, quantity, minstock)   VALUES ('1007000', '', 107, '', '7000', '100', 0.0, 0.0);
+INSERT INTO stock(id, name, modelid, description, itemid, storeid, quantity, minstock)   VALUES ('1005000', '', 107, '', '5000', '100', 0.0, 0.0);
+INSERT INTO stock(id, name, modelid, description, itemid, storeid, quantity, minstock)   VALUES ('1006000', '', 107, '', '6000', '100', 0.0, 0.0);
+INSERT INTO stock(id, name, modelid, description, itemid, storeid, quantity, minstock)   VALUES ('2001000', '', 107, '', '1000', '200', 0.0, 0.0);
+INSERT INTO stock(id, name, modelid, description, itemid, storeid, quantity, minstock)   VALUES ('2002000', '', 107, '', '2000', '200', 0.0, 0.0);
+INSERT INTO stock(id, name, modelid, description, itemid, storeid, quantity, minstock)   VALUES ('2003000', '', 107, '', '3000', '200', 0.0, 0.0);
+INSERT INTO stock(id, name, modelid, description, itemid, storeid, quantity, minstock)   VALUES ('2004000', '', 107, '', '4000', '200', 0.0, 0.0);
+INSERT INTO stock(id, name, modelid, description, itemid, storeid, quantity, minstock)   VALUES ('2005000', '', 107, '', '5000', '200', 0.0, 0.0);
+INSERT INTO stock(id, name, modelid, description, itemid, storeid, quantity, minstock)   VALUES ('2006000', '', 107, '', '6000', '200', 0.0, 0.0);
+INSERT INTO stock(id, name, modelid, description, itemid, storeid, quantity, minstock)    VALUES ('3001000', '', 107, '', '1000', '300', 0.0, 0.0);
+INSERT INTO stock(id, name, modelid, description, itemid, storeid, quantity, minstock)    VALUES ('3002000', '', 107, '', '2000', '300', 0.0, 0.0);
+INSERT INTO stock(id, name, modelid, description, itemid, storeid, quantity, minstock)    VALUES ('3003000', '', 107, '', '3000', '300', 0.0, 0.0);
+INSERT INTO stock(id, name, modelid, description, itemid, storeid, quantity, minstock)    VALUES ('3004000', '', 107, '', '4000', '300', 0.0, 0.0);
+INSERT INTO stock(id, name, modelid, description, itemid, storeid, quantity, minstock)    VALUES ('3005000', '', 107, '', '5000', '300', 0.0, 0.0);
+INSERT INTO stock(id, name, modelid, description, itemid, storeid, quantity, minstock)    VALUES ('3006000', '', 107, '', '6000', '300', 0.0, 0.0);
+INSERT INTO stock(id, name, modelid, description, itemid, storeid, quantity, minstock)    VALUES ('3007000', '', 107, '', '7000', '300', 0.0, 0.0);
+
 insert into category values ('001','Mineralwasser',8,'Mineralwasser');
 insert into category values ('002','Software',8,'Software');
 insert into category values ('003','Hardware',8,'Hardware');
