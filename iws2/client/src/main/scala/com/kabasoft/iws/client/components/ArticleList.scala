@@ -14,7 +14,7 @@ import scalacss.ScalaCssReact._
 object ArticleList {
   @inline private def bss = GlobalStyles.bootstrapStyles
   //val formater =NumberFormat.getIntegerInstance(new java.util.Locale("de", "DE"))
-  case class Props(items: Seq[Article],
+  case class Props(items: Seq[Article], fields:Seq[String],
                    editCB: Option[Article => Callback] = None,
                    deleteCB: Option[Article => Callback] = None
   )
@@ -22,6 +22,12 @@ object ArticleList {
   private val ArticleList = ReactComponentB[Props]("ArticleList")
     .render_P(p => {
       val style = bss.listGroup
+      val fields = Seq ("Id", "Name", "Description", "Qtty. unit","Pck. unit", "Group","P. Price","Avg Price","Sales price")
+      def renderHeader =
+        <.li(style.itemOpt(CommonStyle.info),^.fontSize:=12,^.fontWeight:=50,^.maxHeight:=30,^.height:=30, ^.tableLayout:="fixed",
+          p.fields.map( field => (<.span(field ,^.paddingLeft:=10)))
+        )
+
       def renderItem(item: Article) = {
         def  f(acc:Article):Callback = Callback.empty
         def  editCB(acc:Article):Callback = p.editCB.getOrElse(f(_))(acc)
@@ -45,13 +51,13 @@ object ArticleList {
           tag
         )
       }
-      <.ul(style.listGroup)(p.items.sortBy(_.id) map renderItem)
+      <.ul(style.listGroup)(renderHeader)(p.items.sortBy(_.id) map renderItem)
     })
     .build
 
-  def apply(items: Seq[Article]) = ArticleList(Props(items))
-  def apply(items: Seq[Article], editCB: Option[Article => Callback], deleteCB:  Option[Article => Callback]) = {
-    ArticleList(Props(items,  editCB, deleteCB))
+  def apply(items: Seq[Article], fields:Seq[String]) = ArticleList(Props(items,fields))
+  def apply(items: Seq[Article], fields:Seq[String], editCB: Option[Article => Callback], deleteCB:  Option[Article => Callback]) = {
+    ArticleList(Props(items,  fields, editCB, deleteCB))
 
   }
 }
