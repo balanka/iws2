@@ -1,5 +1,7 @@
 package com.kabasoft.iws.client.components
 
+import com.kabasoft.iws.gui.StringUtils._
+import com.kabasoft.iws.gui.Utils._
 import com.kabasoft.iws.gui.macros.Bootstrap.{Button, CommonStyle}
 import com.kabasoft.iws.gui.macros.{GlobalStyles, Icon}
 import com.kabasoft.iws.shared.Bank
@@ -35,7 +37,7 @@ object BankList {
           tag
           )
       }
-      <.ul(style.listGroup)(p.items.sortBy(_.id) map renderItem)
+      <.ul(style.listGroup)(renderHeader(Bank_headers))(p.items.sortBy(_.id) map renderItem)
     })
     .build
   def apply(items: Seq[Bank]) = mList(Props(items))

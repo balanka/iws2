@@ -1,17 +1,14 @@
 package com.kabasoft.iws.client.components
 
-import com.kabasoft.iws.gui.Utils
+import com.kabasoft.iws.gui.StringUtils._
+import com.kabasoft.iws.gui.Utils._
 import com.kabasoft.iws.shared.Account
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.prefix_<^._
 import com.kabasoft.iws.gui.macros.Bootstrap.{Button, CommonStyle}
 import com.kabasoft.iws.gui.macros.{GlobalStyles, Icon}
-
 import scalacss.ScalaCssReact._
 import org.widok.moment._
-
-
-
 
 object AccountList {
   @inline private def bss = GlobalStyles.bootstrapStyles
@@ -43,7 +40,7 @@ object AccountList {
           tag
           )
       }
-      <.ul(style.listGroup)(p.items.sortBy(_.id) map renderItem)
+      <.ul(style.listGroup)(renderHeader(Account_headers))(p.items.sortBy(_.id) map renderItem)
     })
     .build
   def apply(items: Seq[Account]) =

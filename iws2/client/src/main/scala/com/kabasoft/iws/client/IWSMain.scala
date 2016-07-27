@@ -1,6 +1,7 @@
 package com.kabasoft.iws.client
 
 import com.kabasoft.iws.gui.AppRouter._
+import com.kabasoft.iws.gui.StringUtils._
 import com.kabasoft.iws.gui.services.{RootModel, IWSCircuit}
 import diode.ModelR
 import diode.react.ModelProxy
@@ -79,11 +80,11 @@ object IWSMain extends js.JSApp {
     val x101 = IWSCircuit.connect(_.store.get.models.get(101).get, "POrder")
     val x104 = IWSCircuit.connect(_.store.get.models.get(104).get, "Goodreceiving")
     val x110 = IWSCircuit.connect(_.store.get.models.get(110).get, "Inventory Invoice")
-    val headers = Seq ("Id", "Name", "Description", "Qtty. unit","Pck. unit", "Group","P. Price","Avg Price","Sales price")
+
 
     //val x2 =  SPACircuit.connect(_.store.get.models.getOrElse(2,Ready(Data(List(Article())))).asInstanceOf[Pot[Data]])
      (staticRoute(root, DashboardPage$) ~> renderR(ctl => x4(proxy => Dashboard(ctl, proxy.asInstanceOf[ModelProxy[Pot[Data]]],QuantityUnitPage$)))
-      | staticRoute("#art", ArticlePage$) ~> renderR(ctl => x7(p7 => ARTICLE(p7.asInstanceOf[ModelProxy[Pot[Data]]], headers)))
+      | staticRoute("#art", ArticlePage$) ~> renderR(ctl => x7(p7 => ARTICLE(p7.asInstanceOf[ModelProxy[Pot[Data]]])))
        | staticRoute("#sto", StorePage$) ~> renderR(ctl => x2(p2 => STORE(p2.asInstanceOf[ModelProxy[Pot[Data]]])))
       |staticRoute("#ord", POrderPage$) ~> renderR(ctl => x101(proxy101 => PURCHASEORDER(proxy101.asInstanceOf[ModelProxy[Pot[Data]]])))
       |staticRoute("#good", GoodreceivingPage$) ~> renderR(ctl => x104(proxy104 => GOODRECEIVING("GOODRECEIVING",  {"104"},proxy104.asInstanceOf[ModelProxy[Pot[Data]]])))

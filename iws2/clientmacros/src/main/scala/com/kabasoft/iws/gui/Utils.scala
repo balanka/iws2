@@ -5,6 +5,8 @@ import java.util.Date
 
 import japgolly.scalajs.react.vdom.prefix_<^._
 import com.kabasoft.iws.gui.logger._
+import com.kabasoft.iws.gui.StringUtils._
+import com.kabasoft.iws.gui.macros.Bootstrap.CommonStyle
 import com.kabasoft.iws.gui.macros.GlobalStyles
 import com.kabasoft.iws.shared._
 import japgolly.scalajs.react._
@@ -127,6 +129,11 @@ object Utils {
       <.input.date(bss.formControl, ^.id := id, //^.value := m,
         ^.placeholder := id), ^.onChange ==> evt,   ^.autoFocus := true)
   }
+
+  def renderHeader (headers:Seq[String]) =
+    <.li(bss.listGroup.itemOpt(CommonStyle.info),^.fontSize:=12,^.fontWeight:=50,^.maxHeight:=30,^.height:=30, ^.tableLayout:="fixed",
+       headers.map( field => (<.span(field ,^.paddingLeft:=10)))
+    )
 }
 
 //https://oldfashionedsoftware.com/2009/07/30/lots-and-lots-of-foldleft-examples/

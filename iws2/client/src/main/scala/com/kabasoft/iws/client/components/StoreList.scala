@@ -1,5 +1,7 @@
 package com.kabasoft.iws.client.components
 
+import com.kabasoft.iws.gui.StringUtils._
+import com.kabasoft.iws.gui.Utils._
 import com.kabasoft.iws.gui.macros.Bootstrap.{Button, CommonStyle}
 import com.kabasoft.iws.gui.macros.{GlobalStyles, Icon}
 import com.kabasoft.iws.shared._
@@ -11,7 +13,7 @@ import scalacss.ScalaCssReact._
 object StoreList {
   @inline private def bss = GlobalStyles.bootstrapStyles
 
-  case class Props(items: Seq[IWS], editItem: IWS => Callback, deleteItem: IWS => Callback)
+  case class Props(items: Seq[Store], editItem: Store => Callback, deleteItem: Store => Callback)
 
   private val storeList = ReactComponentB[Props]("StoreList")
     .render_P(p => {
@@ -23,16 +25,16 @@ object StoreList {
           <.span(item.id),
           <.span(item.name ,^.paddingLeft:=10),
           <.span(item.street ,^.paddingLeft:=10),
+          <.span(item.zip ,^.paddingLeft:=10),
           <.span(item.city ,^.paddingLeft:=10),
           <.span(item.state ,^.paddingLeft:=10),
-          <.span(item.zip ,^.paddingLeft:=10),
           <.span(item.accountId ,^.paddingLeft:=10),
           editButton,deleteButton
           )
       }
-      <.ul(style.listGroup)(p.items.asInstanceOf[Seq[Store]].sortBy(_.id) map renderItem)
+      <.ul(style.listGroup)(renderHeader(BusinessPartner_headers))(p.items.sortBy(_.id) map renderItem)
     })
     .build
 
-  def apply(items: Seq[IWS], editItem: IWS => Callback, deleteItem: IWS => Callback) = storeList(Props(items, editItem, deleteItem))
+  def apply(items: Seq[Store], editItem: Store => Callback, deleteItem: Store => Callback) = storeList(Props(items, editItem, deleteItem))
 }

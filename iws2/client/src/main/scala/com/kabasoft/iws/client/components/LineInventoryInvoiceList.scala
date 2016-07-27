@@ -3,6 +3,7 @@ package com.kabasoft.iws.client.components
 import java.util.Date
 
 import com.kabasoft.iws.gui.Utils._
+import com.kabasoft.iws.gui.StringUtils._
 import com.kabasoft.iws.gui.logger._
 import com.kabasoft.iws.gui.macros.Bootstrap.{Button, CommonStyle}
 import com.kabasoft.iws.gui.macros._
@@ -123,6 +124,8 @@ object LineInventoryInvoiceList {
         addStyles = Seq(bss.pullRight, bss.buttonXS)), Icon.plusSquare, "")
       def buildIdNameList [A<:Masterfile](list: List[A]): List[String]= list.filter(_.id !="-1") map (iws =>(iws.id+"|"+iws.name))
       def buildArticleList [A<:Article](list: List[A]): List[String]= list.filter(_.id !="-1") map (iws =>(iws.id+":"+iws.name +":"+iws.qttyUnit  +":"+iws.vat.getOrElse("0")))
+
+
       def editFormLine : Seq [TagMod]= List(
         <.div(^.cls :="row",
           buildSItemN("Item", itemsx = buildArticleList(items), defValue = "0001", evt = updateItem, "col-xs-2"),
@@ -136,7 +139,7 @@ object LineInventoryInvoiceList {
 
       <.div(bss.formGroup,
         //<.ul(style.listGroup)(all.filter(p.predicate (_,s.search)).sortBy(_.tid)(Ordering[Long].reverse) map (e =>renderItem(e,p))),
-        <.ul(style.listGroup)(its.sortBy(_.tid)(Ordering[Long].reverse) map (e =>renderItem(e,p,s))),
+        <.ul(style.listGroup) (renderHeader(LineInv_Trans_Headers))(its.sortBy(_.tid)(Ordering[Long].reverse) map (e =>renderItem(e,p,s))),
         <.table(^.className := "table-responsive table-condensed", ^.tableLayout := "fixed",
           <.tbody(
             <.tr(bss.formGroup, ^.height :=30.px, ^.maxHeight:=30.px,
@@ -146,6 +149,8 @@ object LineInventoryInvoiceList {
         )
      )
     }
+
+
     def renderItem(item:LineInventoryInvoice, p: Props, s:State) = {
       def editButton =  Button(Button.Props(edit(item), addStyles = Seq(bss.pullRight, bss.buttonXS,
         bss.buttonOpt(CommonStyle.success))), Icon.edit, "")

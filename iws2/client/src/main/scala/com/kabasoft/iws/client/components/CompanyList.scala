@@ -1,5 +1,7 @@
 package com.kabasoft.iws.client.components
 
+import com.kabasoft.iws.gui.Utils._
+import com.kabasoft.iws.gui.StringUtils._
 import com.kabasoft.iws.gui.macros.Bootstrap.{Button, CommonStyle}
 import com.kabasoft.iws.gui.macros.{GlobalStyles, Icon}
 import com.kabasoft.iws.shared._
@@ -24,9 +26,10 @@ object CompanyList {
           <.span(item.id),
           <.span(item.name ,^.paddingLeft:=5),
           <.span(item.street ,^.paddingLeft:=5),
+          <.span(item.zip ,^.paddingLeft:=5),
           <.span(item.city ,^.paddingLeft:=5),
           <.span(item.state ,^.paddingLeft:=5),
-          <.span(item.zip ,^.paddingLeft:=5),
+
           <.span(item.bankAccountId ,^.paddingLeft:=5),
           <.span(item.purchasingClearingAccountId ,^.paddingLeft:=5),
           <.span(item.salesClearingAccountId ,^.paddingLeft:=5),
@@ -39,7 +42,7 @@ object CompanyList {
           editButton
           )
       }
-      <.ul(style.listGroup)(p.items.sortBy(_.id) map renderItem)
+      <.ul(style.listGroup)(renderHeader (Company_headers))(p.items.sortBy(_.id) map renderItem)
     })
     .build
 

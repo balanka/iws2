@@ -1,8 +1,10 @@
 package com.kabasoft.iws.client.components
 
+import com.kabasoft.iws.gui.Utils._
+import com.kabasoft.iws.gui.StringUtils._
 import com.kabasoft.iws.gui.macros.Bootstrap.{Button, CommonStyle}
 import com.kabasoft.iws.gui.macros.{GlobalStyles, Icon}
-import com.kabasoft.iws.shared.{Account, _}
+import com.kabasoft.iws.shared.Customer
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.prefix_<^._
 
@@ -24,14 +26,14 @@ object CustomerList {
           <.span(item.id),
           <.span(item.name ,^.paddingLeft:=10),
           <.span(item.street ,^.paddingLeft:=10),
+          <.span(item.zip ,^.paddingLeft:=10),
           <.span(item.city ,^.paddingLeft:=10),
           <.span(item.state ,^.paddingLeft:=10),
-          <.span(item.zip ,^.paddingLeft:=10),
           <.span(item.accountId ,^.paddingLeft:=10),
           editButton,deleteButton
           )
       }
-      <.ul(style.listGroup)(p.items.sortBy(_.id) map renderItem)
+      <.ul(style.listGroup) (renderHeader(BusinessPartner_headers))(p.items.sortBy(_.id) map renderItem)
     })
     .build
 

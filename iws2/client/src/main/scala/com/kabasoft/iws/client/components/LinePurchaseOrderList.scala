@@ -9,6 +9,9 @@ import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.prefix_<^._
 import com.kabasoft.iws.shared._
 import java.util.Date
+
+import com.kabasoft.iws.gui.StringUtils._
+
 import scalacss.ScalaCssReact._
 import org.widok.moment.{Moment, _}
 
@@ -123,7 +126,10 @@ object LinePurchaseOrderList {
         addStyles = Seq(bss.pullRight, bss.buttonXS)), Icon.plusSquare, "")
       def buildIdNameList [A<:Masterfile](list: List[A]): List[String]= list map (iws =>(iws.id+"|"+iws.name))
       def buildArticleList [A<:Article](list: List[A]): List[String]= list map (iws =>(iws.id+":"+iws.name +":"+iws.qttyUnit  +":"+iws.vat.getOrElse("0")))
-
+      def renderHeader =
+        <.li(style.itemOpt(CommonStyle.info),^.fontSize:=12,^.fontWeight:=50,^.maxHeight:=30,^.height:=30, ^.tableLayout:="fixed",
+          LineInv_Trans_Headers.map( field => (<.span(field ,^.paddingLeft:=10)))
+        )
       def editFormLine : Seq [TagMod] = List(
           <.div(^.cls :="row",
             buildSItemN("Item", itemsx = buildArticleList(items), defValue = "0001", evt = updateItem, "col-xs-2"),
@@ -137,7 +143,7 @@ object LinePurchaseOrderList {
 
       <.div(bss.formGroup,
         //<.ul(style.listGroup)(all.filter(p.predicate (_,s.search)).sortBy(_.tid)(Ordering[Long].reverse) map (e =>renderItem(e,p))),
-        <.ul(style.listGroup)(its.sortBy(_.tid)(Ordering[Long].reverse) map (e =>renderItem(e,p, s))),
+        <.ul(style.listGroup)(renderHeader)(its.sortBy(_.tid)(Ordering[Long].reverse) map (e =>renderItem(e,p, s))),
         <.table(^.className := "table-responsive table-condensed", ^.tableLayout := "fixed",
           <.tbody(
             <.tr(bss.formGroup, ^.height :=30.px, ^.maxHeight:=30.px,

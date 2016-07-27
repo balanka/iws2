@@ -120,7 +120,7 @@ object STORE {
          TabComponent(Seq(
            TabItem("vtab1", "List", "#vtab1", true, StoreList(items, item => edit(Some(item.asInstanceOf[Store])), item => p.proxy.dispatch(Delete(item)))),
            TabItem("vtab2", "Form", "#vtab2", false, buildForm(s)),
-           TabItem("vtab3", "Stocks", "#vtab3", false, StockList(stocks, Seq("Id","Item id", "Quantity", "Min stock"))))
+           TabItem("vtab3", "Stocks", "#vtab3", false, StockList(stocks)))
          )
        ))
    }
