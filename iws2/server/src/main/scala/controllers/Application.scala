@@ -33,13 +33,13 @@ object Application extends Controller {
    pickler.addConcreteType[Customer]
    pickler.addConcreteType[QuantityUnit]
    pickler.addConcreteType[ArticleGroup]
-   pickler.addConcreteType[LinePurchaseOrder]
    pickler.addConcreteType[PurchaseOrder[LinePurchaseOrder]].addConcreteType[LinePurchaseOrder]
-  pickler.addConcreteType[Goodreceiving[LineGoodreceiving]].addConcreteType[LineGoodreceiving]
+   pickler.addConcreteType[Goodreceiving[LineGoodreceiving]].addConcreteType[LineGoodreceiving]
+   pickler.addConcreteType[InventoryInvoice[LineInventoryInvoice]].addConcreteType[LineInventoryInvoice]
    pickler.addConcreteType[Vat]
-  pickler.addConcreteType[Bank]
-  pickler.addConcreteType[BankAccount]
-  pickler.addConcreteType[Company]
+   pickler.addConcreteType[Bank]
+   pickler.addConcreteType[BankAccount]
+   pickler.addConcreteType[Company]
    pickler.addConcreteType[MStore]
 
   val apiService = new ApiService()

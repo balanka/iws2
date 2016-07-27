@@ -270,6 +270,41 @@ case class Goodreceiving[LineGoodreceiving] (tid:Long = 0L,oid:Long = 0L, modelI
       case _ => false
     }
 }
+case class LineInventoryInvoice  (tid:Long = 0L, transid:Long =0, modelId:Int = 111,item:Option[String] = None, unit:Option[String] = None, price: Amount = 0,
+                               quantity:Amount = 0,vat:Option[String] = None, duedate:Option[Date] = Some(new Date()),text:String ="txt",
+                               modified:Boolean= false, created:Boolean= false, deleted:Boolean= false) extends LineInventoryTransaction {
+  //def eq (l:LinePurchaseOrder):Boolean = tid == l.tid
+  def eq (id:Long):Boolean = tid == id
+  def eq0:Boolean = tid == 0L
+  def eqId(id:Long):Boolean = tid == id
+  def canEqual(a: Any) = a.isInstanceOf[LineInventoryInvoice]
+  override def equals(that: Any): Boolean =
+    that match {
+      case that: LineInventoryInvoice => that.canEqual(this) && this.hashCode == that.hashCode
+      case _ => false
+    }
+  override def hashCode:Int = {
+    val prime = 31
+    var result = 1
+    result = prime * result + tid.toInt
+    result = prime * result + transid.hashCode
+    result
+  }
+}
+case class InventoryInvoice[LineInventoryInvoice] (tid:Long = 0L,oid:Long = 0L, modelId:Int = 110,store:Option[String]=None, account:Option[String]= None,
+                                             lines:Option[List[LineInventoryInvoice]]=Some(List.empty[LineInventoryInvoice]),
+                                             modified:Boolean =false, created:Boolean = false, deleted:Boolean = false) extends Transaction [LineInventoryInvoice]{
+  def add(line:LineInventoryInvoice) = copy(lines = Some(getLines ++: List(line)))
+  def getLines:List[LineInventoryInvoice] = lines.getOrElse(List.empty[LineInventoryInvoice])
+  def getLinesWithId(id:Long) = getLines.filter(equals(_,id))
+  def replaceLine( newLine:LineInventoryInvoice) = copy(lines = Some( getLines map ( old => if (newLine.equals(old))  newLine else old )))
+  override def  canEqual(a: Any) = a.isInstanceOf[InventoryInvoice[LineInventoryInvoice]]
+  override def equals(that: Any): Boolean =
+    that match {
+      case that: InventoryInvoice[LineInventoryInvoice] => that.canEqual(this) && this.hashCode == that.hashCode
+      case _ => false
+    }
+}
 
 
 
@@ -317,6 +352,8 @@ object  LinePurchaseOrder_{ def unapply (in:LinePurchaseOrder) = Some(in.tid,in.
 object  PurchaseOrder_{ def unapply (in:PurchaseOrder[LinePurchaseOrder]) = Some(in.tid,in.oid, in.modelId, in.store, in.account, in.lines)}
 object  LineGoodreceiving_{ def unapply (in:LineGoodreceiving) = Some(in.tid,in.transid, in.modelId, in.item, in.unit, in.price, in.quantity, in.vat, in.duedate, in.text)}
 object  Goodreceiving_{ def unapply (in:Goodreceiving[LineGoodreceiving]) = Some(in.tid,in.oid, in.modelId, in.store, in.account, in.lines)}
+object  LineInventoryInvoice_{ def unapply (in:LineInventoryInvoice) = Some(in.tid,in.transid, in.modelId, in.item, in.unit, in.price, in.quantity, in.vat, in.duedate, in.text)}
+object  InventoryInvoice_{ def unapply (in:InventoryInvoice[LineInventoryInvoice]) = Some(in.tid,in.oid, in.modelId, in.store, in.account, in.lines)}
 //object  GeneralRegister_{ def unapply (in:GeneralRegister) = Some(in.id, in.modelId, in.appelandId, in.intimeId, in.enterdate,in.reason,in.origin)}
 //implicit def PurchaseOrderOrdering: Ordering[PurchaseOrder[LinePurchaseOrder]] = Ordering.fromLessThan(_.tid > _.tid)
 //implicit def orderingById[A <: PurchaseOrder[LinePurchaseOrder]]: Ordering[A] = Ordering.by(e => (e.tid, e.tid))

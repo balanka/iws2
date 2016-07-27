@@ -262,7 +262,6 @@ implicit def purchaseOrderDAO = new DAO[PurchaseOrder[LinePurchaseOrder]]{
       ret
     }
     def delete(id:String):Int = {
-
       val r = find(id).map(p =>(p.getLines.map(l =>(linePurchaseOrderDAO.delete(l.id)))))
       Queries.purchaseOrderDelete(id.toLong).run.transact(xa).run
     }
@@ -340,6 +339,70 @@ implicit def purchaseOrderDAO = new DAO[PurchaseOrder[LinePurchaseOrder]]{
     def findSome1(id:Long) =Queries.goodreceivingIdSelect(id).process.list.transact(xa).run.map(
       x=> Goodreceiving(x._1,x._2, x._3, Some(x._4), Some(x._5)).copy(lines = Some(f(x._1))))
     def  updateLineId(id:Long,line:LineGoodreceiving):LineGoodreceiving = line.copy(transid=id)
+  }
+
+
+  implicit def lineInventoryInvoiceDAO = new DAO[LineInventoryInvoice]{
+    def insert(model: List[LineInventoryInvoice]) :Int = {
+      println(s" inserting ${model}  items")
+      val tid:Long = Queries.getSequence ("LineInventoryInvoice", "id").unique.transact(xa).run;
+      println(s"  getSequence ${tid} ")
+      val ret= doobie.imports.Update[(Long, Long, Int,String,String,BigDecimal,BigDecimal,String,Date,String)](Queries.lineInventoryInvoiceInsertSQL).
+        updateMany(model.filter(_.item != None).map( x=>(tid, x.transid, x.modelId,x.item.get, x.unit.get, x.price, x.quantity,x.vat.get,x.duedate.get,x.text))).transact(xa).run
+      ret
+    }
+    def create = Queries.createLineInventoryInvoice.run.transact(xa).run
+    def update(model:LineInventoryInvoice) = { println(s" updating ${model}  items"); Queries.lineInventoryInvoiceUpdateName(model).run.transact(xa).run}
+    def delete(id:String):Int = Queries.lineInventoryInvoiceDelete(id.toLong).run.transact(xa).run
+    def all:List[LineInventoryInvoice] =  Queries.lineInventoryInvoiceSelect.process.list.transact(xa).run.map(x =>
+      LineInventoryInvoice(x._1,x._2, x._3, Some(x._4),Some(x._5), x._6, x._7,  Some(x._8), Some(x._9), x._10))
+    def  find(id:String):List[LineInventoryInvoice] = Queries.lineInventoryInvoiceIdSelect(id.toLong).process.list.transact(xa).run.map(x =>
+      LineInventoryInvoice(x._1,x._2, x._3, Some(x._4),Some(x._5), x._6, x._7,  Some(x._8), Some(x._9), x._10))
+    def findSome(id:String) = Queries.lineInventoryInvoiceSelectSome(id).process.list.transact(xa).run.map(x =>
+      LineInventoryInvoice(x._1,x._2, x._3, Some(x._4),Some(x._5), x._6, x._7,  Some(x._8), Some(x._9), x._10))
+    def findSome1(id:Long) = Queries.lineInventoryInvoiceIdSelect(id).process.list.transact(xa).run.map(x => LineInventoryInvoice(x._1,x._2, x._3, Some(x._4),
+      Some(x._5), x._6, x._7,  Some(x._8), Some(x._9), x._10))
+  }
+
+  implicit def InventoryInvoiceDAO = new DAO[InventoryInvoice[LineInventoryInvoice]]{
+    def predicate(p:LineInventoryInvoice) = p.id==0
+    def insert(model: List[InventoryInvoice[LineInventoryInvoice]]) :Int = {
+      val tid:Long = Queries.getSequence ("InventoryInvoice", "id").unique.transact(xa).run;
+      val ret= doobie.imports.Update[(Long,Long, Int, String,String)](Queries.inventoryInvoiceInsertSQL).updateMany(model.map(
+        x=>(tid, x.oid, x.modelId, x.store.getOrElse(""),x.account.getOrElse("")))).transact(xa).run;
+      model.map( x=>implicitly[DAO[LineInventoryInvoice]].insert(x.lines.getOrElse(List[LineInventoryInvoice]()).map( z => z.copy(transid=tid))))
+      ret
+
+    }
+    def create = Queries.createInventoryInvoice.run.transact(xa).run
+    def update(model:InventoryInvoice[LineInventoryInvoice]) = {
+      val ret = Queries.inventoryInvoiceUpdateName(model).run.transact(xa).run;
+      def prdicate (pred:LineInventoryInvoice) = pred.tid == 0L && pred.created == true
+      val newLines = model.getLines.partition(prdicate)._1
+      val k0 = lineInventoryInvoiceDAO.insert(newLines)
+      val k1= model.getLines.partition(_.modified)._1.map (lineInventoryInvoiceDAO.update )
+      val k2 = model.getLines.partition(_.deleted)._1.map ( e =>lineInventoryInvoiceDAO.delete(e.id.toString) )
+
+      println(s" InventoryInvoice Line inserted K0 ${k0}   ${newLines}");
+      println(s" InventoryInvoice Line updated K2 ${k1}   ");
+      println(s" InventoryInvoice Line deleted K2 ${k2}   ");
+      ret
+    }
+    def delete(id:String):Int = {
+      val r = find(id).map(p =>(p.getLines.map(l =>(lineInventoryInvoiceDAO.delete(l.id)))))
+      Queries.inventoryInvoiceDelete(id.toLong).run.transact(xa).run
+    }
+    def all:List[InventoryInvoice[LineInventoryInvoice]] = Queries.inventoryInvoiceSelect.process.list.transact(xa).run.map(
+      x => InventoryInvoice(x._1,x._2, x._3, Some(x._4),Some(x._5)).copy(lines = Some(f(x._1))))
+    def find(id:String)  : List[InventoryInvoice[LineInventoryInvoice]] =
+      Queries.inventoryInvoiceIdSelect(id.toLong).process.list.transact(xa).run.map(
+        x=> InventoryInvoice(x._1,x._2, x._3, Some(x._4), Some(x._5)).copy(lines = Some(f(x._1))))
+    def findSome(id:String) = Queries.inventoryInvoiceSelectSome(id).process.list.transact(xa).run.map(
+      x=> InventoryInvoice(x._1, x._2, x._3, Some(x._4), Some(x._5)).copy(lines = Some(f(x._1))))
+    def f (a:Long) = implicitly[DAO[LineInventoryInvoice]].findSome1(a)
+    def findSome1(id:Long) =Queries.inventoryInvoiceIdSelect(id).process.list.transact(xa).run.map(
+      x=> InventoryInvoice(x._1,x._2, x._3, Some(x._4), Some(x._5)).copy(lines = Some(f(x._1))))
+    def  updateLineId(id:Long,line:LineInventoryInvoice):LineInventoryInvoice = line.copy(transid=id)
   }
 
   def create: ConnectionIO[Int] = Queries.create.run
