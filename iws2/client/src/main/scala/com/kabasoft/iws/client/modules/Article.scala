@@ -22,7 +22,7 @@ object ARTICLE {
 
 
   implicit def orderingById[A <: Article]: Ordering[A] = {Ordering.by(e => (e.id, e.id))}
-  case class Props(proxy: ModelProxy[Pot[Data]])
+  case class Props(proxy: ModelProxy[Pot[Data]], headers:Seq[String])
   case class State(item: Option[Article] = None, name:String)
   class Backend($: BackendScope[Props, State]) {
     def mounted(props: Props) = Callback {
@@ -90,11 +90,13 @@ object ARTICLE {
 
     def buildFormTab(p: Props, s: State, items:List[Article]): Seq[ReactElement] = {
      val subArticles = s.item.getOrElse(Article()).articles.getOrElse(List.empty[Article])
+      //val headers = Seq ("Id", "Name", "Description", "Qtty. unit","Pck. unit", "Group","P. Price","Avg Price","Sales price")
+
       List(<.div(bss.formGroup,
         TabComponent(Seq(
-          TabItem("vtab1", "List", "#vtab1", true,ArticleList(items, Some(item => edit(Some(item))), Some(item => p.proxy.dispatch(Delete[Article](item))))),
+          TabItem("vtab1", "List", "#vtab1", true,ArticleList(items, p.headers, Some(item => edit(Some(item))), Some(item => p.proxy.dispatch(Delete[Article](item))))),
           TabItem("vtab2", "Form", "#vtab2", false,buildFormTable(s,items)),
-          TabItem("vtab3", "group", "#vtab3", false, ArticleList(subArticles))))
+          TabItem("vtab3", "group", "#vtab3", false, ArticleList(subArticles,p.headers))))
         )
       )
     }
@@ -126,7 +128,7 @@ object ARTICLE {
     }
 
     def render(p: Props, s: State) ={
-        val article_items =  IWSCircuit.zoom(_.store.get.models.get(7)).eval(IWSCircuit.getRootModel).get.get.items.asInstanceOf[List[Article]].toSet
+         val article_items =  IWSCircuit.zoom(_.store.get.models.get(7)).eval(IWSCircuit.getRootModel).get.get.items.asInstanceOf[List[Article]].toSet
       def saveButton = Button(Button.Props(edited(s.item.getOrElse(Article())), addStyles = Seq(bss.pullRight, bss.buttonXS,
         bss.buttonOpt(CommonStyle.success))), Icon.circleO, "Save")
       def newButton =  Button(Button.Props(edit(Some(Article())), addStyles = Seq(bss.pullRight, bss.buttonXS)), Icon.plusSquare, "New")
@@ -142,5 +144,5 @@ object ARTICLE {
     .componentDidMount(scope => scope.backend.mounted(scope.props))
     .build
 
-  def apply(proxy: ModelProxy[Pot[Data]]) = component(Props(proxy))
+  def apply(proxy: ModelProxy[Pot[Data]], headers:Seq[String]) = component(Props(proxy,headers))
 }
