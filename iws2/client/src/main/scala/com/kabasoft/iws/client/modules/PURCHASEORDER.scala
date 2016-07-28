@@ -2,6 +2,7 @@ package com.kabasoft.iws.client.modules
 
 
 import com.kabasoft.iws.client.components.{LinePurchaseOrderList, PurchaseOrderList}
+import com.kabasoft.iws.gui.BasePanel
 import diode.react.ReactPot._
 import diode.react._
 import diode.data.{Pot, Ready}
@@ -30,14 +31,6 @@ object PURCHASEORDER {
   class Backend($: BackendScope[Props, State]) {
      implicit def orderingById[A <: PurchaseOrder[LinePurchaseOrder]]: Ordering[A] = {Ordering.by(e => (e.tid, e.tid))}
     def mounted(props: Props) = {
-            def listener(cursor: ModelR[RootModel[IWS,IWS], Pot[ContainerT[IWS,IWS]]]): Unit = {
-              poitems = collection.immutable.SortedSet[PurchaseOrder[LinePurchaseOrder]]() ++
-                IWSCircuit.zoom(_.store.get.models.get(101)).eval(IWSCircuit.getRootModel).get.get.items.asInstanceOf[Seq[PurchaseOrder[LinePurchaseOrder]]].toSet
-              //log.debug(s" POrder Listener ${poitems}")
-              render(props,$.state.runNow())
-            }
-            IWSCircuit.subscribe(IWSCircuit.zoom(_.store.get.models.get(101).get)) (listener)
-
       Callback {
         IWSCircuit.dispatch(Refresh(Supplier()))
         IWSCircuit.dispatch(Refresh(Store()))
@@ -53,67 +46,45 @@ object PURCHASEORDER {
     def updateOid(idx:String) = {
      // val oId = idx.substring(0, idx.indexOf("|"))
      //  log.debug(s"oid is "+oId)
-      $.modState(s => s.copy(item = s.item.map(_.copy(oid = idx.toLong))))
+      $.modState(s => s.copy(item = s.item.map(_.copy(oid = idx.toLong))))>>setModified
     }
     def updateStore(idx:String) = {
       val storeId = idx.substring(0, idx.indexOf("|"))
      // log.debug(s"store is "+storeId)
-      $.modState(s => s.copy(item = s.item.map(_.copy(store = Some(storeId)))))
+      $.modState(s => s.copy(item = s.item.map(_.copy(store = Some(storeId)))))>>setModified
     }
 
     def updateSupplier(idx:String) = {
       val accountId =  idx.substring(0, idx.indexOf("|"))
      // log.debug(s"accountId is "+accountId)
-      $.modState(s => s.copy(item = s.item.map(_.copy(account = Some(accountId)))))
+      $.modState(s => s.copy(item = s.item.map(_.copy(account = Some(accountId))))) >>setModified
     }
-    def edited(order:PurchaseOrder[LinePurchaseOrder]) =  Callback { dispatch1(order)}
+    def setModified  = $.modState(s => s.copy(item = s.item.map(_.copy(modified = true))))
+    def edited(order:PurchaseOrder[LinePurchaseOrder]) =   dispatch(order)
 
-
-  def dispatch1 (order:PurchaseOrder[LinePurchaseOrder]) = {
+  def dispatch (order:PurchaseOrder[LinePurchaseOrder], reset:Boolean = false) =  Callback {
     val m: String = order.account.getOrElse("").concat(order.store.getOrElse(""))
-    log.debug(s"mmmmmmmmmmmmmmmmmm is "+m)
-    if (!m.isEmpty) {
+    //log.debug(s"dispatch mmmmmmmmmmmmmmmmmm is ${m}  order ${order}  con: ${ ((!m.isEmpty) && (order.created || order.modified))}")
+    if ((!m.isEmpty) && (order.created || order.modified)) {
       IWSCircuit.dispatch(Update(order))
-      $.modState(s => s.copy(item = Some(order)))
+      $.modState(s => s.copy(item = Some(order.copy(created = false).copy(modified = false)))).runNow()
+      if( reset) $.modState(s => s.copy(item = Some(resetId(order)))).runNow()
     }
-
   }
 
     def saveLine(line:LinePurchaseOrder) = {
-     // val line = linex.copy(modified=true)
       val k = $.state.runNow().item.getOrElse(PurchaseOrder[LinePurchaseOrder]())
       val k2 = k.replaceLine( line.copy(transid = k.tid))
-       log.debug(s"purchaseOrder to save is ZZZZZZZZZZ" + k2)
-      Callback {runCB(k2)}
+      // runCB(k2)
+      dispatch(k2.copy(modified = true), true)
 
     }
-    def condition(line:LinePurchaseOrder) = line.created == true|| line.modified == true
-    def runCB (item:PurchaseOrder[LinePurchaseOrder]) =  {
-      val m: String = item.account.getOrElse("").concat(item.store.getOrElse(""))
-      log.debug(s"mmmmmmmmm ${m} is !m.empty ${!m.isEmpty}")
-      if (!m.isEmpty) {
-        IWSCircuit.dispatch(Update(item))
-        //dispatch(item)
-        log.debug(s"purchaseOrder saved is ZZZZZZZZZZ" + item)
-        val ro = item.getLines.filter(condition).map(e => item.replaceLine(e.copy(created = false).copy(modified = false)))
-        val setLineID = ro.head.copy(lines = Some(item.getLines map (e => if (e.tid != 0) e else e.copy(tid = -1))))
-        $.modState(s => s.copy(item = Some(setLineID))) //.runNow()
-      }
+
+    def resetId(item:PurchaseOrder[LinePurchaseOrder]): PurchaseOrder[LinePurchaseOrder] = {
+      val ro = item.getLines.filter(_.created == true).map(e => item.replaceLine(e.copy(created = false).copy(modified = false)))
+      val setLineID = ro.head.copy(lines = Some(item.getLines map (e => if (e.tid != 0) e else e.copy(tid = -1))))
+      setLineID.copy(created =false).copy(modified =false)
     }
-
-    def updateState(item:PurchaseOrder[LinePurchaseOrder]) = {
-      val ro = item.getLines.filter(condition).map(e => item.replaceLine( e.copy(created = false).copy(modified =false)))
-      val setLineID = ro.head.copy(lines = Some( item.getLines map ( e => if(e.tid != 0 ) e else  e.copy(tid = -1))))
-      $.modState(s => s.copy(item = Some(setLineID)))
-    }
-
-
-    def postProcess (item:PurchaseOrder[LinePurchaseOrder]) =  {
-      val ro = item.getLines.filter(condition).map(e => item.replaceLine( e.copy(created = false).copy(modified = false)))
-      val setLineID = ro.head.copy(lines = Some( item.getLines map ( e => if(e.tid != 0 ) e else  e.copy(tid = -1))))
-       $.modState(s => s.copy(item =Some(setLineID)))
-    }
-
 
     def delete(item:PurchaseOrder[LinePurchaseOrder]) = {
       //Callback.log("PurchaseOrder deleted>>>>> ${item}  ${s}")
@@ -126,8 +97,7 @@ object PURCHASEORDER {
       val k2 = k.replaceLine(deleted)
       edited(k2)
     }
-//    def AddNewLine(line:LinePurchaseOrder) = $.modState(s => s.copy(item = s.item.map(_.add(line.copy(transid =
-//                                                     s.item.getOrElse(PurchaseOrder[LinePurchaseOrder]()).tid)))))
+
     def AddNewLine(line:LinePurchaseOrder) = {
       val  created =line.copy(created = true)
       log.debug(s"New  LinePurchaseOrder  created>>>>>  ${line}")
@@ -138,10 +108,22 @@ object PURCHASEORDER {
     def render(p: Props, s: State) = {
       def saveButton = Button(Button.Props(edited(s.item.getOrElse(PurchaseOrder[LinePurchaseOrder]())),
         addStyles = Seq(bss.pullRight, bss.buttonXS, bss.buttonOpt(CommonStyle.success))), Icon.circleO, " Save")
-      def newButton = Button(Button.Props(edit(Some(PurchaseOrder[LinePurchaseOrder]())),
+      def newButton = Button(Button.Props(edit(Some(PurchaseOrder[LinePurchaseOrder](created = true))),
         addStyles = Seq(bss.pullRight, bss.buttonXS)), Icon.plusSquare, " New")
 
-     def buildFormTab(p: Props, s: State, items:List[PurchaseOrder[LinePurchaseOrder]], header:Seq[ReactElement]): ReactElement =
+
+      def buildFormTab(p: Props, s: State, items:List[PurchaseOrder[LinePurchaseOrder]]): Seq[ReactElement] =
+        List(<.div(bss.formGroup,
+          TabComponent(Seq(
+            TabItem("vtab1", "List", "#vtab1", true,
+              PurchaseOrderList( items, item => edit(Some(item)), item => p.proxy.dispatch(Delete(item)))),
+            TabItem("vtab2", "Form", "#vtab2", false, buildForm(p, s, items))
+          ))
+        )
+        )
+
+
+      def buildFormTab2(p: Props, s: State, items:List[PurchaseOrder[LinePurchaseOrder]], header:Seq[ReactElement]): ReactElement =
          <.div(bss.formGroup,
          TabComponent2("Purchase Order", Seq(
            TabItem("vtab1", "List", "#vtab1", true,
@@ -176,8 +158,8 @@ object PURCHASEORDER {
         poitems = IWSCircuit.zoom(_.store.get.models.get(101)).eval(IWSCircuit.getRootModel).get.get.items.asInstanceOf[List[PurchaseOrder[LinePurchaseOrder]]].toSet
       }
       val items = poitems.toList.sorted
-      //BasePanel("Purchase Order", buildFormTab(p, s, items, List(saveButton, newButton)))
-      buildFormTab(p, s, items, List(saveButton, newButton))
+      BasePanel("Purchase Order", buildFormTab(p, s, items), List(saveButton, newButton))
+      //buildFormTab2(p, s, items, List(saveButton, newButton))
     }
   }
 
