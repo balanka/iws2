@@ -3,7 +3,7 @@ resolvers += "Typesafe Releases" at "http://repo.typesafe.com/typesafe/releases/
 //resolvers += Resolver.sonatypeRepo("releases")
 //resolvers += Resolver.sonatypeRepo("snapshots")
 
-addSbtPlugin("org.scala-js" % "sbt-scalajs" % "0.6.10")
+addSbtPlugin("org.scala-js" % "sbt-scalajs" % "0.6.11")
 
 addSbtPlugin("com.typesafe.sbt" % "sbt-less" % "1.0.6")
 
