@@ -27,16 +27,8 @@ object GOODRECEIVING {
   @volatile var gitems = Set.empty[Goodreceiving[LineGoodreceiving]]
 
   class Backend($: BackendScope[Props, State]) {
-   // @volatile var poitems = Set.empty[PurchaseOrder[LinePurchaseOrder]]
     implicit def orderingById[A <: Goodreceiving[LineGoodreceiving]]: Ordering[A] = {Ordering.by(e => (e.tid, e.tid))}
     def mounted(props: Props) = {
-//      def listener(cursor: ModelR[RootModel[IWS,IWS], Pot[ContainerT[IWS,IWS]]]): Unit = {
-//       gitems = collection.immutable.SortedSet [Goodreceiving[LineGoodreceiving]]() ++
-//        IWSCircuit.zoom(_.store.get.models.get(104)).eval(IWSCircuit.getRootModel).get.get.items.asInstanceOf[Seq[Goodreceiving[LineGoodreceiving]]].toSet
-//      log.debug(s" Goodreceiving Listener ${gitems}")
-//      render(props,$.state.runNow())
-//    }
-//    IWSCircuit.subscribe(IWSCircuit.zoom(_.store.get.models.get(101).get)) (listener)
       Callback {
         IWSCircuit.dispatch(Refresh(Supplier()))
         IWSCircuit.dispatch(Refresh(Store()))
