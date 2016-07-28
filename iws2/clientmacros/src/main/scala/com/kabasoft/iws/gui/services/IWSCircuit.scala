@@ -74,29 +74,29 @@ class IWSHandler[M](modelRW: ModelRW[M, Pot[DStore[IWS,IWS]]]) extends ActionHan
   override def handle = {
     case Refresh (item:IWS) =>
       val x = Map(item.modelId ->Ready(Data(Seq(item))))
-      log.info(s"+>>>>>>>>Refresh+++++ RefreshRefresh ===== ${item} ====RefreshRefreshRefreshRefresh+"+x)
+      log.info(s"+>>>>>>>>Refresh+++++ RefreshRefresh ===== ${item} ====RefreshRefreshRefreshRefresh+ ${x}")
       //updated(Ready(value.get.updatedAll(x)))
       updated(Ready(value.get.updated(item)), Effect(AjaxClient[Api].all(item).call().map(UpdateAll[IWS])))
-    case UpdateAll(all:Seq[IWS]) =>
-      val xx = all.seq.headOption.get
-      //log.info("+++++++++>>>>>>>>ZZZZZZZZZ"+all)
-     // log.info("+++++++++>>>>>>>>XXX"+xx)
-      val  a = all.filter(_.modelId == xx.modelId)
+    case UpdateAll(items:Seq[IWS]) =>
+      val xx = items.seq.headOption.get
+      log.debug(s"+++++++++>>>>>>>>ZZZZZZZZZ items ${items}")
+      log.debug(s"+++++++++>>>>>>>>XXX ${xx}")
+      val  a = items.filter(_.modelId == xx.modelId)
      // val r =value.get.models.get(xx.modelId).get.get
       //log.info("+++++++++aaaa0000000"+ a +"<<<<<<<<<<<"+ all)
       val r =value.get.models.get(xx.modelId).get.get.asInstanceOf[Data].items
      // log.info("+++++++++rrrrr<<<<<<<<<<<"+(all++r))
 
-      val x = Map(xx.modelId ->Ready(Data(all++r)))
+      val x = Map(xx.modelId ->Ready(Data(items++r)))
       updated(Ready(value.get.updatedAll(x)))
     case Update(item:IWS) =>
-      log.debug("+++++++++<<<<<<<<<<< Update: "+item)
+      log.debug(s"+++++++++<<<<<<<<<<< Update: ${item} ")
       updated(Ready(value.get.updated(item)), Effect(AjaxClient[Api].update(item).call().map(UpdateAll[IWS])))
     case FindAll(item:IWS) =>
-      log.info("+++++++++<<<<<<<<<<< FindAll : "+item)
+      log.info(s"+++++++++<<<<<<<<<<< FindAll : ${item}")
       updated(Ready(value.get.updated(item)), Effect(AjaxClient[Api].all(item).call().map(UpdateAll[IWS])))
     case Delete(item:IWS) =>
-      log.info("+++++++++<<<<<<<<<<< Delete Item: "+item)
+      log.info(s"+++++++++<<<<<<<<<<< Delete Item:  ${item}")
       //ActionResult.NoChange
       updated(Ready(value.get.remove(item)).asInstanceOf[Pot[DStore[IWS,IWS]]], Effect(AjaxClient[Api].delete(item).call().map(UpdateAll[IWS])))
     }
