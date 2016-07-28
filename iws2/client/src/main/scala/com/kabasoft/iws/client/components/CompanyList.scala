@@ -29,7 +29,6 @@ object CompanyList {
           <.span(item.zip ,^.paddingLeft:=5),
           <.span(item.city ,^.paddingLeft:=5),
           <.span(item.state ,^.paddingLeft:=5),
-
           <.span(item.bankAccountId ,^.paddingLeft:=5),
           <.span(item.purchasingClearingAccountId ,^.paddingLeft:=5),
           <.span(item.salesClearingAccountId ,^.paddingLeft:=5),
