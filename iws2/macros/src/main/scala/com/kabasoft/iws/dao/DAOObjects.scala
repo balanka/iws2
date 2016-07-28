@@ -217,10 +217,13 @@ object DAOObjects  {
     implicit def linePurchaseOrderDAO = new DAO[LinePurchaseOrder]{
     def insert(model: List[LinePurchaseOrder]) :Int = {
       println(s" inserting ${model}  items")
+      var ret = 0
+      if(!model.empty) {
       val tid:Long = Queries.getSequence ("LinePurchaseOrder", "id").unique.transact(xa).run;
       println(s"  getSequence ${tid} ")
-      val ret= doobie.imports.Update[(Long, Long, Int,String,String,BigDecimal,BigDecimal,String,Date,String)](Queries.linePurchaseOrderInsertSQL).
+       ret = doobie.imports.Update[(Long, Long, Int,String,String,BigDecimal,BigDecimal,String,Date,String)](Queries.linePurchaseOrderInsertSQL).
         updateMany(model.filter(_.item != None).map( x=>(tid, x.transid, x.modelId,x.item.get, x.unit.get, x.price, x.quantity,x.vat.get,x.duedate.get,x.text))).transact(xa).run
+      }
       ret
     }
     def create = Queries.createLinePurchaseOrder.run.transact(xa).run
@@ -281,10 +284,13 @@ implicit def purchaseOrderDAO = new DAO[PurchaseOrder[LinePurchaseOrder]]{
   implicit def lineGoodreceivingDAO = new DAO[LineGoodreceiving]{
     def insert(model: List[LineGoodreceiving]) :Int = {
       println(s" inserting ${model}  items")
-      val tid:Long = Queries.getSequence ("LineGoodreceiving", "id").unique.transact(xa).run;
-      println(s"  getSequence ${tid} ")
-      val ret= doobie.imports.Update[(Long, Long, Int,String,String,BigDecimal,BigDecimal,String,Date,String)](Queries.lineGoodreceivingInsertSQL).
-        updateMany(model.filter(_.item != None).map( x=>(tid, x.transid, x.modelId,x.item.get, x.unit.get, x.price, x.quantity,x.vat.get,x.duedate.get,x.text))).transact(xa).run
+      var ret = 0
+      if(!model.empty) {
+        val tid: Long = Queries.getSequence("LineGoodreceiving", "id").unique.transact(xa).run;
+        println(s"  getSequence ${tid} ")
+         ret = doobie.imports.Update[(Long, Long, Int, String, String, BigDecimal, BigDecimal, String, Date, String)](Queries.lineGoodreceivingInsertSQL).
+          updateMany(model.filter(_.item != None).map(x => (tid, x.transid, x.modelId, x.item.get, x.unit.get, x.price, x.quantity, x.vat.get, x.duedate.get, x.text))).transact(xa).run
+      }
       ret
     }
     def create = Queries.createLineGoodreceiving.run.transact(xa).run
@@ -345,10 +351,13 @@ implicit def purchaseOrderDAO = new DAO[PurchaseOrder[LinePurchaseOrder]]{
   implicit def lineInventoryInvoiceDAO = new DAO[LineInventoryInvoice]{
     def insert(model: List[LineInventoryInvoice]) :Int = {
       println(s" inserting ${model}  items")
-      val tid:Long = Queries.getSequence ("LineInventoryInvoice", "id").unique.transact(xa).run;
-      println(s"  getSequence ${tid} ")
-      val ret= doobie.imports.Update[(Long, Long, Int,String,String,BigDecimal,BigDecimal,String,Date,String)](Queries.lineInventoryInvoiceInsertSQL).
-        updateMany(model.filter(_.item != None).map( x=>(tid, x.transid, x.modelId,x.item.get, x.unit.get, x.price, x.quantity,x.vat.get,x.duedate.get,x.text))).transact(xa).run
+      var ret = 0
+      if(!model.empty) {
+        val tid: Long = Queries.getSequence("LineInventoryInvoice", "id").unique.transact(xa).run;
+        println(s"  getSequence ${tid} ")
+         ret = doobie.imports.Update[(Long, Long, Int, String, String, BigDecimal, BigDecimal, String, Date, String)](Queries.lineInventoryInvoiceInsertSQL).
+          updateMany(model.filter(_.item != None).map(x => (tid, x.transid, x.modelId, x.item.get, x.unit.get, x.price, x.quantity, x.vat.get, x.duedate.get, x.text))).transact(xa).run
+      }
       ret
     }
     def create = Queries.createLineInventoryInvoice.run.transact(xa).run
