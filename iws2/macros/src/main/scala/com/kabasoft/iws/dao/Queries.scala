@@ -192,6 +192,24 @@ object Queries  {
     sql"Update InventoryInvoice set oid =${model.oid}, store=${model.store.get}, account=${model.account.get} where id =${model.tid}".update}
   def inventoryInvoiceDelete = {id:Long =>sql"Delete FROM InventoryInvoice where id =$id".update}
 
+  type LineVendorInvoice_TYPE = (Long,Long,Int, String,String, String, BigDecimal, Date, String)
+  def lineVendorInvoiceInsertSQL = "INSERT INTO LineVendorInvoice ( id, transid, modelId, account, side ,oaccount, amount,  duedate, text)  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
+  def lineVendorInvoiceSelect = sql"SELECT * FROM LineVendorInvoice".query[LineVendorInvoice_TYPE]
+  def lineVendorInvoiceIdSelect1(id:String) = sql"SELECT * FROM LineVendorInvoice  where id =$id".query[LineVendorInvoice_TYPE]
+  def lineVendorInvoiceIdSelect(id:Long) = sql"SELECT * FROM LineVendorInvoice  where transid =$id".query[LineVendorInvoice_TYPE]
+  def lineVendorInvoiceSelectSome = { id:String =>sql"SELECT * FROM LineVendorInvoice where id =$id".query[LineVendorInvoice_TYPE]}
+  def lineVendorInvoiceUpdateName = {(model:LineVendorInvoice) =>
+    sql"Update LineVendorInvoice set transid=${model.transid},  modelId=${model.modelId}, account=${model.account.get}, side = ${model.side}, oaccount=${model.oaccount.get}, amount=${model.amount}, duedate=${model.duedate.get}, text =${model.text} where id =${model.tid}".update}
+  def lineVendorInvoiceDelete = {(id:Long) =>sql"Delete FROM LineVendorInvoice where id =$id".update}
+  type VendorInvoice_TYPE =(Long,Long,Int, String,String)
+  def vendorInvoiceInsertSQL = "INSERT INTO VendorInvoice (id, oid, modelId, store, account) VALUES (?, ?, ?,?,?)"
+  def vendorInvoiceSelect = sql"SELECT * FROM VendorInvoice".query[VendorInvoice_TYPE]
+  def vendorInvoiceIdSelect1(id:String) = sql"SELECT * FROM VendorInvoice  where id =$id.toLong".query[VendorInvoice_TYPE]
+  def vendorInvoiceIdSelect(id:Long) = sql"SELECT * FROM VendorInvoice  where id =$id".query[VendorInvoice_TYPE]
+  def vendorInvoiceSelectSome = { id:String =>sql"SELECT * FROM VendorInvoice where id =$id".query[VendorInvoice_TYPE]}
+  def vendorInvoiceUpdateName= {(model:VendorInvoice[LineVendorInvoice]) =>
+    sql"Update VendorInvoice set oid =${model.oid}, store=${model.store.get}, account=${model.account.get} where id =${model.tid}".update}
+  def vendorInvoiceDelete = {id:Long =>sql"Delete FROM VendorInvoice where id =$id".update}
 
   def getSequence (tablename:String,columnname:String) = sql"SELECT nextval(pg_get_serial_sequence( ${tablename}, ${columnname}))".query[Long]
 
@@ -235,6 +253,44 @@ object Queries  {
    taxCode VARCHAR NOT NULL,
    vatCode VARCHAR NOT NULL
   );""".update
+
+  val createVendorInvoice=sql"""
+           DROP SEQUENCE IF EXISTS VendorInvoiceId_seq;
+           CREATE SEQUENCE VendorInvoiceId_seq
+             INCREMENT 1
+             MINVALUE 1
+             MAXVALUE 9223372036854775807
+             START 1
+             CACHE 1;
+           DROP TABLE IF EXISTS VendorInvoice;
+           CREATE TABLE VendorInvoice(
+                id bigserial NOT NULL PRIMARY KEY,
+                oid bigint NOT NULL ,
+                modelId int NOT NULL,
+                store   VARCHAR NOT NULL,
+                account   VARCHAR NOT NULL
+
+                );""".update
+  val createLineVendorInvoice=sql"""
+           DROP SEQUENCE IF EXISTS LineVendorInvoiceId_seq;
+           CREATE SEQUENCE LineVendorInvoiceId_seq
+             INCREMENT 1
+             MINVALUE 1
+             MAXVALUE 9223372036854775807
+             START 1
+             CACHE 1;
+           DROP TABLE IF EXISTS LineVendorInvoice;
+           CREATE TABLE LineVendorInvoice(
+                id bigserial NOT NULL PRIMARY KEY,
+                transid     bigint  NOT NULL ,
+                modelId int NOT NULL,
+                account   VARCHAR NOT NULL,
+                side VARCHAR NOT NULL,
+                oaccount   VARCHAR NOT NULL,
+                amount  DECIMAL(20,2) NOT NULL,
+                duedate      DATE NOT NULL,
+                text  VARCHAR
+                );""".update
 
   val createInventoryInvoice=sql"""
            DROP SEQUENCE IF EXISTS InventoryInvoiceId_seq;
@@ -479,6 +535,42 @@ object Queries  {
   );""".update
 
   val createSchema =sql"""
+           DROP SEQUENCE IF EXISTS VendorInvoiceId_seq;
+           CREATE SEQUENCE VendorInvoiceId_seq
+             INCREMENT 1
+             MINVALUE 1
+             MAXVALUE 9223372036854775807
+             START 1
+             CACHE 1;
+           DROP TABLE IF EXISTS VendorInvoice;
+           CREATE TABLE VendorInvoice(
+                id bigserial NOT NULL PRIMARY KEY,
+                oid bigint NOT NULL ,
+                modelId int NOT NULL,
+                store   VARCHAR NOT NULL,
+                account   VARCHAR NOT NULL
+                );
+
+           DROP SEQUENCE IF EXISTS LineVendorInvoiceId_seq;
+           CREATE SEQUENCE LineVendorInvoiceId_seq
+             INCREMENT 1
+             MINVALUE 1
+             MAXVALUE 9223372036854775807
+             START 1
+             CACHE 1;
+           DROP TABLE IF EXISTS LineVendorInvoice;
+           CREATE TABLE LineVendorInvoice(
+                id bigserial NOT NULL PRIMARY KEY,
+                transid     bigint  NOT NULL ,
+                modelId int NOT NULL,
+                account   VARCHAR NOT NULL,
+                side VARCHAR NOT NULL,
+                oaccount   VARCHAR NOT NULL,
+                amount  DECIMAL(20,2) NOT NULL,
+                duedate      DATE NOT NULL,
+                text  VARCHAR
+                );
+
       DROP TABLE IF EXISTS Company CASCADE;
       CREATE TABLE Company (
         id   VARCHAR     NOT NULL PRIMARY KEY,

@@ -10,7 +10,8 @@ object StringUtils {
   val Stock_headers = Seq ("Id","Item id", "Quantity", "Min stock")
   val Company_headers = Seq ("Id", "Name", "Street", "Zip","City", "State", "B.Account","Purch. Cl. acc","Sales. Cl. acc" ,"Pmt. Cl. acc","Sett. Cl. acc","Vat.ID", "TaxCode"," Cur. Periode", "Next Periode")
   val Inv_Trans_Headers = Seq ("Id", "Oid", "Store", "Account")
+  val Fin_Trans_Headers = Seq ("Id", "Oid", "Store", "Account")
   val LineInv_Trans_Headers = Seq ("Id", "Item.Id", "Price", "Quantity", "Unit", "Vat", "Duedate")
-
+  val LineFin_Trans_Headers = Seq ("Id", "Account", "Side", "OAccount", "Amount", "Duedate",  "Text")
 
 }

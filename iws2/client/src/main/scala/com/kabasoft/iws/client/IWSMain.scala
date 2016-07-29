@@ -46,7 +46,8 @@ object IWSMain extends js.JSApp {
   val v2 = MenuItem("020","Purchasing", "#Purchasing" ,
           List(MenuItem("021","Purchase order","#ord"),
                MenuItem("022","Goodreceiving","#good"),
-               MenuItem("023","Inventory Invoice","#iinv")
+               MenuItem("023","Inventory Invoice","#iinv"),
+               MenuItem("024","Vendor Invoice","#vinv")
     ))
   val v3 = MenuItem("030","Dashboard", "#Dashboard" ,
     List(MenuItem("031","Dashboard","#scalacss"))
@@ -80,7 +81,7 @@ object IWSMain extends js.JSApp {
     val x101 = IWSCircuit.connect(_.store.get.models.get(101).get, "POrder")
     val x104 = IWSCircuit.connect(_.store.get.models.get(104).get, "Goodreceiving")
     val x110 = IWSCircuit.connect(_.store.get.models.get(110).get, "Inventory Invoice")
-
+    val x112 = IWSCircuit.connect(_.store.get.models.get(112).get, "Vendor Invoice")
 
     //val x2 =  SPACircuit.connect(_.store.get.models.getOrElse(2,Ready(Data(List(Article())))).asInstanceOf[Pot[Data]])
      (staticRoute(root, DashboardPage$) ~> renderR(ctl => x4(proxy => Dashboard(ctl, proxy.asInstanceOf[ModelProxy[Pot[Data]]],QuantityUnitPage$)))
@@ -98,6 +99,7 @@ object IWSMain extends js.JSApp {
       | staticRoute("#bank", BankPage$) ~> renderR(ctl => x11(p11 =>(BANK(p11.asInstanceOf[ModelProxy[Pot[Data]]]))))
       | staticRoute("#bacc", BankAccountPage$) ~> renderR(ctl => x12(p12 =>(BANKACCOUNT(p12.asInstanceOf[ModelProxy[Pot[Data]]]))))
       |staticRoute("#iinv", InventoryInvoicePage$) ~> renderR(ctl => x110(proxy110 => INVENTORYINVOICE("INVENTORYINVOICE",  {"110"},proxy110.asInstanceOf[ModelProxy[Pot[Data]]])))
+      |staticRoute("#vinv", VendorInvoicePage$) ~> renderR(ctl => x110(proxy112 => VENDORINVOICE(proxy112.asInstanceOf[ModelProxy[Pot[Data]]])))
 
        ).notFound(redirectToPage(DashboardPage$)(Redirect.Replace))
    // ).notFound(redirectToPage(Home)(Redirect.Replace))

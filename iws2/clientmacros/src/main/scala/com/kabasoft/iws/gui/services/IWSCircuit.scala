@@ -64,6 +64,7 @@ class IWSHandler[M](modelRW: ModelRW[M, Pot[DStore[IWS,IWS]]]) extends ActionHan
    pickler.addConcreteType[PurchaseOrder[LinePurchaseOrder]].addConcreteType[LinePurchaseOrder]
    pickler.addConcreteType[Goodreceiving[LineGoodreceiving]].addConcreteType[LineGoodreceiving]
    pickler.addConcreteType[InventoryInvoice[LineInventoryInvoice]].addConcreteType[LineInventoryInvoice]
+   pickler.addConcreteType[VendorInvoice[LineVendorInvoice]].addConcreteType[LineVendorInvoice]
    pickler.addConcreteType[Vat]
    pickler.addConcreteType[Bank]
    pickler.addConcreteType[BankAccount]
@@ -121,10 +122,10 @@ object IWSCircuit extends Circuit[RootModel[IWS,IWS]] with ReactConnector[RootMo
       10 -> Ready(Data(Seq.empty[Company])),
       11 -> Ready(Data(Seq.empty[Bank])),
       12 -> Ready(Data(Seq.empty[BankAccount])),
-
      101 -> Ready(Data(Seq.empty[PurchaseOrder[LinePurchaseOrder]])),
      104 -> Ready(Data(Seq.empty[Goodreceiving[LineGoodreceiving]])),
-     110 -> Ready(Data(Seq.empty[InventoryInvoice[LineInventoryInvoice]]))
+     110 -> Ready(Data(Seq.empty[InventoryInvoice[LineInventoryInvoice]])),
+     112 -> Ready(Data(Seq.empty[VendorInvoice[LineVendorInvoice]]))
     )))
 
     RootModel(store, Empty)
