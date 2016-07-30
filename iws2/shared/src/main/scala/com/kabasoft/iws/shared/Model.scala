@@ -103,7 +103,7 @@ sealed trait  LineInventoryTransaction extends LineTransaction {
 sealed trait  LineFinancialsTransaction extends LineTransaction {
   def account: Option[String]
   def oaccount: Option[String]
-  def side:String
+  def side:Boolean
   def amount: Amount
 }
 
@@ -314,7 +314,7 @@ case class InventoryInvoice[LineInventoryInvoice] (tid:Long = 0L,oid:Long = 0L, 
     }
 }
 
-case class LineVendorInvoice  (tid:Long = 0L, transid:Long =0, modelId:Int = 113,account:Option[String] = None,  side:String = "S", oaccount:Option[String] = None, amount: Amount = 0,
+case class LineVendorInvoice  (tid:Long = 0L, transid:Long =0, modelId:Int = 113,account:Option[String] = None,  side:Boolean = true, oaccount:Option[String] = None, amount: Amount = 0,
                                    duedate:Option[Date] = Some(new Date()),text:String ="txt",
                                   modified:Boolean= false, created:Boolean= false, deleted:Boolean= false) extends LineFinancialsTransaction {
   def eq (id:Long):Boolean = tid == id

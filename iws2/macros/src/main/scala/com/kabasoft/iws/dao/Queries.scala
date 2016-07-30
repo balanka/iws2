@@ -192,7 +192,7 @@ object Queries  {
     sql"Update InventoryInvoice set oid =${model.oid}, store=${model.store.get}, account=${model.account.get} where id =${model.tid}".update}
   def inventoryInvoiceDelete = {id:Long =>sql"Delete FROM InventoryInvoice where id =$id".update}
 
-  type LineVendorInvoice_TYPE = (Long,Long,Int, String,String, String, BigDecimal, Date, String)
+  type LineVendorInvoice_TYPE = (Long,Long,Int, String,Boolean, String, BigDecimal, Date, String)
   def lineVendorInvoiceInsertSQL = "INSERT INTO LineVendorInvoice ( id, transid, modelId, account, side ,oaccount, amount,  duedate, text)  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
   def lineVendorInvoiceSelect = sql"SELECT * FROM LineVendorInvoice".query[LineVendorInvoice_TYPE]
   def lineVendorInvoiceIdSelect1(id:String) = sql"SELECT * FROM LineVendorInvoice  where id =$id".query[LineVendorInvoice_TYPE]
