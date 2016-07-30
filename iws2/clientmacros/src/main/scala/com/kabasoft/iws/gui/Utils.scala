@@ -60,6 +60,15 @@ object Utils {
         ^.placeholder := id), ^.onChange ==> evt, ^.maxHeight:=2.px, ^.paddingLeft := 10.px,  ^.autoFocus := true))
         //^.placeholder := id), ^.onChange ==> evt, ^.maxHeight:=2.px, ^.paddingLeft := 10.px,  ^.autoFocus := true))
   }
+
+  def buildAreaItem(id:String , value:Option[String], defValue:String, evt:ReactEventI=> Callback  , offset:String) = {
+    val m = value getOrElse defValue
+     <.div(^.cls :="form-group".concat( offset),
+       <.label(^.`for` := id, id),
+          <.textarea(bss.formControl, ^.id := id, ^.value := m.toString,
+        ^.placeholder := id), ^.onChange ==> evt,  ^.padding := 10.px,  ^.autoFocus := true)
+  }
+
   def buildWItem[A](id:String , value:Option[A], defValue:A, evt:ReactEventI=> Callback ) = {
     val m = value getOrElse defValue
 
@@ -67,6 +76,14 @@ object Utils {
       <.td(<.input.text(bss.formControl, ^.id := id, ^.value := m.toString,
         ^.placeholder := id), ^.onChange ==> evt, ^.maxHeight:=2.px, ^.paddingLeft := 10.px,  ^.autoFocus := true))
     //^.placeholder := id), ^.onChange ==> evt, ^.maxHeight:=2.px, ^.paddingLeft := 10.px,  ^.autoFocus := true))
+  }
+  def buildBItem(id:String , value1:Option[Boolean], defValue:Boolean, evt:ReactEventI=> Callback , offset:String ) = {
+    val m = value1 getOrElse defValue
+    <.div( ^.cls := offset,
+    <.label(^.`for` := id, id),
+     // <.input(bss.formControl, ^.tpe := "checkbox", ^.checked := value1, ^.onClick   ==> evt))
+       <.input.checkbox(bss.formControl, ^.id := id, ^.value := m, ^.placeholder := id),
+                     ^.onChange ==> evt, ^.maxHeight:=2.px)
   }
   def buildLabel(id:String , value:Option[String], defValue:String) = {
     val m = value getOrElse  defValue
