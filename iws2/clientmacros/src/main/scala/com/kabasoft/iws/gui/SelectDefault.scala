@@ -8,10 +8,10 @@ object IWSSelect {
 
   case class Props(label: String, value:String, onChange: String => Callback, items:List[String])
 
-  def onChange(P: Props)(e: ReactEventI) = P.onChange(e.target.value)
+  def onChange(P: Props)(e: ReactEventI) = { val r = e.target.value; P.onChange(r) }
   def render(P: Props) =
-     <.div(
-         <.select(^.paddingLeft := "5px", ^.id := "reactselect", ^.value := P.value,
+     <.div( //^.padding := "10px",
+         <.select(^.padding := "5px", ^.id := "reactselect", ^.value := P.value, ^.fontSize:=12.px,
            ^.onChange ==> onChange(P))(
            P.items.map(item => (<.option(item)))
          )
