@@ -120,7 +120,7 @@ object GOODRECEIVING {
 
     def buildFormTab2(p: Props, s: State, items:List[Goodreceiving[LineGoodreceiving]], header:Seq[ReactElement]): ReactElement =
       <.div(bss.formGroup,
-        TabComponent2("Good receipt", Seq(
+        TabComponent2("Goods receipt", Seq(
           TabItem("GOODRECEIVING_vtab1", "List", "GOODRECEIVING_#vtab1", true,
             GoodreceivingList("GOODRECEIVING",  {"104"},items, item => edit(Some(item)), item => p.proxy.dispatch(Delete(item)))),
           TabItem("GOODRECEIVING_vtab1", "Form", "GOODRECEIVING_#vtab2", false, buildForm(p, s, items))),
@@ -138,7 +138,7 @@ object GOODRECEIVING {
         gitems = IWSCircuit.zoom(_.store.get.models.get(104)).eval(IWSCircuit.getRootModel).get.get.items.asInstanceOf[List[Goodreceiving[LineGoodreceiving]]].toSet
       }
       val items = gitems.toList.sorted
-       BasePanel("Good receipt", buildFormTab(p, s, items), List(saveButton, newButton))
+       BasePanel("Goods receipt", buildFormTab(p, s, items), List(saveButton, newButton))
      // buildFormTab(p, s, items, List(saveButton, newButton))
     }
 
