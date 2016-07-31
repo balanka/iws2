@@ -70,6 +70,7 @@ sealed trait Transaction [L] extends Trans {
     def store:Option[String]
     def account:Option[String]
     def lines:Option[List[L]]
+    def text:String
   def canEqual(a: Any) = a.isInstanceOf[Transaction[LineTransaction]]
   override def equals(that: Any): Boolean =
     that match {
@@ -248,7 +249,7 @@ case class LineGoodreceiving  (tid:Long = 0L, transid:Long =0, modelId:Int = 105
   }
 }
 case class PurchaseOrder[LinePurchaseOrder] (tid:Long = 0L,oid:Long = 0L, modelId:Int = 101,store:Option[String]=None, account:Option[String]= None,
-                                              lines:Option[List[LinePurchaseOrder]]=Some(List.empty[LinePurchaseOrder]),
+                                             text:String ="", lines:Option[List[LinePurchaseOrder]]=Some(List.empty[LinePurchaseOrder]),
                                               modified:Boolean =false, created:Boolean = false, deleted:Boolean = false) extends Transaction [LinePurchaseOrder]{
  def add(line:LinePurchaseOrder) = copy(lines = Some(getLines ++: List(line)))
  def getLines = lines.getOrElse(List.empty[LinePurchaseOrder])
@@ -263,7 +264,7 @@ case class PurchaseOrder[LinePurchaseOrder] (tid:Long = 0L,oid:Long = 0L, modelI
     }
 }
 case class Goodreceiving[LineGoodreceiving] (tid:Long = 0L,oid:Long = 0L, modelId:Int = 104,store:Option[String]=None, account:Option[String]= None,
-                                              lines:Option[List[LineGoodreceiving]]=Some(List.empty[LineGoodreceiving]),
+                                             text:String ="", lines:Option[List[LineGoodreceiving]]=Some(List.empty[LineGoodreceiving]),
                                               modified:Boolean =false, created:Boolean = false, deleted:Boolean = false) extends Transaction [LineGoodreceiving]{
   def add(line:LineGoodreceiving) = copy(lines = Some(getLines ++: List(line)))
   def getLines:List[LineGoodreceiving] = lines.getOrElse(List.empty[LineGoodreceiving])
@@ -300,7 +301,7 @@ case class LineInventoryInvoice  (tid:Long = 0L, transid:Long =0, modelId:Int = 
   }
 }
 case class InventoryInvoice[LineInventoryInvoice] (tid:Long = 0L,oid:Long = 0L, modelId:Int = 110,store:Option[String]=None, account:Option[String]= None,
-                                             lines:Option[List[LineInventoryInvoice]]=Some(List.empty[LineInventoryInvoice]),
+                                                   text:String ="", lines:Option[List[LineInventoryInvoice]]=Some(List.empty[LineInventoryInvoice]),
                                              modified:Boolean =false, created:Boolean = false, deleted:Boolean = false) extends Transaction [LineInventoryInvoice]{
   def add(line:LineInventoryInvoice) = copy(lines = Some(getLines ++: List(line)))
   def getLines:List[LineInventoryInvoice] = lines.getOrElse(List.empty[LineInventoryInvoice])
@@ -335,7 +336,7 @@ case class LineVendorInvoice  (tid:Long = 0L, transid:Long =0, modelId:Int = 113
   }
 }
 case class VendorInvoice[LineVendorInvoice] (tid:Long = 0L,oid:Long = 0L, modelId:Int = 112,store:Option[String]=None, account:Option[String]= None,
-                                                   lines:Option[List[LineVendorInvoice]]=Some(List.empty[LineVendorInvoice]),
+                                             text:String ="", lines:Option[List[LineVendorInvoice]]=Some(List.empty[LineVendorInvoice]),
                                                    modified:Boolean =false, created:Boolean = false, deleted:Boolean = false) extends Transaction [LineVendorInvoice]{
   def add(line:LineVendorInvoice) = copy(lines = Some(getLines ++: List(line)))
   def getLines:List[LineVendorInvoice] = lines.getOrElse(List.empty[LineVendorInvoice])
