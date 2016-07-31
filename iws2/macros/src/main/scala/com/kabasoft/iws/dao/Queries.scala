@@ -144,8 +144,8 @@ object Queries  {
     sql"Update LinePurchaseOrder set transid=${model.transid}, item=${model.item.get}, modelId=${model.modelId}, unit=${model.unit.get},quantity = ${model.quantity}, price=${model.price},vat=${model.vat.get},duedate=${model.duedate.get}, text =${model.text} where id =${model.tid}".update}
   def linePurchaseOrderDelete = {(id:Long) =>sql"Delete FROM LinePurchaseOrder where id =$id".update}
   //INSERT INTO PurchaseOrder ( oid, modelId, store, account) VALUES (0,101,'200','1000');
-  type PurchaseOrder_TYPE =(Long,Long,Int, String,String)
-  def purchaseOrderInsertSQL = "INSERT INTO PurchaseOrder (id, oid, modelId, store, account) VALUES (?, ?, ?,?,?)"
+  type PurchaseOrder_TYPE =(Long,Long,Int, String,String, String)
+  def purchaseOrderInsertSQL = "INSERT INTO PurchaseOrder (id, oid, modelId, store, account, text) VALUES (?, ?, ?,?,?, ?)"
   def purchaseOrderSelect = sql"SELECT * FROM PurchaseOrder".query[PurchaseOrder_TYPE]
   def purchaseOrderIdSelect1(id:String) = sql"SELECT * FROM PurchaseOrder  where id =$id.toLong".query[PurchaseOrder_TYPE]
   def purchaseOrderIdSelect(id:Long) = sql"SELECT * FROM PurchaseOrder  where id =$id".query[PurchaseOrder_TYPE]
@@ -163,8 +163,8 @@ object Queries  {
   def lineGoodreceivingUpdateName = {(model:LineGoodreceiving) =>
     sql"Update LineGoodreceiving set transid=${model.transid}, item=${model.item.get}, modelId=${model.modelId}, unit=${model.unit.get},quantity = ${model.quantity}, price=${model.price},vat=${model.vat.get},duedate=${model.duedate.get}, text =${model.text} where id =${model.tid}".update}
   def lineGoodreceivingDelete = {(id:Long) =>sql"Delete FROM LineGoodreceiving where id =$id".update}
-  type Goodreceiving_TYPE =(Long,Long,Int, String,String)
-  def goodreceivingInsertSQL = "INSERT INTO Goodreceiving (id, oid, modelId, store, account) VALUES (?, ?, ?,?,?)"
+  type Goodreceiving_TYPE =(Long,Long,Int, String,String, String)
+  def goodreceivingInsertSQL = "INSERT INTO Goodreceiving (id, oid, modelId, store, account, text) VALUES (?, ?, ?, ?, ?, ?)"
   def goodreceivingSelect = sql"SELECT * FROM Goodreceiving".query[Goodreceiving_TYPE]
   def goodreceivingIdSelect1(id:String) = sql"SELECT * FROM Goodreceiving  where id =$id.toLong".query[Goodreceiving_TYPE]
   def goodreceivingIdSelect(id:Long) = sql"SELECT * FROM Goodreceiving  where id =$id".query[Goodreceiving_TYPE]
@@ -182,8 +182,8 @@ object Queries  {
   def lineInventoryInvoiceUpdateName = {(model:LineInventoryInvoice) =>
     sql"Update LineInventoryInvoice set transid=${model.transid}, item=${model.item.get}, modelId=${model.modelId}, unit=${model.unit.get},quantity = ${model.quantity}, price=${model.price},vat=${model.vat.get},duedate=${model.duedate.get}, text =${model.text} where id =${model.tid}".update}
   def lineInventoryInvoiceDelete = {(id:Long) =>sql"Delete FROM LineInventoryInvoice where id =$id".update}
-  type InventoryInvoice_TYPE =(Long,Long,Int, String,String)
-  def inventoryInvoiceInsertSQL = "INSERT INTO InventoryInvoice (id, oid, modelId, store, account) VALUES (?, ?, ?,?,?)"
+  type InventoryInvoice_TYPE =(Long,Long,Int, String,String, String)
+  def inventoryInvoiceInsertSQL = "INSERT INTO InventoryInvoice (id, oid, modelId, store, account, text) VALUES (?, ?, ?, ?, ?, ?)"
   def inventoryInvoiceSelect = sql"SELECT * FROM InventoryInvoice".query[InventoryInvoice_TYPE]
   def inventoryInvoiceIdSelect1(id:String) = sql"SELECT * FROM InventoryInvoice  where id =$id.toLong".query[InventoryInvoice_TYPE]
   def inventoryInvoiceIdSelect(id:Long) = sql"SELECT * FROM InventoryInvoice  where id =$id".query[InventoryInvoice_TYPE]
@@ -201,8 +201,8 @@ object Queries  {
   def lineVendorInvoiceUpdateName = {(model:LineVendorInvoice) =>
     sql"Update LineVendorInvoice set transid=${model.transid},  modelId=${model.modelId}, account=${model.account.get}, side = ${model.side}, oaccount=${model.oaccount.get}, amount=${model.amount}, duedate=${model.duedate.get}, text =${model.text} where id =${model.tid}".update}
   def lineVendorInvoiceDelete = {(id:Long) =>sql"Delete FROM LineVendorInvoice where id =$id".update}
-  type VendorInvoice_TYPE =(Long,Long,Int, String,String)
-  def vendorInvoiceInsertSQL = "INSERT INTO VendorInvoice (id, oid, modelId, store, account) VALUES (?, ?, ?,?,?)"
+  type VendorInvoice_TYPE =(Long,Long,Int, String,String, String)
+  def vendorInvoiceInsertSQL = "INSERT INTO VendorInvoice (id, oid, modelId, store, account) VALUES (?, ?, ?, ?, ?, ?)"
   def vendorInvoiceSelect = sql"SELECT * FROM VendorInvoice".query[VendorInvoice_TYPE]
   def vendorInvoiceIdSelect1(id:String) = sql"SELECT * FROM VendorInvoice  where id =$id.toLong".query[VendorInvoice_TYPE]
   def vendorInvoiceIdSelect(id:Long) = sql"SELECT * FROM VendorInvoice  where id =$id".query[VendorInvoice_TYPE]
@@ -268,7 +268,8 @@ object Queries  {
                 oid bigint NOT NULL ,
                 modelId int NOT NULL,
                 store   VARCHAR NOT NULL,
-                account   VARCHAR NOT NULL
+                account   VARCHAR NOT NULL,
+                text  VARCHAR
 
                 );""".update
   val createLineVendorInvoice=sql"""
@@ -306,8 +307,8 @@ object Queries  {
                 oid bigint NOT NULL ,
                 modelId int NOT NULL,
                 store   VARCHAR NOT NULL,
-                account   VARCHAR NOT NULL
-
+                account   VARCHAR NOT NULL,
+                text  VARCHAR
                 );""".update
   val createLineInventoryInvoice=sql"""
            DROP SEQUENCE IF EXISTS LineInventoryInvoiceId_seq;
@@ -344,7 +345,8 @@ object Queries  {
                 oid bigint NOT NULL ,
                 modelId int NOT NULL,
                 store   VARCHAR NOT NULL,
-                account   VARCHAR NOT NULL
+                account   VARCHAR NOT NULL,
+                text  VARCHAR
                 );""".update
   val createLineGoodreceiving=sql"""
            DROP SEQUENCE IF EXISTS LineGoodreceivingId_seq;
@@ -381,7 +383,8 @@ object Queries  {
                 oid bigint NOT NULL ,
                 modelId int NOT NULL,
                 store   VARCHAR NOT NULL,
-                account   VARCHAR NOT NULL
+                account   VARCHAR NOT NULL,
+                text  VARCHAR
                 );""".update
 
   val createLinePurchaseOrder=sql"""
@@ -548,7 +551,8 @@ object Queries  {
                 oid bigint NOT NULL ,
                 modelId int NOT NULL,
                 store   VARCHAR NOT NULL,
-                account   VARCHAR NOT NULL
+                account   VARCHAR NOT NULL,
+                text  VARCHAR
                 );
 
            DROP SEQUENCE IF EXISTS LineVendorInvoiceId_seq;
@@ -727,8 +731,8 @@ object Queries  {
                 oid bigint NOT NULL ,
                 modelId int NOT NULL,
                 store   VARCHAR NOT NULL,
-                account   VARCHAR NOT NULL
-
+                account   VARCHAR NOT NULL,
+                text  VARCHAR
                 );
 
      DROP SEQUENCE IF EXISTS LinePurchaseOrderId_seq;
@@ -765,7 +769,8 @@ object Queries  {
                        oid bigint NOT NULL ,
                        modelId int NOT NULL,
                        store   VARCHAR NOT NULL,
-                       account   VARCHAR NOT NULL
+                       account   VARCHAR NOT NULL,
+                       text  VARCHAR
                  );
 
            DROP SEQUENCE IF EXISTS LineInventoryInvoiceId_seq;
