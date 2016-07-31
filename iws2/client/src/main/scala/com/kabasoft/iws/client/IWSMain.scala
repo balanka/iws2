@@ -45,7 +45,7 @@ object IWSMain extends js.JSApp {
 
   val v2 = MenuItem("020","Purchasing", "#Purchasing" ,
           List(MenuItem("021","Purchase order","#ord"),
-               MenuItem("022","Goodreceiving","#good"),
+               MenuItem("022","Goods receipt","#good"),
                MenuItem("023","Inventory Invoice","#iinv"),
                MenuItem("024","Vendor Invoice","#vinv")
     ))
@@ -79,7 +79,7 @@ object IWSMain extends js.JSApp {
     val x11 =  IWSCircuit.connect(_.store.get.models.get(11).get)
     val x12 =  IWSCircuit.connect(_.store.get.models.get(12).get)
     val x101 = IWSCircuit.connect(_.store.get.models.get(101).get, "POrder")
-    val x104 = IWSCircuit.connect(_.store.get.models.get(104).get, "Goodreceiving")
+    val x104 = IWSCircuit.connect(_.store.get.models.get(104).get, "Good receipt")
     val x110 = IWSCircuit.connect(_.store.get.models.get(110).get, "Inventory Invoice")
     val x112 = IWSCircuit.connect(_.store.get.models.get(112).get, "Vendor Invoice")
 
