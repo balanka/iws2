@@ -147,9 +147,9 @@ object Utils {
         ^.placeholder := id), ^.onChange ==> evt,   ^.autoFocus := true)
   }
 
-  def renderHeader (headers:Seq[String]) =
+  def renderHeader (headers:Seq[String], padding:Int =10) =
     <.li(bss.listGroup.itemOpt(CommonStyle.info),^.fontSize:=12,^.fontWeight:=50,^.maxHeight:=30,^.height:=30, ^.tableLayout:="fixed",
-       headers.map( field => (<.span(field ,^.paddingLeft:=10)))
+       headers.map( field => (<.span(field ,^.padding:=padding)))
     )
 }
 
