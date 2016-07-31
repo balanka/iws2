@@ -39,7 +39,7 @@ object Main  {
      println( "Running Line purchaseorder2  com.kabasoft.iws.services.Main:")
  
   val lineOrder = LinePurchaseOrder(0L,1L,101,Some("001"),Some("Stk"),1000.0,100.0,Some("19"),Some(new Date()),"TEST")
-  val purchaseorder =PurchaseOrder(3L, 2L,101,Some("300"),Some("1000"), Some(List(lineOrder)))
+  val purchaseorder =PurchaseOrder(3L, 2L,101,Some("300"),Some("1000"), "test", Some(List(lineOrder)))
    val lineOrder2 = LinePurchaseOrder(0L,3L,101,Some("001"),Some("Stk"),1000.00,900.00,Some("19"),Some(new Date()),"TEST")
 
 //val f:List[PurchaseOrder[LinePurchaseOrder]]= run.runG[List[PurchaseOrder[LinePurchaseOrder]]](Find[PurchaseOrder[LinePurchaseOrder]]("22"))
