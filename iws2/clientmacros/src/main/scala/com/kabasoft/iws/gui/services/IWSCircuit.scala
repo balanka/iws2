@@ -9,7 +9,7 @@ import diode.data._
 import diode.react.ReactConnector
 import diode.util._
 import boopickle.Default._
-
+import japgolly.scalajs.react.Callback
 
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
@@ -25,9 +25,11 @@ case class DStore [+A<:IWS,-B<:IWS](models: Map[Int, Pot[ContainerT[A,B]]]) {
 
    //def updatedAll(newModels: Map[Int, Pot[ContainerT[B,A]]])  = DStore[A,B](newModels.asInstanceOf[Map[Int, Pot[ContainerT[A,B]]]])
   def updatedAll(newModels: Map[Int, Pot[ContainerT[B,A]]])  = {
-     //log.debug("+++++++++<<<<<<<<<<< newModels: "+newModels)
-     DStore[A,B]( models.asInstanceOf[Map[Int, Pot[ContainerT[A,B]]]]++
-    newModels.asInstanceOf[Map[Int, Pot[ContainerT[A,B]]]])}
+      log.debug("+++++++++<<<<<<<<<<< newModels: "+newModels)
+
+     val v = models.asInstanceOf[Map[Int, Pot[ContainerT[A,B]]]]++ newModels.asInstanceOf[Map[Int, Pot[ContainerT[A,B]]]]
+     log.debug("+++++++++<<<<<<<<<<< newModels All :"+ v)
+     DStore[A,B]( v)}
   def remove(item:B) = {
     //log.info("+>>>>>>>>Item to Delete++++++ ${item}")
     val x= models.get(item.modelId).get.map(_.remove(item))
@@ -80,17 +82,20 @@ class IWSHandler[M](modelRW: ModelRW[M, Pot[DStore[IWS,IWS]]]) extends ActionHan
       updated(Ready(value.get.updated(item)), Effect(AjaxClient[Api].all(item).call().map(UpdateAll[IWS])))
     case UpdateAll(items:Seq[IWS]) =>
       val xx = items.seq.headOption.get
-      log.debug(s"+++++++++>>>>>>>>ZZZZZZZZZ items ${items}")
-      log.debug(s"+++++++++>>>>>>>>XXX ${xx}")
+     // log.debug(s"+++++++++>>>>>>>>ZZZZZZZZZYYYYYYYYYY items ${items}")
+     // log.debug(s"+++++++++>>>>>>>>XXX ${xx}")
       val  a = items.filter(_.modelId == xx.modelId)
      // val r =value.get.models.get(xx.modelId).get.get
       //log.info("+++++++++aaaa0000000"+ a +"<<<<<<<<<<<"+ all)
-      val r =value.get.models.get(xx.modelId).get.get.asInstanceOf[Data].items
-     // log.info("+++++++++rrrrr<<<<<<<<<<<"+(all++r))
-
-      val x = Map(xx.modelId ->Ready(Data(items++r)))
+     // val r = value.get.models.get(xx.modelId).get.get.asInstanceOf[Data].items
+      val l = value.get.models.get(xx.modelId).get.get.asInstanceOf[Data].updateAll(items)
+      //val r = value.get.models.get(xx.modelId).get.get.asInstanceOf[Data].items
+      //log.info("+++++++++rrrrr<<<<<<<<<<<"+(l.items))
+     // val x = Map(xx.modelId ->Ready(Data(items++r)))
+      val x = Map(xx.modelId ->Ready(l))
       updated(Ready(value.get.updatedAll(x)))
-    case Update(item:IWS) =>
+
+       case Update(item:IWS) =>
       log.debug(s"+++++++++<<<<<<<<<<< Update: ${item} ")
       updated(Ready(value.get.updated(item)), Effect(AjaxClient[Api].update(item).call().map(UpdateAll[IWS])))
     case FindAll(item:IWS) =>
