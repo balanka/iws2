@@ -59,6 +59,11 @@ object PURCHASEORDER {
      // log.debug(s"accountId is "+accountId)
       $.modState(s => s.copy(item = s.item.map(_.copy(account = Some(accountId))))) >>setModified
     }
+    def updateText(e: ReactEventI) = {
+      val txt = e.target.value
+      log.debug(s"txt is ${txt}")
+      $.modState(s => s.copy(item = s.item.map(_.copy(text = txt))))  >>setModified
+    }
     def setModified  = $.modState(s => s.copy(item = s.item.map(_.copy(modified = true))))
     def edited(order:PurchaseOrder[LinePurchaseOrder]) =   dispatch(order)
 
@@ -143,10 +148,11 @@ object PURCHASEORDER {
           <.table(^.className := "table-responsive table-condensed", ^.tableLayout := "fixed",
             <.tbody(
               <.tr(bss.formGroup, ^.height := 10.px,
-                  buildItem[String]("id", s.item.map(_.id), "id"),
+                  buildItem[String]("Id", s.item.map(_.id), "id"),
                   buildSItem("oid", itemsx = buildTransIdList(items) , defValue = "001", evt = updateOid),
-                  buildSItem("store", itemsx = storeList , defValue = "001", evt = updateStore),
-                  buildSItem("supplier", itemsx = supplierList , defValue = "70000", evt = updateSupplier)
+                  buildSItem("Store", itemsx = storeList , defValue = "001", evt = updateStore),
+                  buildSItem("Supplier", itemsx = supplierList , defValue = "70000", evt = updateSupplier),
+                  buildWItem("Text", s.item.map(_.text), defValue = "txt", evt = updateText)
               )
             )
           ),
