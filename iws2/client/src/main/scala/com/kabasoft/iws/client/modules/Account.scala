@@ -74,7 +74,7 @@ object ACCOUNT {
       List(<.div(bss.formGroup,
         TabComponent(Seq(
           TabItem("vtab1", "List", "#vtab1", true,
-            AccountList(items, Some(item => edit(Some(item))), Some(item => p.proxy.dispatch(Delete[Account](item))))),
+            AccountList(items, Some(item => edit(Some(item))), Some(item => p.proxy.dispatch(Delete(item))))),
           TabItem("vtab2", "Form", "#vtab2", false,buildFormTable(s,items)),
           TabItem("vtab3", "sub", "#vtab3", false, AccountList(subAccounts))
 
