@@ -124,8 +124,9 @@ object LinePurchaseOrderList {
         addStyles = Seq(bss.pullRight, bss.buttonXS, bss.buttonOpt(CommonStyle.success))), Icon.circleO, "")
       def newButton = Button(Button.Props( newLine(LinePurchaseOrder(created = true), p.newLine),
         addStyles = Seq(bss.pullRight, bss.buttonXS)), Icon.plusSquare, "")
-      def buildIdNameList [A<:Masterfile](list: List[A]): List[String]= list map (iws =>(iws.id+"|"+iws.name))
-      def buildArticleList [A<:Article](list: List[A]): List[String]= list map (iws =>(iws.id+":"+iws.name +":"+iws.qttyUnit  +":"+iws.vat.getOrElse("0")))
+
+      def buildIdNameList [A<:Masterfile](list: List[A]): List[String]= list.filter(_.id !="-1") map (iws =>(iws.id+"|"+iws.name))
+      def buildArticleList [A<:Article](list: List[A]): List[String]= list.filter(_.id !="-1") map (iws =>(iws.id+":"+iws.name +":"+iws.qttyUnit  +":"+iws.vat.getOrElse("0")))
       def renderHeader =
         <.li(style.itemOpt(CommonStyle.info),^.fontSize:=12,^.fontWeight:=50,^.maxHeight:=30,^.height:=30, ^.tableLayout:="fixed",
           LineInv_Trans_Headers.map( field => (<.span(field ,^.paddingLeft:=10)))
