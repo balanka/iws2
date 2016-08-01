@@ -150,8 +150,8 @@ object INVENTORYINVOICE {
       val supplier =  IWSCircuit.zoom(_.store.get.models.get(1)).eval(IWSCircuit.getRootModel).getOrElse(Ready(Data(List.empty[Supplier]))).get.items.asInstanceOf[List[Supplier]].toSet
       val store =  IWSCircuit.zoom(_.store.get.models.get(2)).eval(IWSCircuit.getRootModel).getOrElse(Ready(Data(List.empty[Store]))).get.items.asInstanceOf[List[Store]].toSet
       val porder = s.item.getOrElse(InventoryInvoice[LineInventoryInvoice]().add(LineInventoryInvoice(item = Some("4711"))))
-      val  storeList=store.toList.filter(_.id !="-1") map (iws =>(iws.id+"|"+iws.name))
-      val  supplierList=supplier.toList.filter(_.id !="-1") map (iws =>(iws.id+"|"+iws.name))
+      val  storeList=store.toList.filter(_.id !="-1") .sortBy(_.id) map (iws =>(iws.id+"|"+iws.name))
+      val  supplierList=supplier.toList.filter(_.id !="-1") .sortBy(_.id)  map (iws =>(iws.id+"|"+iws.name))
         <.div(bss.formGroup,
         <.table(^.className := "table-responsive table-condensed", ^.tableLayout := "fixed",
           <.tbody(

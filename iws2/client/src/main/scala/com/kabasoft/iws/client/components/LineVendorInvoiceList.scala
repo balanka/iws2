@@ -103,7 +103,7 @@ object LineVendorInvoiceList {
         addStyles = Seq(bss.pullRight, bss.buttonXS, bss.buttonOpt(CommonStyle.success))), Icon.circleO, "")
       def newButton = Button(Button.Props( newLine(LineVendorInvoice(created = true), p.newLine),
         addStyles = Seq(bss.pullRight, bss.buttonXS)), Icon.plusSquare, "")
-      def buildIdNameList [A<:Masterfile](list: List[A]): List[String]= list map (iws =>(iws.id+"|"+iws.name))
+      def buildIdNameList [A<:Masterfile](list: List[A]): List[String]= list.filter(_.id != "-1") .sortBy(_.id) map (iws =>(iws.id+"|"+iws.name))
 
       def editFormLine : Seq [TagMod] = List(
           <.div(^.cls :="row",

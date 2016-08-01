@@ -122,8 +122,8 @@ object LineInventoryInvoiceList {
         addStyles = Seq(bss.pullRight, bss.buttonXS, bss.buttonOpt(CommonStyle.success))), Icon.circleO, "")
       def newButton = Button(Button.Props( newLine(LineInventoryInvoice(created = true),p.newLine),
         addStyles = Seq(bss.pullRight, bss.buttonXS)), Icon.plusSquare, "")
-      def buildIdNameList [A<:Masterfile](list: List[A]): List[String]= list.filter(_.id !="-1") map (iws =>(iws.id+"|"+iws.name))
-      def buildArticleList [A<:Article](list: List[A]): List[String]= list.filter(_.id !="-1") map (iws =>(iws.id+":"+iws.name +":"+iws.qttyUnit  +":"+iws.vat.getOrElse("0")))
+      def buildIdNameList [A<:Masterfile](list: List[A]): List[String]= list.filter(_.id !="-1") .sortBy(_.id) map (iws =>(iws.id+"|"+iws.name))
+      def buildArticleList [A<:Article](list: List[A]): List[String]= list.filter(_.id !="-1") .sortBy(_.id) map (iws =>(iws.id+":"+iws.name +":"+iws.qttyUnit  +":"+iws.vat.getOrElse("0")))
 
 
       def editFormLine : Seq [TagMod]= List(
