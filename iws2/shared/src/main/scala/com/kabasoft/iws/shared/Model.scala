@@ -24,6 +24,7 @@ sealed trait IWS {
 
 trait ContainerT [+A<:IWS,-B<:IWS] {
   def update(newItem: B): ContainerT [A,B]
+  def updateAll(all: Seq[B]): ContainerT [A,B]
   def remove (item: B): ContainerT  [A,B]
   def size = items.size
   def items : Seq[A]
@@ -57,6 +58,25 @@ case class Data  (items: Seq[IWS]) extends ContainerT [IWS,IWS]{
         Data(items.updated(index, newItem))
     }
   }
+
+ // override def updateAll(all: Seq[IWS]) =  all.map ( e => update(e))
+
+ override def updateAll(all: Seq[IWS]) =  Data(kk(all))
+
+
+  def kk(all: Seq[IWS]): Seq[IWS] = {
+    def refac( allItems: Seq [IWS], e: IWS): Seq[IWS] = {
+      allItems.indexWhere((_.id == e.id)) match {
+        case -1 =>
+          allItems :+ e
+        case index =>
+          allItems.updated(index, e)
+      }
+    }
+    all.map(refac(items, _)).flatten
+
+  }
+
   override def add(newItem: IWS)= Data(items :+ newItem)
   override def remove (item: IWS) = Data(items.filterNot(_.id==item.id))
 }
