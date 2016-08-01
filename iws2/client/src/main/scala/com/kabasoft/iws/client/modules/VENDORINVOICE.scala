@@ -57,9 +57,13 @@ object VENDORINVOICE {
       log.debug(s"ItemId Key is ${supplierId}  ")
       $.modState(s => s.copy(item = s.item.map(_.copy(account = Some(supplierId)))))
     }
-
+    def updateText(e: ReactEventI) = {
+      val txt = e.target.value
+      log.debug(s"txt is ${txt}")
+      $.modState(s => s.copy(item = s.item.map(_.copy(text = txt))))  >>setModified
+    }
     def edited(order:VendorInvoice[LineVendorInvoice]) = {
-      $.modState(s => s.copy(item =Some(order)))
+     // $.modState(s => s.copy(item =Some(order)))
       Callback {IWSCircuit.dispatch(Update(order))}
       //$.props >>= (_.proxy.dispatch(Update(order)))
     }
@@ -71,6 +75,7 @@ object VENDORINVOICE {
       runCB(k2)
 
     }
+    def setModified  = $.modState(s => s.copy(item = s.item.map(_.copy(modified = true))))
     def runCB (item:VendorInvoice[LineVendorInvoice]) = Callback {
       IWSCircuit.dispatch(Update(item))
       val ro = item.getLines.filter(_.created ==true).map( e => item.replaceLine( e.copy(created = false).copy(modified =false)))
@@ -138,7 +143,7 @@ object VENDORINVOICE {
         gitems = IWSCircuit.zoom(_.store.get.models.get(112)).eval(IWSCircuit.getRootModel).get.get.items.asInstanceOf[List[VendorInvoice[LineVendorInvoice]]].toSet
       }
       val items = gitems.toList.sorted
-      log.debug(s"itemsitemsitemsitemsitems ${items}")
+      //log.debug(s"itemsitemsitemsitemsitems ${items}")
        BasePanel("Vendor Invoice", buildFormTab(p, s, items), List(saveButton, newButton))
      // buildFormTab(p, s, items, List(saveButton, newButton))
     }
@@ -153,11 +158,12 @@ object VENDORINVOICE {
         <.table(^.className := "table-responsive table-condensed", ^.tableLayout := "fixed",
           <.tbody(
             <.tr(bss.formGroup, ^.height := 10.px,
-              buildItem[String]("id", s.item.map(_.id), "id"),
+              buildItem[String]("Id", s.item.map(_.id), "id"),
               //buildWItem[Long]("oid", s.item.map(_.oid), 1L, updateOid),
               buildSItem("oid", itemsx = buildTransIdList(items) , defValue = "001", evt = updateStore),
-              buildSItem("store", itemsx=storeList,defValue = "0001", evt = updateStore),
-              buildSItem("supplier", itemsx = supplierList, defValue = "KG", evt = updateAccount)
+              buildSItem("Store", itemsx=storeList,defValue = "0001", evt = updateStore),
+              buildSItem("Supplier", itemsx = supplierList, defValue = "KG", evt = updateAccount),
+              buildWItem("Text", s.item.map(_.text), defValue = "txt", evt = updateText)
             )
           )
         ),

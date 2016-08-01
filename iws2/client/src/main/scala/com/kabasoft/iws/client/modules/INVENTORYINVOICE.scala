@@ -43,23 +43,27 @@ object INVENTORYINVOICE {
     def updateOid(idx:String) = {
       // val oId = idx.substring(0, idx.indexOf("|"))
       //  log.debug(s"oid is "+oId)
-      $.modState(s => s.copy(item = s.item.map(_.copy(oid = idx.toLong))))
+      $.modState(s => s.copy(item = s.item.map(_.copy(oid = idx.toLong)))) >> setModified
     }
 
     def updateStore(idx:String) = {
       val storeId = idx.substring(0, idx.indexOf("|"))
       log.debug(s"store is "+storeId)
-      $.modState(s => s.copy(item = s.item.map(_.copy(store = Some(storeId)))))
+      $.modState(s => s.copy(item = s.item.map(_.copy(store = Some(storeId))))) >> setModified
     }
 
     def updateAccount(idx: String) = {
       val supplierId=idx.substring(0, idx.indexOf("|"))
       log.debug(s"ItemId Key is ${supplierId}  ")
-      $.modState(s => s.copy(item = s.item.map(_.copy(account = Some(supplierId)))))
+      $.modState(s => s.copy(item = s.item.map(_.copy(account = Some(supplierId))))) >> setModified
     }
-
+    def updateText(e: ReactEventI) = {
+       val txt = e.target.value
+        log.debug(s"txt is ${txt}")
+      $.modState(s => s.copy(item = s.item.map(_.copy(text = txt)))) >> setModified
+    }
     def edited(order:InventoryInvoice[LineInventoryInvoice]) = {
-      $.modState(s => s.copy(item =Some(order)))
+     // $.modState(s => s.copy(item =Some(order)))
       Callback {IWSCircuit.dispatch(Update(order))}
       //$.props >>= (_.proxy.dispatch(Update(order)))
     }
@@ -77,7 +81,7 @@ object INVENTORYINVOICE {
       val setLineID = ro.head.copy(lines = Some( item.getLines map ( e => if(e.tid != 0 ) e else  e.copy(tid = -1))))
       $.modState(s => s.copy(item =Some(setLineID))).runNow()
     }
-
+    def setModified  = $.modState(s => s.copy(item = s.item.map(_.copy(modified = true))))
     def delete(item:InventoryInvoice[LineGoodreceiving]) = {
       Callback.log("InventoryInvoice deleted>>>>> ${item}  ${s}")
       $.props >>= (_.proxy.dispatch(Delete(item)))
@@ -152,11 +156,12 @@ object INVENTORYINVOICE {
         <.table(^.className := "table-responsive table-condensed", ^.tableLayout := "fixed",
           <.tbody(
             <.tr(bss.formGroup, ^.height := 10.px,
-              buildItem[String]("id", s.item.map(_.id), "id"),
+              buildItem[String]("Id", s.item.map(_.id), "id"),
               //buildWItem[Long]("oid", s.item.map(_.oid), 1L, updateOid),
               buildSItem("oid", itemsx = buildTransIdList(items) , defValue = "001", evt = updateStore),
-              buildSItem("store", itemsx=storeList,defValue = "0001", evt = updateStore),
-              buildSItem("supplier", itemsx = supplierList, defValue = "KG", evt = updateAccount)
+              buildSItem("Store", itemsx=storeList,defValue = "0001", evt = updateStore),
+              buildSItem("Supplier", itemsx = supplierList, defValue = "KG", evt = updateAccount),
+              buildWItem("Text", s.item.map(_.text), defValue = "txt", evt = updateText)
             )
           )
         ),
