@@ -25,10 +25,10 @@ case class DStore [+A<:IWS,-B<:IWS](models: Map[Int, Pot[ContainerT[A,B]]]) {
 
    //def updatedAll(newModels: Map[Int, Pot[ContainerT[B,A]]])  = DStore[A,B](newModels.asInstanceOf[Map[Int, Pot[ContainerT[A,B]]]])
   def updatedAll(newModels: Map[Int, Pot[ContainerT[B,A]]])  = {
-      log.debug("+++++++++<<<<<<<<<<< newModels: "+newModels)
+      //log.debug("+++++++++<<<<<<<<<<< newModels: "+newModels)
 
      val v = models.asInstanceOf[Map[Int, Pot[ContainerT[A,B]]]]++ newModels.asInstanceOf[Map[Int, Pot[ContainerT[A,B]]]]
-     log.debug("+++++++++<<<<<<<<<<< newModels All :"+ v)
+     //log.debug("+++++++++<<<<<<<<<<< newModels All :"+ v)
      DStore[A,B]( v)}
   def remove(item:B) = {
     //log.info("+>>>>>>>>Item to Delete++++++ ${item}")
@@ -67,6 +67,7 @@ class IWSHandler[M](modelRW: ModelRW[M, Pot[DStore[IWS,IWS]]]) extends ActionHan
    pickler.addConcreteType[Goodreceiving[LineGoodreceiving]].addConcreteType[LineGoodreceiving]
    pickler.addConcreteType[InventoryInvoice[LineInventoryInvoice]].addConcreteType[LineInventoryInvoice]
    pickler.addConcreteType[VendorInvoice[LineVendorInvoice]].addConcreteType[LineVendorInvoice]
+   pickler.addConcreteType[Payment[LinePayment]].addConcreteType[LinePayment]
    pickler.addConcreteType[Vat]
    pickler.addConcreteType[Bank]
    pickler.addConcreteType[BankAccount]
@@ -77,7 +78,7 @@ class IWSHandler[M](modelRW: ModelRW[M, Pot[DStore[IWS,IWS]]]) extends ActionHan
   override def handle = {
     case Refresh (item:IWS) =>
       val x = Map(item.modelId ->Ready(Data(Seq(item))))
-      log.info(s"+>>>>>>>>Refresh+++++ RefreshRefresh ===== ${item} ====RefreshRefreshRefreshRefresh+ ${x}")
+     // log.info(s"+>>>>>>>>Refresh+++++ RefreshRefresh ===== ${item} ====RefreshRefreshRefreshRefresh+ ${x}")
       //updated(Ready(value.get.updatedAll(x)))
       updated(Ready(value.get.updated(item)), Effect(AjaxClient[Api].all(item).call().map(UpdateAll[IWS])))
     case UpdateAll(items:Seq[IWS]) =>
@@ -96,7 +97,7 @@ class IWSHandler[M](modelRW: ModelRW[M, Pot[DStore[IWS,IWS]]]) extends ActionHan
       updated(Ready(value.get.updatedAll(x)))
 
        case Update(item:IWS) =>
-      log.debug(s"+++++++++<<<<<<<<<<< Update: ${item} ")
+       log.debug(s"+++++++++<<<<<<<<<<< Update: ${item} ")
       updated(Ready(value.get.updated(item)), Effect(AjaxClient[Api].update(item).call().map(UpdateAll[IWS])))
     case FindAll(item:IWS) =>
       log.info(s"+++++++++<<<<<<<<<<< FindAll : ${item}")
@@ -130,7 +131,8 @@ object IWSCircuit extends Circuit[RootModel[IWS,IWS]] with ReactConnector[RootMo
      101 -> Ready(Data(Seq.empty[PurchaseOrder[LinePurchaseOrder]])),
      104 -> Ready(Data(Seq.empty[Goodreceiving[LineGoodreceiving]])),
      110 -> Ready(Data(Seq.empty[InventoryInvoice[LineInventoryInvoice]])),
-     112 -> Ready(Data(Seq.empty[VendorInvoice[LineVendorInvoice]]))
+     112 -> Ready(Data(Seq.empty[VendorInvoice[LineVendorInvoice]])),
+     114 -> Ready(Data(Seq.empty[Payment[LinePayment]]))
     )))
 
     RootModel(store, Empty)

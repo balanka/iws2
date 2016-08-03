@@ -15,6 +15,7 @@ object AppRouter {
   case object GoodreceivingPage$ extends Page
   case object InventoryInvoicePage$ extends Page
   case object VendorInvoicePage$ extends Page
+  case object PaymentPage$ extends Page
   case object CustomerPage$ extends Page
   case object VatPage$ extends Page
   case object StorePage$ extends Page

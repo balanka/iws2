@@ -350,6 +350,40 @@ case class VendorInvoice[LineVendorInvoice] (tid:Long = 0L,oid:Long = 0L, modelI
       case _ => false
     }
 }
+case class LinePayment  (tid:Long = 0L, transid:Long =0, modelId:Int = 115,account:Option[String] = None,  side:Boolean = true, oaccount:Option[String] = None, amount: Amount = 0,
+                               duedate:Option[Date] = Some(new Date()),text:String ="txt",
+                               modified:Boolean= false, created:Boolean= false, deleted:Boolean= false) extends LineFinancialsTransaction {
+  def eq (id:Long):Boolean = tid == id
+  def eq0:Boolean = tid == 0L
+  def eqId(id:Long):Boolean = tid == id
+  def canEqual(a: Any) = a.isInstanceOf[LinePayment]
+  override def equals(that: Any): Boolean =
+    that match {
+      case that: LinePayment => that.canEqual(this) && this.hashCode == that.hashCode
+      case _ => false
+    }
+  override def hashCode:Int = {
+    val prime = 31
+    var result = 1
+    result = prime * result + tid.toInt
+    result = prime * result + transid.hashCode
+    result
+  }
+}
+case class Payment[LinePayment] (tid:Long = 0L,oid:Long = 0L, modelId:Int = 114,store:Option[String]=None, account:Option[String]= None,
+                                             text:String ="", lines:Option[List[LinePayment]]=Some(List.empty[LinePayment]),
+                                             modified:Boolean =false, created:Boolean = false, deleted:Boolean = false) extends Transaction [LinePayment]{
+  def add(line:LinePayment) = copy(lines = Some(getLines ++: List(line)))
+  def getLines:List[LinePayment] = lines.getOrElse(List.empty[LinePayment])
+  def getLinesWithId(id:Long) = getLines.filter(equals(_,id))
+  def replaceLine( newLine:LinePayment) = copy(lines = Some( getLines map ( old => if (newLine.equals(old))  newLine else old )))
+  override def  canEqual(a: Any) = a.isInstanceOf[VendorInvoice[LinePayment]]
+  override def equals(that: Any): Boolean =
+    that match {
+      case that: Payment[LinePayment] => that.canEqual(this) && this.hashCode == that.hashCode
+      case _ => false
+    }
+}
 
 
 // Registre general des affaires  frappees d'appel
@@ -393,13 +427,15 @@ object  PeriodicAccountBalance_{ def unapply (in:PeriodicAccountBalance) =Some(i
 object  Stock_{ def unapply (in:Stock) =Some(in.id,in.name,in.description, in.itemId, in.storeId, in.quantity, in.minStock)}
 object  ArticleGroup_{ def unapply (in:ArticleGroup) =Some(in.id,in.name,in.modelId, in.description)}
 object  LinePurchaseOrder_{ def unapply (in:LinePurchaseOrder) = Some(in.tid,in.transid, in.modelId, in.item, in.unit, in.price, in.quantity, in.vat, in.duedate, in.text)}
-object  PurchaseOrder_{ def unapply (in:PurchaseOrder[LinePurchaseOrder]) = Some(in.tid,in.oid, in.modelId, in.store, in.account, in.lines)}
+object  PurchaseOrder_{ def unapply (in:PurchaseOrder[LinePurchaseOrder]) = Some(in.tid,in.oid, in.modelId, in.store, in.account, in.text, in.lines)}
 object  LineGoodreceiving_{ def unapply (in:LineGoodreceiving) = Some(in.tid,in.transid, in.modelId, in.item, in.unit, in.price, in.quantity, in.vat, in.duedate, in.text)}
-object  Goodreceiving_{ def unapply (in:Goodreceiving[LineGoodreceiving]) = Some(in.tid,in.oid, in.modelId, in.store, in.account, in.lines)}
+object  Goodreceiving_{ def unapply (in:Goodreceiving[LineGoodreceiving]) = Some(in.tid,in.oid, in.modelId, in.store, in.account, in.text, in.lines)}
 object  LineInventoryInvoice_{ def unapply (in:LineInventoryInvoice) = Some(in.tid,in.transid, in.modelId, in.item, in.unit, in.price, in.quantity, in.vat, in.duedate, in.text)}
-object  InventoryInvoice_{ def unapply (in:InventoryInvoice[LineInventoryInvoice]) = Some(in.tid,in.oid, in.modelId, in.store, in.account, in.lines)}
+object  InventoryInvoice_{ def unapply (in:InventoryInvoice[LineInventoryInvoice]) = Some(in.tid,in.oid, in.modelId, in.store, in.account, in.text, in.lines)}
 object  LineVendorInvoice_{ def unapply (in:LineVendorInvoice) = Some(in.tid,in.transid, in.modelId, in.account, in.side, in.oaccount, in.amount,  in.duedate, in.text)}
-object  VendorInvoice_{ def unapply (in:VendorInvoice[LineVendorInvoice]) = Some(in.tid,in.oid, in.modelId, in.store, in.account, in.lines)}
+object  VendorInvoice_{ def unapply (in:VendorInvoice[LineVendorInvoice]) = Some(in.tid,in.oid, in.modelId, in.store, in.account, in.text, in.lines)}
+object  LinePayment_{ def unapply (in:LinePayment) = Some(in.tid,in.transid, in.modelId, in.account, in.side, in.oaccount, in.amount,  in.duedate, in.text)}
+object  Payment_{ def unapply (in:Payment[LinePayment]) = Some(in.tid,in.oid, in.modelId, in.store, in.account, in.text, in.lines)}
 //object  GeneralRegister_{ def unapply (in:GeneralRegister) = Some(in.id, in.modelId, in.appelandId, in.intimeId, in.enterdate,in.reason,in.origin)}
 //implicit def PurchaseOrderOrdering: Ordering[PurchaseOrder[LinePurchaseOrder]] = Ordering.fromLessThan(_.tid > _.tid)
 //implicit def orderingById[A <: PurchaseOrder[LinePurchaseOrder]]: Ordering[A] = Ordering.by(e => (e.tid, e.tid))

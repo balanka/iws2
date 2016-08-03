@@ -37,6 +37,7 @@ object Application extends Controller {
    pickler.addConcreteType[Goodreceiving[LineGoodreceiving]].addConcreteType[LineGoodreceiving]
    pickler.addConcreteType[InventoryInvoice[LineInventoryInvoice]].addConcreteType[LineInventoryInvoice]
    pickler.addConcreteType[VendorInvoice[LineVendorInvoice]].addConcreteType[LineVendorInvoice]
+   pickler.addConcreteType[Payment[LinePayment]].addConcreteType[LinePayment]
    pickler.addConcreteType[Vat]
    pickler.addConcreteType[Bank]
    pickler.addConcreteType[BankAccount]

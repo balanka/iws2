@@ -479,6 +479,72 @@ implicit def purchaseOrderDAO = new DAO[PurchaseOrder[LinePurchaseOrder]]{
       x=> VendorInvoice(x._1,x._2, x._3, Some(x._4), Some(x._5), x._6).copy(lines = Some(f(x._1))))
     def  updateLineId(id:Long,line:LineVendorInvoice):LineVendorInvoice = line.copy(transid=id)
   }
+  
+  implicit def linePaymentDAO = new DAO[LinePayment]{
+    def insert(model: List[LinePayment]) :Int = {
+      println(s" inserting ${model}  items")
+      var ret = 0
+      if(!model.empty) {
+        val tid: Long = Queries.getSequence("LinePayment", "id").unique.transact(xa).run;
+        println(s"  getSequence ${tid} ")
+        ret = doobie.imports.Update[LinePayment_TYPE](Queries.linePaymentInsertSQL).
+          updateMany(model.filter(_.account != None).map(x => (tid, x.transid, x.modelId, x.account.get, x.side, x.oaccount.get, x.amount, x.duedate.get, x.text))).transact(xa).run
+      }
+      ret
+    }
+    def create = Queries.createLinePayment.run.transact(xa).run
+    def update(model:LinePayment) = { println(s" updating ${model}  items"); Queries.linePaymentUpdateName(model).run.transact(xa).run}
+    def delete(id:String):Int = Queries.linePaymentDelete(id.toLong).run.transact(xa).run
+    def all:List[LinePayment] =  Queries.linePaymentSelect.process.list.transact(xa).run.map(x =>
+      LinePayment(x._1,x._2, x._3, Some(x._4),x._5, Some(x._6), x._7,  Some(x._8), x._9))
+    def  find(id:String):List[LinePayment] = Queries.linePaymentIdSelect(id.toLong).process.list.transact(xa).run.map(x =>
+      LinePayment(x._1,x._2, x._3, Some(x._4),x._5, Some(x._6), x._7,  Some(x._8), x._9))
+    def findSome(id:String) = Queries.linePaymentSelectSome(id).process.list.transact(xa).run.map(x =>
+      LinePayment(x._1,x._2, x._3, Some(x._4),x._5, Some(x._6), x._7,  Some(x._8), x._9))
+    def findSome1(id:Long) = Queries.linePaymentIdSelect(id).process.list.transact(xa).run.map(x =>
+      LinePayment(x._1,x._2, x._3, Some(x._4),x._5, Some(x._6), x._7,  Some(x._8), x._9))
+  }
+
+  implicit def paymentDAO = new DAO[Payment[LinePayment]]{
+    def predicate(p:LinePayment) = p.id==0
+    def insert(model: List[Payment[LinePayment]]) :Int = {
+      val tid:Long = Queries.getSequence ("Payment", "id").unique.transact(xa).run;
+      val ret= doobie.imports.Update[VendorInvoice_TYPE](Queries.paymentInsertSQL).updateMany(model.map(
+        x=>(tid, x.oid, x.modelId, x.store.getOrElse(""),x.account.getOrElse(""), x.text))).transact(xa).run;
+      model.map( x=>implicitly[DAO[LinePayment]].insert(x.lines.getOrElse(List[LinePayment]()).map( z => z.copy(transid=tid))))
+      ret
+
+    }
+    def create = Queries.createPayment.run.transact(xa).run
+    def update(model:Payment[LinePayment]) = {
+      val ret = Queries.paymentUpdateName(model).run.transact(xa).run;
+      def prdicate (pred:LinePayment) = pred.tid == 0L && pred.created == true
+      val newLines = model.getLines.partition(prdicate)._1
+      val k0 = linePaymentDAO.insert(newLines)
+      val k1= model.getLines.partition(_.modified)._1.map (linePaymentDAO.update )
+      val k2 = model.getLines.partition(_.deleted)._1.map ( e =>linePaymentDAO.delete(e.id.toString) )
+
+      println(s" Payment Line inserted K0 ${k0}   ${newLines}");
+      println(s" Payment Line updated K2 ${k1}   ");
+      println(s" Payment Line deleted K2 ${k2}   ");
+      ret
+    }
+    def delete(id:String):Int = {
+      val r = find(id).map(p =>(p.getLines.map(l =>(linePaymentDAO.delete(l.id)))))
+      Queries.paymentDelete(id.toLong).run.transact(xa).run
+    }
+    def all:List[Payment[LinePayment]] = Queries.paymentSelect.process.list.transact(xa).run.map(
+      x => Payment(x._1, x._2, x._3, Some(x._4),Some(x._5), x._6).copy(lines = Some(f(x._1))))
+    def find(id:String)  : List[Payment[LinePayment]] =
+      Queries.paymentIdSelect(id.toLong).process.list.transact(xa).run.map(
+        x=> Payment(x._1,x._2, x._3, Some(x._4), Some(x._5), x._6).copy(lines = Some(f(x._1))))
+    def findSome(id:String) = Queries.paymentSelectSome(id).process.list.transact(xa).run.map(
+      x=> Payment(x._1, x._2, x._3, Some(x._4), Some(x._5), x._6).copy(lines = Some(f(x._1))))
+    def f (a:Long) = implicitly[DAO[LinePayment]].findSome1(a)
+    def findSome1(id:Long) = Queries.paymentIdSelect(id).process.list.transact(xa).run.map(
+      x=> Payment(x._1,x._2, x._3, Some(x._4), Some(x._5), x._6).copy(lines = Some(f(x._1))))
+    def  updateLineId(id:Long,line:LinePayment):LinePayment = line.copy(transid=id)
+  }
   def create: ConnectionIO[Int] = Queries.create.run
 
   def runNonParameterizedSingleObjectQuery[A](q: Query0[A]) = q.unique.transact(xa).run

@@ -211,6 +211,25 @@ object Queries  {
     sql"Update VendorInvoice set oid =${model.oid}, store=${model.store.get}, account=${model.account.get} where id =${model.tid}".update}
   def vendorInvoiceDelete = {id:Long =>sql"Delete FROM VendorInvoice where id =$id".update}
 
+  type LinePayment_TYPE = (Long,Long,Int, String,Boolean, String, BigDecimal, Date, String)
+  def linePaymentInsertSQL = "INSERT INTO LinePayment ( id, transid, modelId, account, side ,oaccount, amount,  duedate, text)  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
+  def linePaymentSelect = sql"SELECT * FROM LinePayment".query[LinePayment_TYPE]
+  def linePaymentIdSelect1(id:String) = sql"SELECT * FROM LinePayment  where id =$id".query[LinePayment_TYPE]
+  def linePaymentIdSelect(id:Long) = sql"SELECT * FROM LinePayment  where transid =$id".query[LinePayment_TYPE]
+  def linePaymentSelectSome = { id:String =>sql"SELECT * FROM LinePayment where id =$id".query[LinePayment_TYPE]}
+  def linePaymentUpdateName = {(model:LinePayment) =>
+    sql"Update LinePayment set transid=${model.transid},  modelId=${model.modelId}, account=${model.account.get}, side = ${model.side}, oaccount=${model.oaccount.get}, amount=${model.amount}, duedate=${model.duedate.get}, text =${model.text} where id =${model.tid}".update}
+  def linePaymentDelete = {(id:Long) =>sql"Delete FROM LinePayment where id =$id".update}
+  type Payment_TYPE =(Long,Long,Int, String,String, String)
+  def paymentInsertSQL = "INSERT INTO Payment (id, oid, modelId, store, account, text) VALUES (?, ?, ?, ?, ?, ?)"
+  def paymentSelect = sql"SELECT * FROM Payment".query[Payment_TYPE]
+  def paymentIdSelect1(id:String) = sql"SELECT * FROM Payment  where id =$id.toLong".query[Payment_TYPE]
+  def paymentIdSelect(id:Long) = sql"SELECT * FROM Payment  where id =$id".query[Payment_TYPE]
+  def paymentSelectSome = { id:String =>sql"SELECT * FROM Payment where id =$id".query[Payment_TYPE]}
+  def paymentUpdateName= {(model:Payment[LinePayment]) =>
+    sql"Update payment set oid =${model.oid}, store=${model.store.get}, account=${model.account.get} where id =${model.tid}".update}
+  def paymentDelete = {id:Long =>sql"Delete FROM Payment where id =$id".update}
+
   def getSequence (tablename:String,columnname:String) = sql"SELECT nextval(pg_get_serial_sequence( ${tablename}, ${columnname}))".query[Long]
 
 
@@ -253,6 +272,45 @@ object Queries  {
    taxCode VARCHAR NOT NULL,
    vatCode VARCHAR NOT NULL
   );""".update
+  val createPayment = sql"""
+           DROP SEQUENCE IF EXISTS PaymentId_seq;
+           CREATE SEQUENCE PaymentId_seq
+             INCREMENT 1
+             MINVALUE 1
+             MAXVALUE 9223372036854775807
+             START 1
+             CACHE 1;
+           DROP TABLE IF EXISTS Payment;
+           CREATE TABLE Payment(
+                id bigserial NOT NULL PRIMARY KEY,
+                oid bigint NOT NULL ,
+                modelId int NOT NULL,
+                store   VARCHAR NOT NULL,
+                account   VARCHAR NOT NULL,
+                text  VARCHAR
+
+                );""".update
+  val createLinePayment=sql"""
+           DROP SEQUENCE IF EXISTS LinePaymentId_seq;
+           CREATE SEQUENCE LinePaymentId_seq
+             INCREMENT 1
+             MINVALUE 1
+             MAXVALUE 9223372036854775807
+             START 1
+             CACHE 1;
+           DROP TABLE IF EXISTS LinePayment;
+           CREATE TABLE LinePayment(
+                id bigserial NOT NULL PRIMARY KEY,
+                transid     bigint  NOT NULL ,
+                modelId int NOT NULL,
+                account   VARCHAR NOT NULL,
+                side VARCHAR NOT NULL,
+                oaccount   VARCHAR NOT NULL,
+                amount  DECIMAL(20,2) NOT NULL,
+                duedate      DATE NOT NULL,
+                text  VARCHAR
+                );""".update
+
 
   val createVendorInvoice=sql"""
            DROP SEQUENCE IF EXISTS VendorInvoiceId_seq;
@@ -538,6 +596,43 @@ object Queries  {
   );""".update
 
   val createSchema =sql"""
+           DROP SEQUENCE IF EXISTS PaymentId_seq;
+           CREATE SEQUENCE PaymentId_seq
+             INCREMENT 1
+             MINVALUE 1
+             MAXVALUE 9223372036854775807
+             START 1
+             CACHE 1;
+           DROP TABLE IF EXISTS Payment;
+           CREATE TABLE Payment(
+                id bigserial NOT NULL PRIMARY KEY,
+                oid bigint NOT NULL ,
+                modelId int NOT NULL,
+                store   VARCHAR NOT NULL,
+                account   VARCHAR NOT NULL,
+                text  VARCHAR
+
+                );
+           DROP SEQUENCE IF EXISTS LinePaymentId_seq;
+           CREATE SEQUENCE LinePaymentId_seq
+             INCREMENT 1
+             MINVALUE 1
+             MAXVALUE 9223372036854775807
+             START 1
+             CACHE 1;
+           DROP TABLE IF EXISTS LinePayment;
+           CREATE TABLE LinePayment(
+                id bigserial NOT NULL PRIMARY KEY,
+                transid     bigint  NOT NULL ,
+                modelId int NOT NULL,
+                account   VARCHAR NOT NULL,
+                side VARCHAR NOT NULL,
+                oaccount   VARCHAR NOT NULL,
+                amount  DECIMAL(20,2) NOT NULL,
+                duedate      DATE NOT NULL,
+                text  VARCHAR
+                );
+
            DROP SEQUENCE IF EXISTS VendorInvoiceId_seq;
            CREATE SEQUENCE VendorInvoiceId_seq
              INCREMENT 1
