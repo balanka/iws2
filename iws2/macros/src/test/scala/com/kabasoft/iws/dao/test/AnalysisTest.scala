@@ -6,20 +6,20 @@ import com.kabasoft.iws.shared.Model._
 
 import doobie.imports._
 import com.kabasoft.iws.dao.test.analysisspec._
-import org.specs2.mutable.Specification
+//import org.specs2.mutable.Specification
 import scalaz.concurrent.Task
 
 import scalaz.concurrent.Task
 import doobie.imports._
 import doobie.contrib.postgresql.pgtypes._
-import org.postgresql.geometric._
+//import org.postgresql.geometric._
 
 object AnalysisTest {
 
 
   val xa = DriverManagerTransactor[Task]("org.postgresql.Driver","jdbc:postgresql:world","postgres","")
 
-   val  POrderSelectTest = sql"""SELECT * FROM PurchaseOrder""".query[POrder]
+   //val  POrderSelectTest = sql"""SELECT * FROM PurchaseOrder""".query[POrder]
 
   /*
 
