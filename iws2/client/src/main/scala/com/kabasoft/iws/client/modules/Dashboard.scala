@@ -14,7 +14,7 @@ import com.kabasoft.iws.shared.Data
 
 object Dashboard {
 
-  case class Props(router: RouterCtl[Page], proxy: ModelProxy[Pot[Data]], loc:Page)
+  case class Props(router: RouterCtl[Page], proxy: ModelProxy[Pot[Data]])
 
   // create dummy data for the chart
  // val cp = Chart.ChartProps("Test chart", Chart.BarChart, ChartData(Seq("A", "B", "C"), Seq(ChartDataset(Seq(1, 2, 3), "Data1"))))
@@ -27,7 +27,7 @@ object Dashboard {
 
   // create the React component for Dashboard
   private val component = ReactComponentB[Props]("Dashboard")
-    .render_P { case Props(router, proxy, loc) =>
+    .render_P { case Props(router, proxy) =>
       <.div(
         // header, MessageOfTheDay and chart components
         <.h2("Dashboard"),
@@ -37,11 +37,11 @@ object Dashboard {
         Chart(cp),
         Chart(cp1),
         Chart(cp2),
-        Chart(cp4),
-        // create a link to the To Do view
-        <.div(router.link(loc)("Check your todos!"))
+        Chart(cp4)
+
+      //  <.div(router.link(loc)("Check your todos!"))
       )
     }.build
 
-  def apply(router: RouterCtl[Page], proxy: ModelProxy[Pot[Data]], loc:Page) = component(Props(router, proxy,loc))
+  def apply(router: RouterCtl[Page], proxy: ModelProxy[Pot[Data]]) = component(Props(router, proxy))
 }
