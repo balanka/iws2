@@ -114,19 +114,12 @@ object LinePaymentList {
             buildWItemN[BigDecimal]("Amount", s.item.map(_.amount), 0.0, updateAmount(_, s),"col-xs-2"),
             buildDateN("Duedate", s.item.map(_.duedate.getOrElse(new Date())), new Date(), updateDuedate,"col-sm-3 col-xs-2"),
               saveButton, newButton),
-          <.div(^.cls :="row",buildAreaItem("Text", s.item.map(_.text), "", updateText,"col-sm-3 col-xs-12"))
+          <.div(^.cls :="row", buildAreaItem("Text", s.item.map(_.text), "", updateText,"col-sm-3 col-xs-12"))
          )
 
       <.div(bss.formGroup,
-        //<.ul(style.listGroup)(all.filter(p.predicate (_,s.search)).sortBy(_.tid)(Ordering[Long].reverse) map (e =>renderItem(e,p))),
         <.ul(style.listGroup)(renderHeader(LineFin_Trans_Headers))(its.sortBy(_.tid)(Ordering[Long].reverse) map (e =>renderItem(e,p, s))),
-        <.table(^.className := "table-responsive table-condensed", ^.tableLayout := "fixed",
-          <.tbody(
-            <.tr(bss.formGroup, ^.height :=30.px, ^.maxHeight:=30.px,
-               if(its.size>0) editFormLine else List(saveButton, newButton)
-             )
-          )
-        )
+            if(its.size>0) editFormLine else List(saveButton, newButton)
      )
     }
 
@@ -147,8 +140,8 @@ object LinePaymentList {
         <.input.checkbox(^.checked := item.side, ^.padding:=10.px),
         <.span(item.oaccount ,^.padding:=10.px),
         <.span("%06.2f".format(item.amount.bigDecimal),^.padding:=10.px),
-        <.span( Moment(item.duedate.get.getTime).format("DD.MM.YYYY"),^.paddingLeft:=10, ^.paddingRight:=30),
-        <.span(item.text, ^.paddingRight:=5),
+        <.span( Moment(item.duedate.get.getTime).format("DD.MM.YYYY"),^.paddingLeft:=10.px, ^.paddingRight:=30.px),
+        <.span(item.text, ^.paddingRight:=5.px),
         <.span(editButton,^.alignContent:="center")
       )
     }
