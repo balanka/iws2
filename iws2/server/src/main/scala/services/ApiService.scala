@@ -63,7 +63,7 @@ class ApiService extends Api {
      case _: LinePayment => MakeService.makeTransaction[LinePayment].insert(List(item.asInstanceOf[LinePayment]))     
    }
  }
-  def find(item:IWS) ={
+  def find(item:IWS) = {
    item match {
      case _: Bank =>MakeService.make[Bank].find(item.id)
      case _: BankAccount =>MakeService.make[BankAccount].find(item.id)
