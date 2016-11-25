@@ -48,6 +48,7 @@ object Settings {
     val javaTime ="0.1.0"
     val jsjoda = "1.0.2"
     val js_joda ="1.1.8"
+    val akka ="2.4.4"
   }
 
   /**
@@ -72,7 +73,10 @@ object Settings {
   val jvmDependencies = Def.setting(Seq(
     "com.vmunier" %% "play-scalajs-scripts" % versions.playScripts,
     "org.webjars" % "font-awesome" % "4.3.0-1" % Provided,
-    "org.webjars" % "bootstrap" % versions.bootstrap % Provided
+    "org.webjars" % "bootstrap" % versions.bootstrap % Provided,
+    "com.typesafe.akka" %% "akka-actor" %  versions.akka,
+    "com.typesafe.akka" %% "akka-remote" %   versions.akka,
+    "com.typesafe.akka" % "akka-slf4j_2.11" % versions.akka
   ))
 
   /** Dependencies only used by the JS project (note the use of %%% instead of %%) */

@@ -83,7 +83,7 @@ object PAYMENT {
     }
 
     def delete(item:Payment[LinePayment]) = {
-      Callback.log("Payment deleted>>>>> ${item}  ${s}")
+      Callback.log("Payment deleted>>>>> ${item}")
       $.props >>= (_.proxy.dispatch(Delete(item)))
       //$.modState(s => s.copy(item = None)).runNow()
     }

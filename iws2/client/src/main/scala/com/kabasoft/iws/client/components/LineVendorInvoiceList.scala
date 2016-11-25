@@ -33,23 +33,25 @@ object LineVendorInvoiceList {
     def updateAccount(id:String) = {
       val accountId = id.substring(0, id.indexOf("|"))
       $.modState(s => s.copy(item = s.item.map(_.copy(account = Some(accountId)))))>>
-        setModfied
+        setModified
     }
 
     def updateOAccount(id:String) = {
       val oaccountId = id.substring(0, id.indexOf("|"))
       $.modState(s => s.copy(item = s.item.map(_.copy(oaccount = Some(oaccountId)))))>>
-        setModfied
+        setModified
     }
 
     def updateSide(e: ReactEventI) = {
+      e.preventDefault()
       val sideId = e.target.checked
       //log.debug(s" sideId ${sideId}")
       $.modState(s => s.copy(item = s.item.map(_.copy(side = sideId)))).runNow() //>>
-        setModfied
+        setModified
     }
 
     def updateDuedate(e: ReactEventI) = {
+      e.preventDefault()
      // log.debug(s" Duedate is  mm${e.target.value}")
       val l = e.target.value
       Moment.locale("de_DE")
@@ -60,36 +62,36 @@ object LineVendorInvoiceList {
       val _helsenkiTime = new Date((_date.getTime()+_helsenkiOffset+_userOffset).toLong)
 
        $.modState(s => s.copy(item = s.item.map(_.copy(duedate = Some(_helsenkiTime)))))>>
-        setModfied
+        setModified
     }
     def updateText(e: ReactEventI) = {
+      e.preventDefault()
       val l =e.target.value
       $.modState(s => s.copy(item = s.item.map(_.copy(text = l))))>>
-        setModfied
+        setModified
     }
 
     def updateAmount(e: ReactEventI, s1:State) = {
+      e.preventDefault()
       val l =e.target.value.toDouble
       //log.debug(s"Item price is ${l} State:${s1}")
       $.modState(s => s.copy(item = s.item.map(_.copy(amount = l))))>>
-      setModfied
+        setModified
     }
 
     def delete(line:LineVendorInvoice, deleteLineCallback:LineVendorInvoice =>Callback) = deleteLineCallback(line)
      // Callback.log(s"LinePurchaseOrder deleted>>>>>  ${line}") >> deleteLineCallback(line)
     def save(line:LineVendorInvoice, saveLineCB:LineVendorInvoice =>Callback) = {
-      saveLineCB(line) >> $.modState(s => s.copy(item = None).copy(edit = false))
-        //>> resetState
+      saveLineCB(line)   >> Callback {resetState }//>> $.modState(s => s.copy(item = None).copy(edit = false))
+
     }
 
-    def postProcess (item:VendorInvoice[LineVendorInvoice]) =  Callback {
-      val ro = item.getLines.filter(_.created ==true).map( e => item.replaceLine( e.copy(created = false).copy(modified =false)))
-      val setLineID = ro.head.copy(lines = Some( item.getLines map ( e => if(e.tid != 0 ) e else  e.copy(tid = -1))))
-      // $.modState(s => s.copy(item = Some(setLineID)))
-    }
 
-  def resetState =   $.modState(s => s.copy(item = None).copy(edit = false))
-    def setModfied = Callback {$.modState(s => s.copy(item = s.item.map(_.copy(modified = true)))).runNow() }
+
+   def resetState =   $.modState(s => s.copy(item = None).copy(edit = false)).runNow()
+    //def setModfied = Callback {$.modState(s => s.copy(item = s.item.map(_.copy(modified = true)))).runNow() }
+    def setModified  = $.modState(s => s.copy(item = if(!s.item.map(_.created).getOrElse(false)) s.item.map(_.copy(modified = true)) else s.item) )
+
     def newLine(line:LineVendorInvoice, newLineCallback:LineVendorInvoice =>Callback) = {
      newLineCallback(line)>> edit(line)
     }

@@ -36,12 +36,10 @@ object TabAccordionMenu {
       <.div(^.className :="panel-body", menu.menuItems map buildSubMenu)
   )
 
-  def buildMainAccordionMenu(menu:MenuItem)= buildMenu(menu)
-
   val component = ReactComponentB[Props]("Menu")
     .stateless
     .render_P(p => {
-      <.div(menuTitleTag, buildMainAccordionMenu(p.menuItem))
+      <.div(menuTitleTag, buildMenu(p.menuItem))
     }).build
 
   def apply(menuItem:MenuItem) = component(Props(menuItem))

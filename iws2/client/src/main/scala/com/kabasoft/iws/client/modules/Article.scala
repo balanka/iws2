@@ -20,7 +20,6 @@ object ARTICLE {
 
   @inline private def bss = GlobalStyles.bootstrapStyles
 
-
   implicit def orderingById[A <: Article]: Ordering[A] = {Ordering.by(e => (e.id, e.id))}
   case class Props(proxy: ModelProxy[Pot[Data]])
   case class State(item: Option[Article] = None, name:String)

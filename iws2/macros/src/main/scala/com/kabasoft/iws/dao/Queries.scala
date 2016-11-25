@@ -37,7 +37,6 @@ object Queries  {
   def bankAccountUpdateName = {(model:BankAccount) =>sql"Update bankAccount set id = ${model.id}, name =${model.name},  description=${model.description}, bic =${model.bic}, debit = ${model.debit} , credit = ${model.credit} where id =${model.id}".update}
   def bankAccountDelete = {id:String =>sql"Delete FROM bankAccount where id =$id".update}
 
-
   def accountInsertSQL= "INSERT INTO account VALUES (?, ?, ?, ?, ?, ?, ?)"
   def accountSelect =  sql"SELECT * FROM account".query[ACCOUNT_TYPE]
   def accountIdSelect(id:String) = sql"SELECT * FROM account where id =$id".query[ACCOUNT_TYPE]

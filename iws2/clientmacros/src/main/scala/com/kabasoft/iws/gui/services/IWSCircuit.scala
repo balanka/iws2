@@ -78,19 +78,20 @@ class IWSHandler[M](modelRW: ModelRW[M, Pot[DStore[IWS,IWS]]]) extends ActionHan
   override def handle = {
     case Refresh (item:IWS) =>
       val x = Map(item.modelId ->Ready(Data(Seq(item))))
-     // log.info(s"+>>>>>>>>Refresh+++++ RefreshRefresh ===== ${item} ====RefreshRefreshRefreshRefresh+ ${x}")
+      //log.info(s"+>>>>>>>>Refresh+++++ RefreshRefresh ===== ${item} ====RefreshRefreshRefreshRefresh+ ${x}")
       //updated(Ready(value.get.updatedAll(x)))
       updated(Ready(value.get.updated(item)), Effect(AjaxClient[Api].all(item).call().map(UpdateAll[IWS])))
     case UpdateAll(items:Seq[IWS]) =>
       val xx = items.seq.headOption.get
      // log.debug(s"+++++++++>>>>>>>>ZZZZZZZZZYYYYYYYYYY items ${items}")
      // log.debug(s"+++++++++>>>>>>>>XXX ${xx}")
-      val  a = items.filter(_.modelId == xx.modelId)
+      //val  a = items.filter(_.modelId == xx.modelId)
      // val r =value.get.models.get(xx.modelId).get.get
       //log.info("+++++++++aaaa0000000"+ a +"<<<<<<<<<<<"+ all)
      // val r = value.get.models.get(xx.modelId).get.get.asInstanceOf[Data].items
       val l = value.get.models.get(xx.modelId).get.get.asInstanceOf[Data].updateAll(items)
       //val r = value.get.models.get(xx.modelId).get.get.asInstanceOf[Data].items
+     // println("+++++++++rrrrr<<<<<<<<<<<"+l.items)
       //log.info("+++++++++rrrrr<<<<<<<<<<<"+(l.items))
      // val x = Map(xx.modelId ->Ready(Data(items++r)))
       val x = Map(xx.modelId ->Ready(l))
@@ -100,7 +101,7 @@ class IWSHandler[M](modelRW: ModelRW[M, Pot[DStore[IWS,IWS]]]) extends ActionHan
        log.debug(s"+++++++++<<<<<<<<<<< Update: ${item} ")
       updated(Ready(value.get.updated(item)), Effect(AjaxClient[Api].update(item).call().map(UpdateAll[IWS])))
     case FindAll(item:IWS) =>
-      log.info(s"+++++++++<<<<<<<<<<< FindAll : ${item}")
+      //log.info(s"+++++++++<<<<<<<<<<< FindAll : ${item}")
       updated(Ready(value.get.updated(item)), Effect(AjaxClient[Api].all(item).call().map(UpdateAll[IWS])))
     case Delete(item:IWS) =>
       log.info(s"+++++++++<<<<<<<<<<< Delete Item:  ${item}")

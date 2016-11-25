@@ -80,7 +80,7 @@ object DAOObjects  {
     def create = Queries.createBank.run.transact(xa).run
     def update(model:Bank) = Queries.bankUpdateName(model).run.transact(xa).run
     def delete(id:String):Int = Queries.bankDelete(id).run.transact(xa).run
-    def all= Queries.bankSelect.process.list.transact(xa).run
+    def all = Queries.bankSelect.process.list.transact(xa).run
     def find(id:String) : List[Bank] = Queries.bankIdSelect(id).process.list.transact(xa).run
     def findSome(id:String) = Queries.bankSelectSome(id).process.list.transact(xa).run
     def findSome1(id:Long) = Queries.bankSelectSome(id+"").process.list.transact(xa).run

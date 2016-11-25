@@ -23,10 +23,32 @@ object VENDORINVOICE {
   case class Props(proxy: ModelProxy[Pot[Data]])
   case class State(item: Option[VendorInvoice[LineVendorInvoice]] = None)
   @volatile var gitems = Set.empty[VendorInvoice[LineVendorInvoice]]
-
+  def updateOid1(idx:String,  bs: BackendScope[Props,State]) = {
+    // val oId = idx.substring(0, idx.indexOf("|"))
+    //  log.debug(s"oid is "+oId)
+    bs.modState(s => s.copy(item = s.item.map(_.copy(oid = idx.toLong))))
+  }
+  def updateStore(idx:String, bs: BackendScope[Props,State]) = {
+    val storeId = idx.substring(0, idx.indexOf("|"))
+    log.debug(s"store is "+storeId)
+    bs.modState(s => s.copy(item = s.item.map(_.copy(store = Some(storeId)))))
+  }
+  def updateAccount(idx: String, bs: BackendScope[Props,State]) = {
+    val supplierId=idx.substring(0, idx.indexOf("|"))
+    log.debug(s"ItemId Key is ${supplierId}  ")
+    bs.modState(s => s.copy(item = s.item.map(_.copy(account = Some(supplierId)))))
+  }
+  def updateText(e: ReactEventI, bs: BackendScope[Props,State]) = {
+    val txt = e.target.value
+    log.debug(s"txt is ${txt}")
+    bs.modState(s => s.copy(item = s.item.map(_.copy(text = txt))))
+  }
   class Backend($: BackendScope[Props, State]) {
 
     implicit def orderingById[A <: VendorInvoice[LineVendorInvoice]]: Ordering[A] = {Ordering.by(e => (e.tid, e.tid))}
+
+    val r = List( updateOid1 _, updateStore _, updateAccount _, updateText _, edit _,  edited _)
+
     def mounted(props: Props) = {
 
       Callback {
@@ -43,19 +65,23 @@ object VENDORINVOICE {
     def updateOid(idx:String) = {
       // val oId = idx.substring(0, idx.indexOf("|"))
       //  log.debug(s"oid is "+oId)
-      $.modState(s => s.copy(item = s.item.map(_.copy(oid = idx.toLong))))
+      $.modState(s => s.copy(item = s.item.map(_.copy(oid = idx.toLong)))) >>setModified
     }
-
+    def updateOid1(idx:String,  bs: BackendScope[Props,State]) = {
+      // val oId = idx.substring(0, idx.indexOf("|"))
+      //  log.debug(s"oid is "+oId)
+      bs.modState(s => s.copy(item = s.item.map(_.copy(oid = idx.toLong)))) >>setModified
+    }
     def updateStore(idx:String) = {
       val storeId = idx.substring(0, idx.indexOf("|"))
       log.debug(s"store is "+storeId)
-      $.modState(s => s.copy(item = s.item.map(_.copy(store = Some(storeId)))))
+      $.modState(s => s.copy(item = s.item.map(_.copy(store = Some(storeId))))) >>setModified
     }
 
     def updateAccount(idx: String) = {
       val supplierId=idx.substring(0, idx.indexOf("|"))
       log.debug(s"ItemId Key is ${supplierId}  ")
-      $.modState(s => s.copy(item = s.item.map(_.copy(account = Some(supplierId)))))
+      $.modState(s => s.copy(item = s.item.map(_.copy(account = Some(supplierId))))) >>setModified
     }
     def updateText(e: ReactEventI) = {
       val txt = e.target.value
@@ -63,28 +89,40 @@ object VENDORINVOICE {
       $.modState(s => s.copy(item = s.item.map(_.copy(text = txt))))  >>setModified
     }
     def edited(order:VendorInvoice[LineVendorInvoice]) = {
-     // $.modState(s => s.copy(item =Some(order)))
+      $.modState(s => s.copy(item =Some(order)))
       Callback {IWSCircuit.dispatch(Update(order))}
+      //IWSCircuit.dispatch(Update(order))
+      //$.modState(s => s.copy(item =Some(order)))
       //$.props >>= (_.proxy.dispatch(Update(order)))
     }
-    def saveLine(linex:LineVendorInvoice) = {
-      val line = linex.copy(modified=true)
-      val k = $.state.runNow().item.getOrElse(VendorInvoice[LineVendorInvoice]())
+    def runIt = $.state.runNow().item.getOrElse(VendorInvoice[LineVendorInvoice]())
+    def saveLine(linex:LineVendorInvoice) =  {
+      //val line = linex.copy(modified=true)
+      val line = linex
+      val k = runIt
       val k2 = k.replaceLine( line.copy(transid = k.tid))
-     // log.debug(s"purchaseOrder saved is ZZZZZZZZZZ" + k2)
+
       runCB(k2)
 
     }
-    def setModified  = $.modState(s => s.copy(item = s.item.map(_.copy(modified = true))))
-    def runCB (item:VendorInvoice[LineVendorInvoice]) = Callback {
-      IWSCircuit.dispatch(Update(item))
-      val ro = item.getLines.filter(_.created ==true).map( e => item.replaceLine( e.copy(created = false).copy(modified =false)))
-      val setLineID = ro.head.copy(lines = Some( item.getLines map ( e => if(e.tid != 0 ) e else  e.copy(tid = -1))))
-      $.modState(s => s.copy(item =Some(setLineID))).runNow()
+    def setModified  = $.modState(s => s.copy(item = if(!s.item.map(_.created).getOrElse(false)) s.item.map(_.copy(modified = true)) else s.item) )
+    def runCB (itemx:VendorInvoice[LineVendorInvoice]) = Callback {
+      IWSCircuit.dispatch(Update(itemx))
+
+      val ro = itemx.getLines.filter(_.created == true).map(e => itemx.replaceLine(e.copy(created = false).copy(modified = false)))
+      //log.debug(s"  rororororororororororororororororororororororororororo >>>>>  ${ro.size} >>>>>${ro}")
+      if (!ro.isEmpty) {
+        val setLineID = ro.head.copy(lines = Some(itemx.getLines map (e => if (e.tid <= 0) e.copy(tid = e.tid - 1) else e)))
+        $.modState(s => s.copy(item = Some(setLineID))).runNow()
+      }else {
+        //log.debug(s"  rororororororororororororororororororororororororororoxxxxxxxxxxx >>>>>  ${itemx.copy(modified = false)} ")
+        $.modState(s => s.copy(item = Some(itemx.copy(modified = false)))).runNow()
+      }
+
     }
 
     def delete(item:VendorInvoice[LineVendorInvoice]) = {
-      Callback.log("VendorInvoice deleted>>>>> ${item}  ${s}")
+      Callback.log("VendorInvoice deleted>>>>> ${item}")
       $.props >>= (_.proxy.dispatch(Delete(item)))
       //$.modState(s => s.copy(item = None)).runNow()
     }
@@ -106,7 +144,7 @@ object VENDORINVOICE {
     def AddNewLine(line:LineVendorInvoice) = {
       val  created =line.copy(created = true)
       log.debug(s"New Line VendorInvoice  created>>>>>  ${line}")
-      $.modState(s => s.copy(item = s.item.map(_.add(line.copy(transid=
+      $.modState(s => s.copy(item = s.item.map(_.add(created.copy(transid=
                 s.item.getOrElse(VendorInvoice[LineVendorInvoice]()).tid)))))
     }
 
@@ -139,9 +177,9 @@ object VENDORINVOICE {
       def newButton = Button(Button.Props(edit(Some(VendorInvoice[LineVendorInvoice]())),
         addStyles = Seq(bss.pullRight, bss.buttonXS)), Icon.plusSquare, " New")
 
-      if( gitems.filter(_.tid != 0).size <=1) {
+    //  if( gitems.filter(_.tid != 0).size <=1) {
         gitems = IWSCircuit.zoom(_.store.get.models.get(112)).eval(IWSCircuit.getRootModel).get.get.items.asInstanceOf[List[VendorInvoice[LineVendorInvoice]]].toSet
-      }
+      //}
       val items = gitems.toList.sorted
       //log.debug(s"itemsitemsitemsitemsitems ${items}")
        BasePanel("Vendor Invoice", buildFormTab(p, s, items), List(saveButton, newButton))
