@@ -40,7 +40,7 @@ object MakeService {
     """
   }
 
-
+/*
  def makeTransaction[T]:DAO[T] = macro makeTransactionImpl[T]
  def makeTransactionImpl[T:c.WeakTypeTag](c: Context): c.Tree = {
 
@@ -69,6 +69,6 @@ object MakeService {
     api
     """
   }
-
+ */
 }
 

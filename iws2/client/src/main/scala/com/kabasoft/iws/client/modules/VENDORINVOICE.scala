@@ -91,16 +91,11 @@ object VENDORINVOICE {
     def edited(order:VendorInvoice[LineVendorInvoice]) = {
       $.modState(s => s.copy(item =Some(order)))
       Callback {IWSCircuit.dispatch(Update(order))}
-      //IWSCircuit.dispatch(Update(order))
-      //$.modState(s => s.copy(item =Some(order)))
-      //$.props >>= (_.proxy.dispatch(Update(order)))
     }
     def runIt = $.state.runNow().item.getOrElse(VendorInvoice[LineVendorInvoice]())
     def saveLine(linex:LineVendorInvoice) =  {
-      //val line = linex.copy(modified=true)
-      val line = linex
       val k = runIt
-      val k2 = k.replaceLine( line.copy(transid = k.tid))
+      val k2 = k.replaceLine( linex.copy(transid = k.tid))
 
       runCB(k2)
 
@@ -110,12 +105,10 @@ object VENDORINVOICE {
       IWSCircuit.dispatch(Update(itemx))
 
       val ro = itemx.getLines.filter(_.created == true).map(e => itemx.replaceLine(e.copy(created = false).copy(modified = false)))
-      //log.debug(s"  rororororororororororororororororororororororororororo >>>>>  ${ro.size} >>>>>${ro}")
       if (!ro.isEmpty) {
         val setLineID = ro.head.copy(lines = Some(itemx.getLines map (e => if (e.tid <= 0) e.copy(tid = e.tid - 1) else e)))
         $.modState(s => s.copy(item = Some(setLineID))).runNow()
       }else {
-        //log.debug(s"  rororororororororororororororororororororororororororoxxxxxxxxxxx >>>>>  ${itemx.copy(modified = false)} ")
         $.modState(s => s.copy(item = Some(itemx.copy(modified = false)))).runNow()
       }
 
@@ -124,7 +117,6 @@ object VENDORINVOICE {
     def delete(item:VendorInvoice[LineVendorInvoice]) = {
       Callback.log("VendorInvoice deleted>>>>> ${item}")
       $.props >>= (_.proxy.dispatch(Delete(item)))
-      //$.modState(s => s.copy(item = None)).runNow()
     }
     def runDelete(item1:VendorInvoice[LineVendorInvoice]) =   {
       log.debug(s"  VendorInvoice to delete line from  >>>>>  ${item1}")
@@ -138,7 +130,6 @@ object VENDORINVOICE {
       val k =$.state.runNow().item.getOrElse(VendorInvoice[LineVendorInvoice]())
       val k2 = k.replaceLine(deleted)
       edited(k2)
-      //runDelete(k2)
     }
 
     def AddNewLine(line:LineVendorInvoice) = {
@@ -176,14 +167,9 @@ object VENDORINVOICE {
         addStyles = Seq(bss.pullRight, bss.buttonXS, bss.buttonOpt(CommonStyle.success))), Icon.circleO, " Save")
       def newButton = Button(Button.Props(edit(Some(VendorInvoice[LineVendorInvoice]())),
         addStyles = Seq(bss.pullRight, bss.buttonXS)), Icon.plusSquare, " New")
-
-    //  if( gitems.filter(_.tid != 0).size <=1) {
         gitems = IWSCircuit.zoom(_.store.get.models.get(112)).eval(IWSCircuit.getRootModel).get.get.items.asInstanceOf[List[VendorInvoice[LineVendorInvoice]]].toSet
-      //}
       val items = gitems.toList.sorted
-      //log.debug(s"itemsitemsitemsitemsitems ${items}")
        BasePanel("Vendor Invoice", buildFormTab(p, s, items), List(saveButton, newButton))
-     // buildFormTab(p, s, items, List(saveButton, newButton))
     }
 
     def buildForm (p: Props, s:State, items:List[VendorInvoice[LineVendorInvoice]]) = {
