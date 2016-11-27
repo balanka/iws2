@@ -1,9 +1,11 @@
 package com.kabasoft.iws.client.components
 
 import java.util.Date
+
 import com.kabasoft.iws.gui.StringUtils._
 import com.kabasoft.iws.gui.Utils._
 import com.kabasoft.iws.gui.logger._
+import com.kabasoft.iws.gui.macros.Bootstrap.Button.Props
 import com.kabasoft.iws.gui.macros.Bootstrap.{Button, CommonStyle}
 import com.kabasoft.iws.gui.macros._
 import com.kabasoft.iws.gui.services.IWSCircuit
@@ -11,6 +13,7 @@ import com.kabasoft.iws.shared._
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.prefix_<^._
 import org.widok.moment.Moment
+
 import scalacss.ScalaCssReact._
 
 object LineVendorInvoiceList {
@@ -79,8 +82,7 @@ object LineVendorInvoiceList {
 
 
     def render(p:Props, s: State) = {
-      val style = bss.listGroup
-      val its  = p.porder.lines.getOrElse(Seq.empty[LineVendorInvoice])
+      val lines  = p.porder.lines.getOrElse(Seq.empty[LineVendorInvoice])
       def items =  IWSCircuit.zoom(_.store.get.models.get(9)).eval(IWSCircuit.getRootModel).get.get.items.asInstanceOf[List[Account]]
       def saveButton = Button(Button.Props(save(s.item.getOrElse(LineVendorInvoice()),p.saveLine),
         addStyles = Seq(bss.pullRight, bss.buttonXS, bss.buttonOpt(CommonStyle.success))), Icon.circleO, "")
@@ -88,7 +90,7 @@ object LineVendorInvoiceList {
         addStyles = Seq(bss.pullRight, bss.buttonXS)), Icon.plusSquare, "")
       def buildIdNameList [A<:Masterfile](list: List[A]): List[String]= list.filter(_.id != "-1") .sortBy(_.id) map (iws =>(iws.id+"|"+iws.name))
 
-      def editFormLine : Seq [TagMod] = List(
+      def editLine : Seq [TagMod] = List(
           <.div(^.cls :="row",
             buildSItemN("Account", itemsx = buildIdNameList(items), defValue = "0001", evt = updateAccount, "col-xs-3"),
             buildBItem("D/C", s.item.map(_.side), true, evt = updateSide, "col-xs-1" ),
@@ -99,17 +101,24 @@ object LineVendorInvoiceList {
           <.div(^.cls :="row",buildAreaItem("Text", s.item.map(_.text), "", updateText,"col-xs-12"))
          )
 
+      renderBase(p, s, lines, saveButton _, newButton _, editLine _)
+    }
+
+    private def renderBase(p: Props, s: State, lines: Seq[LineVendorInvoice],
+                           savex: () => ReactComponentU[Button.Props, Unit, Unit, TopNode],
+                           newx: () => ReactComponentU[Button.Props, Unit, Unit, TopNode],
+                           editLine: () => Seq[TagMod]) = {
       <.div(bss.formGroup,
         //<.ul(style.listGroup)(all.filter(p.predicate (_,s.search)).sortBy(_.tid)(Ordering[Long].reverse) map (e =>renderItem(e,p))),
-        <.ul(style.listGroup)(renderHeader(LineFin_Trans_Headers))(its.sortBy(_.tid)(Ordering[Long].reverse) map (e =>renderItem(e,p, s))),
+        <.ul(bss.listGroup.listGroup)(renderHeader(LineFin_Trans_Headers))(lines.sortBy(_.tid)(Ordering[Long].reverse) map (e => renderItem(e, p, s))),
         <.table(^.className := "table-responsive table-condensed", ^.tableLayout := "fixed",
           <.tbody(
-            <.tr(bss.formGroup, ^.height :=30.px, ^.maxHeight:=30.px,
-               if(its.size>0) editFormLine else List(saveButton, newButton)
-             )
+            <.tr(bss.formGroup, ^.height := 30.px, ^.maxHeight := 30.px,
+              if (lines.size > 0) editLine() else List(savex(), newx())
+            )
           )
         )
-     )
+      )
     }
 
     def renderItem(item:LineVendorInvoice, p: Props, s:State) = {
