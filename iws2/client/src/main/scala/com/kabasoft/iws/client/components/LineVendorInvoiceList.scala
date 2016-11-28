@@ -105,8 +105,8 @@ object LineVendorInvoiceList {
     }
 
     private def renderBase(p: Props, s: State, lines: Seq[LineVendorInvoice],
-                           savex: () => ReactComponentU[Button.Props, Unit, Unit, TopNode],
-                           newx: () => ReactComponentU[Button.Props, Unit, Unit, TopNode],
+                           savex: ()   => ReactComponentU[Button.Props, Unit, Unit, TopNode],
+                           newx: ()    => ReactComponentU[Button.Props, Unit, Unit, TopNode],
                            editLine: () => Seq[TagMod]) = {
       <.div(bss.formGroup,
         //<.ul(style.listGroup)(all.filter(p.predicate (_,s.search)).sortBy(_.tid)(Ordering[Long].reverse) map (e =>renderItem(e,p))),

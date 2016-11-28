@@ -142,22 +142,22 @@ object VENDORINVOICE {
     def filterWith(line:LineVendorInvoice, search:String) =
       line.account.getOrElse("").contains(search)
 
-    def buildFormTab(p: Props, s: State, items:List[VendorInvoice[LineVendorInvoice]]): Seq[ReactElement] =
-      List(<.div(bss.formGroup,
+    def buildFormTab(p: Props, s: State, items:List[VendorInvoice[LineVendorInvoice]],header:Seq[ReactElement]): ReactElement =
+      //List(<.div(bss.formGroup,
         TabComponent(Seq(
           TabItem("vtab1", "List", "#vtab1", true,
             VendorInvoiceList( items, item => edit(Some(item)), item => p.proxy.dispatch(Delete(item)))),
-          TabItem("vtab2", "Form", "#vtab2", false, buildForm(p, s, items))
+          TabItem("vtab2", "Form", "#vtab2", false, buildForm(p, s, items,header))
         ))
-      )
-      )
+     // )
+     // )
 
     def buildFormTab2(p: Props, s: State, items:List[VendorInvoice[LineVendorInvoice]], header:Seq[ReactElement]): ReactElement =
       <.div(bss.formGroup,
         TabComponent2("Vendor Invoice", Seq(
           TabItem("VendorInvoice_vtab1", "List", "VendorInvoice_#vtab1", true,
             VendorInvoiceList(items, item => edit(Some(item)), item => p.proxy.dispatch(Delete(item)))),
-          TabItem("VendorInvoice_vtab1", "Form", "VendorInvoice_#vtab2", false, buildForm(p, s, items))),
+          TabItem("VendorInvoice_vtab1", "Form", "VendorInvoice_#vtab2", false, buildForm(p, s, items,header))),
           header)
       )
 
@@ -169,16 +169,19 @@ object VENDORINVOICE {
         addStyles = Seq(bss.pullRight, bss.buttonXS)), Icon.plusSquare, " New")
         gitems = IWSCircuit.zoom(_.store.get.models.get(112)).eval(IWSCircuit.getRootModel).get.get.items.asInstanceOf[List[VendorInvoice[LineVendorInvoice]]].toSet
       val items = gitems.toList.sorted
-       BasePanel("Vendor Invoice", buildFormTab(p, s, items), List(saveButton, newButton))
+      val header =  List(saveButton, newButton)
+      buildFormTab(p, s, items, header)
     }
 
-    def buildForm (p: Props, s:State, items:List[VendorInvoice[LineVendorInvoice]]) = {
+    def buildForm (p: Props, s:State, items:List[VendorInvoice[LineVendorInvoice]], header:Seq[ReactElement]) = {
       val supplier =  IWSCircuit.zoom(_.store.get.models.get(1)).eval(IWSCircuit.getRootModel).getOrElse(Ready(Data(List.empty[Supplier]))).get.items.asInstanceOf[List[Supplier]].toSet
       val store =  IWSCircuit.zoom(_.store.get.models.get(2)).eval(IWSCircuit.getRootModel).getOrElse(Ready(Data(List.empty[Store]))).get.items.asInstanceOf[List[Store]].toSet
       val porder = s.item.getOrElse(VendorInvoice[LineVendorInvoice]().add(LineVendorInvoice(account = Some("4711"))))
       val  storeList=store.toList.filter(_.id !="-1") .sortBy(_.id) map (iws =>(iws.id+"|"+iws.name))
       val  supplierList=supplier.toList.filter(_.id !="-1") .sortBy(_.id) map (iws =>(iws.id+"|"+iws.name))
-        <.div(bss.formGroup,
+
+      BasePanel("Vendor Invoice",
+       List(<.div(bss.formGroup,
         <.table(^.className := "table-responsive table-condensed", ^.tableLayout := "fixed",
           <.tbody(
             <.tr(bss.formGroup, ^.height := 10.px,
@@ -192,7 +195,7 @@ object VENDORINVOICE {
           )
         ),
           LineVendorInvoiceList(porder, AddNewLine, saveLine, deleteLine)
-      )
+      )),header)
     }
   }
 
