@@ -14,6 +14,7 @@ object VendorInvoiceList {
   @inline private def bss = GlobalStyles.bootstrapStyles
 
   case class Props(items: Seq[VendorInvoice[LineVendorInvoice]],
+                   title:String,
                    edit: VendorInvoice[LineVendorInvoice] => Callback,
                    delete: VendorInvoice[LineVendorInvoice] => Callback)
   private val vendorInvoiceList = ReactComponentB[Props]("VendorInvoiceList")
@@ -32,12 +33,13 @@ object VendorInvoiceList {
         )
       }
       // <.ul(style.listGroup)(renderHeader)( p.items.filter(_.tid >=52).sortBy(_.tid)(Ordering[Long].reverse) map renderItem)
-      <.ul(style.listGroup)(renderHeader(Inv_Trans_Headers, 15))(p.items.sortBy(_.tid)(Ordering[Long].reverse) map renderItem)
+      <.ul(style.listGroup)(renderHeader(Inv_Trans_Headers++ Array(p.title), 15))(p.items.sortBy(_.tid)(Ordering[Long].reverse) map renderItem)
     })
     .build
 
   def apply(items: Seq[VendorInvoice[LineVendorInvoice]],
+            title:String,
             edit: VendorInvoice[LineVendorInvoice] => Callback,
-            delete: VendorInvoice[LineVendorInvoice] => Callback) = vendorInvoiceList(Props(items,edit,delete))
+            delete: VendorInvoice[LineVendorInvoice] => Callback) = vendorInvoiceList(Props(items, title, edit,delete))
 
 }
