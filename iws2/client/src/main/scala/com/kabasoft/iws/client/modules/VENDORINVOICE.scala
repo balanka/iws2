@@ -143,23 +143,11 @@ object VENDORINVOICE {
       line.account.getOrElse("").contains(search)
 
     def buildFormTab(p: Props, s: State, items:List[VendorInvoice[LineVendorInvoice]],header:Seq[ReactElement]): ReactElement =
-      //List(<.div(bss.formGroup,
         TabComponent(Seq(
           TabItem("vtab1", "List", "#vtab1", true,
-            VendorInvoiceList( items, item => edit(Some(item)), item => p.proxy.dispatch(Delete(item)))),
+            VendorInvoiceList( items, "VendorInvoice", item => edit(Some(item)), item => p.proxy.dispatch(Delete(item)))),
           TabItem("vtab2", "Form", "#vtab2", false, buildForm(p, s, items,header))
         ))
-     // )
-     // )
-
-    def buildFormTab2(p: Props, s: State, items:List[VendorInvoice[LineVendorInvoice]], header:Seq[ReactElement]): ReactElement =
-      <.div(bss.formGroup,
-        TabComponent2("Vendor Invoice", Seq(
-          TabItem("VendorInvoice_vtab1", "List", "VendorInvoice_#vtab1", true,
-            VendorInvoiceList(items, item => edit(Some(item)), item => p.proxy.dispatch(Delete(item)))),
-          TabItem("VendorInvoice_vtab1", "Form", "VendorInvoice_#vtab2", false, buildForm(p, s, items,header))),
-          header)
-      )
 
     def render(p: Props, s: State) = {
 
