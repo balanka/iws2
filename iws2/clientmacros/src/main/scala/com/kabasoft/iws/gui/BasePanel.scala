@@ -25,5 +25,5 @@ object BasePanel {
     .renderBackend[Backend]
     .build
  def apply(name:String, body:Seq[ReactElement]) = component(Props(name,body))
-  def apply(name:String, header:Seq[ReactElement], body:Seq[ReactElement]) = component(Props(name,header,body))
+  def apply(name:String, body:Seq[ReactElement], header:Seq[ReactElement]) = component(Props(name,body,header))
 }
