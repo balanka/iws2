@@ -2,6 +2,7 @@ package com.kabasoft.iws.client.components
 
 import java.util.Date
 
+import com.kabasoft.iws.gui.BasePanel2
 import com.kabasoft.iws.gui.StringUtils._
 import com.kabasoft.iws.gui.Utils._
 import com.kabasoft.iws.gui.logger._
@@ -96,8 +97,8 @@ object LineVendorInvoiceList {
             buildBItem("D/C", s.item.map(_.side), true, evt = updateSide, "col-xs-1" ),
             buildSItemN("OAccount", itemsx = buildIdNameList(items), defValue = "7", evt = updateOAccount, "col-xs-3"),
             buildWItemN[BigDecimal]("Amount", s.item.map(_.amount), 0.0, updateAmount(_, s),"col-xs-2"),
-            buildDateN("Duedate", s.item.map(_.duedate.getOrElse(new Date())), new Date(), updateDuedate,"col-xs-2"),
-              saveButton, newButton),
+            buildDateN("Duedate", s.item.map(_.duedate.getOrElse(new Date())), new Date(), updateDuedate,"col-xs-2")),
+            //  saveButton, newButton),
           <.div(^.cls :="row",buildAreaItem("Text", s.item.map(_.text), "", updateText,"col-xs-12"))
          )
 
@@ -110,11 +111,13 @@ object LineVendorInvoiceList {
                            editLine: () => Seq[TagMod]) = {
       <.div(bss.formGroup,
         //<.ul(style.listGroup)(all.filter(p.predicate (_,s.search)).sortBy(_.tid)(Ordering[Long].reverse) map (e =>renderItem(e,p))),
-        <.ul(bss.listGroup.listGroup)(renderHeader(LineFin_Trans_Headers))(lines.sortBy(_.tid)(Ordering[Long].reverse) map (e => renderItem(e, p, s))),
+       // <.ul(bss.listGroup.listGroup)(renderHeader2(LineFin_Trans_Headers, List(savex(), newx())))(lines.sortBy(_.tid)(Ordering[Long].reverse) map (e => renderItem(e, p, s))),
+
+        BasePanel2(renderHeader2(LineFin_Trans_Headers,List(savex(), newx()), 15), lines.sortBy(_.tid)(Ordering[Long].reverse) map (e => renderItem(e, p, s))),
         <.table(^.className := "table-responsive table-condensed", ^.tableLayout := "fixed",
           <.tbody(
             <.tr(bss.formGroup, ^.height := 30.px, ^.maxHeight := 30.px,
-              if (lines.size > 0) editLine() else List(savex(), newx())
+              if (lines.size > 0) editLine() else  Seq.empty[ReactElement]
             )
           )
         )
