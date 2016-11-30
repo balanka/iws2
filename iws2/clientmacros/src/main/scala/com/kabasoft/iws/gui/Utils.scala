@@ -151,6 +151,12 @@ object Utils {
     <.li(bss.listGroup.itemOpt(CommonStyle.info),^.fontSize:=12,^.fontWeight:=50,^.maxHeight:=30,^.height:=30, ^.tableLayout:="fixed",
        headers.map( field => (<.span(field ,^.padding:=padding)))
     )
+
+  def renderHeader2 (headers:Seq[String], buttons:Seq[ReactElement], padding:Int =10) = List(
+    <.li(bss.listGroup.itemOpt(CommonStyle.info),^.fontSize:=12,^.fontWeight:=50,^.maxHeight:=30,^.height:=30, ^.tableLayout:="fixed",
+      headers.map( field => (<.span(field ,^.padding:=padding))),
+      buttons
+    ))
 }
 
 //https://oldfashionedsoftware.com/2009/07/30/lots-and-lots-of-foldleft-examples/
