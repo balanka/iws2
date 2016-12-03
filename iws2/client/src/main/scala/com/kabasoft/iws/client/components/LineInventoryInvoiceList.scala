@@ -133,7 +133,8 @@ object LineInventoryInvoiceList {
           buildSItemN("Vat", itemsx = buildIdNameList(vat), defValue = "7", evt = updateVat, "col-xs-2"),
           buildDItem2[String]("Price", s.item.map(_.price.toString()), "0,0", updatePrice,"col-xs-2"),
           buildDItem2[String]("Quantity", s.item.map(_.quantity.toString()), "0,0", updateQuantity,"col-xs-2"),
-          buildDateN2("Duedate", s.item.map(_.duedate.getOrElse(new Date())), new Date(), updateDuedate,"col-xs-2"),
+          //buildDateN2("Duedate", s.item.map(_.duedate.getOrElse(new Date())), new Date(), updateDuedate,"col-xs-2"),
+          buildField("Duedate", updateDuedate,"col-xs-2"),
           saveButton, newButton)
          )
 

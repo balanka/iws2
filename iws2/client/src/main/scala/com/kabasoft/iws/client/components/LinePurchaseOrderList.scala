@@ -138,7 +138,8 @@ object LinePurchaseOrderList {
             buildSItemN("Vat", itemsx = buildIdNameList(vat), defValue = "7", evt = updateVat, "col-xs-2"),
             buildWItemN[BigDecimal]("Price", s.item.map(_.price), 0.0, updatePrice(_, s),"col-xs-2"),
             buildWItemN[BigDecimal]("Quantity", s.item.map(_.quantity), 0.0, updateQuantity,"col-xs-2"),
-            buildDateN("Duedate", s.item.map(_.duedate.getOrElse(new Date())), new Date(), updateDuedate,"col-xs-2"),
+            //buildDateN("Duedate", s.item.map(_.duedate.getOrElse(new Date())), new Date(), updateDuedate,"col-xs-2"),
+            buildField("Duedate", updateDuedate,"col-xs-2"),
               saveButton, newButton)
          )
 

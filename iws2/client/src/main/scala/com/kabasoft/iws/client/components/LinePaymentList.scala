@@ -112,7 +112,8 @@ object LinePaymentList {
             buildBItem("D/C", s.item.map(_.side), true, evt = updateSide, "col-sm-1 col-xs-1" ),
             buildSItemN("OAccount", itemsx = buildIdNameList(items), defValue = "7", evt = updateOAccount, "col-sm-3 col-xs-3"),
             buildWItemN[BigDecimal]("Amount", s.item.map(_.amount), 0.0, updateAmount(_, s),"col-xs-2"),
-            buildDateN("Duedate", s.item.map(_.duedate.getOrElse(new Date())), new Date(), updateDuedate,"col-sm-3 col-xs-2"),
+            //buildDateN("Duedate", s.item.map(_.duedate.getOrElse(new Date())), new Date(), updateDuedate,"col-sm-3 col-xs-2"),
+            buildField("Duedate", updateDuedate,"col-sm-3 col-xs-2"),
               saveButton, newButton),
           <.div(^.cls :="row", buildAreaItem("Text", s.item.map(_.text), "", updateText,"col-sm-3 col-xs-12"))
          )

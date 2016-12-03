@@ -10,7 +10,10 @@ import com.kabasoft.iws.gui.macros.Bootstrap.CommonStyle
 import com.kabasoft.iws.gui.macros.GlobalStyles
 import com.kabasoft.iws.shared._
 import japgolly.scalajs.react._
+import japgolly.scalajs.react.vdom.Namespace
 import japgolly.scalajs.react.vdom.prefix_<^._
+import org.scalajs.dom.html.TextArea
+import org.scalajs.dom.{html => *}
 
 import scalacss.ScalaCssReact._
 import scalacss.Defaults._
@@ -30,79 +33,49 @@ object Utils {
   def buildIdNameList [A<:Masterfile](list: List[A]): List[String]= list map (iws =>(iws.id+":"+iws.name))
   def buildTransIdList [A<:IWS](list: List[A]): List[String]= list map (iws =>(iws.id))
 
-  def buildDate(id:String, value:Option[Date], defValue:Date, evt:ReactEventI=> Callback) = {
-    val m = value getOrElse defValue
+  def buildDate(id:String, value:Option[Date], defValue:Date, evt:ReactEventI=> Callback) =
     List(<.td(<.label(^.`for` := id, id), ^.maxHeight:=2.px),
-      <.td(<.input.date(bss.formControl, ^.id := id, //^.value := m,
-    ^.placeholder := id), ^.onChange ==> evt, ^.maxHeight:=2.px, ^.paddingLeft := 10.px,  ^.autoFocus := true))
-  }
-  def buildAmount(id:String, value:Option[BigDecimal], defValue:BigDecimal, evt:ReactEventI=> Callback) = {
-    val m = value getOrElse defValue
+      <.td(buildInputField0(id,<.input.date),^.onChange ==> evt, ^.maxHeight:=2.px, ^.paddingLeft := 10.px,  ^.autoFocus := true))
+
+  def buildAmount(id:String, value:Option[BigDecimal], defValue:BigDecimal, evt:ReactEventI=> Callback) =
     List(<.td(<.label(^.`for` := id, id), ^.maxHeight:=2.px),
-      <.td(<.input.number(bss.formControl, ^.id := id,  //^.value := m.toString,
-        ^.placeholder := id), ^.onChange ==> evt, ^.maxHeight:=2.px, ^.paddingLeft := 10.px,  ^.autoFocus := true))
-  }
+      <.td(buildInputField0(id,<.input.number), ^.onChange ==> evt, ^.maxHeight:=2.px, ^.paddingLeft := 10.px,  ^.autoFocus := true))
 
-
-  def buildDItem1(id:String , value:Option[BigDecimal], defValue:BigDecimal, evt:ReactEventI=> Callback) = {
-    val m = (value getOrElse defValue).bigDecimal
+  def buildDItem1(id:String , value:Option[BigDecimal], defValue:BigDecimal, evt:ReactEventI=> Callback) =
     List(<.td(<.label(^.`for` := id, id), ^.maxHeight:=2.px),
-      <.td(<.input.text(bss.formControl, ^.id := id, ^.value :=m.toString,
-       // <.td(<.input.text(bss.formControl, ^.id := id, ^.value := "%06.2f".format(m).replace(".",","),
-        ^.placeholder := id), ^.onChange ==> evt, ^.maxHeight:=2.px, ^.paddingLeft := 10.px,  ^.autoFocus := true))
-    //^.placeholder := id), ^.onChange ==> evt, ^.maxHeight:=2.px, ^.paddingLeft := 10.px,  ^.autoFocus := true))
-  }
+      <.td(buildInputField(id, <.input.text,value,defValue ),^.onChange ==> evt, ^.maxHeight:=2.px, ^.paddingLeft := 10.px,  ^.autoFocus := true))
 
-  def buildWItem1[A](id:String , value:Option[A], defValue:A, evt:ReactEventI=> Callback) = {
-    val m = value getOrElse defValue
+  def buildWItem1[A](id:String , value:Option[A], defValue:A, evt:ReactEventI=> Callback) =
     List(<.td(<.label(bss.td(50), ^.`for` := id, id), ^.maxHeight:=2.px),
-      <.td(<.input.text(bss.formControl, bss.td(100), ^.id := id, ^.value := m.toString,
-        ^.placeholder := id), ^.onChange ==> evt, ^.maxHeight:=2.px, ^.paddingLeft := 10.px,  ^.autoFocus := true))
-        //^.placeholder := id), ^.onChange ==> evt, ^.maxHeight:=2.px, ^.paddingLeft := 10.px,  ^.autoFocus := true))
-  }
+      <.td(buildInputField(id, <.input.text,value,defValue ),^.onChange ==> evt, ^.maxHeight:=2.px, ^.paddingLeft := 10.px,  ^.autoFocus := true))
 
-  def buildAreaItem(id:String , value:Option[String], defValue:String, evt:ReactEventI=> Callback  , offset:String) = {
-    val m = value getOrElse defValue
+  def buildAreaItem(id:String , value:Option[String], defValue:String, evt:ReactEventI=> Callback  , offset:String) =
      <.div(^.cls :="form-group".concat( offset),
        <.label(^.`for` := id, id),
-          <.textarea(bss.formControl, ^.id := id, ^.value := m.toString,
-        ^.placeholder := id), ^.onChange ==> evt,  ^.padding := 10.px,  ^.autoFocus := true)
-  }
+          buildTextAreaField(id, <.textarea, value,defValue ), ^.onChange ==> evt,  ^.padding := 10.px,  ^.autoFocus := true)
 
-  def buildWItem[A](id:String , value:Option[A], defValue:A, evt:ReactEventI=> Callback ) = {
-    val m = value getOrElse defValue
+  def buildWItem[A](id:String , value:Option[A], defValue:A, evt:ReactEventI=> Callback ) =
+      List(<.td(<.label(^.`for` := id, id), ^.maxHeight:=2.px),
+      <.td(buildInputField(id, <.input.text,value,defValue ), ^.onChange ==> evt, ^.maxHeight:=2.px,
+                            ^.paddingLeft := 10.px,  ^.autoFocus := true))
 
-    List(<.td(<.label(^.`for` := id, id), ^.maxHeight:=2.px),
-      <.td(<.input.text(bss.formControl, ^.id := id, ^.value := m.toString,
-        ^.placeholder := id), ^.onChange ==> evt, ^.maxHeight:=2.px, ^.paddingLeft := 10.px,  ^.autoFocus := true))
-    //^.placeholder := id), ^.onChange ==> evt, ^.maxHeight:=2.px, ^.paddingLeft := 10.px,  ^.autoFocus := true))
-  }
-  def buildBItem(id:String , value1:Option[Boolean], defValue:Boolean, evt:ReactEventI=> Callback , offset:String ) = {
-    val m = value1 getOrElse defValue
+  def buildBItem(id:String , value1:Option[Boolean], defValue:Boolean, evt:ReactEventI=> Callback , offset:String ) =
     <.div( ^.cls := offset,
     <.label(^.`for` := id, id),
-     // <.input(bss.formControl, ^.tpe := "checkbox", ^.checked := value1, ^.onClick   ==> evt))
-       <.input.checkbox(bss.formControl, ^.id := id, ^.value := m, ^.placeholder := id),
-                     ^.onChange ==> evt, ^.maxHeight:=2.px)
-  }
+      buildInputField(id, <.input.checkbox,value1, defValue), ^.onChange ==> evt, ^.maxHeight:=2.px)
+
   def buildLabel(id:String , value:Option[String], defValue:String) = {
     val m = value getOrElse  defValue
     List(<.td(<.label(^.`for` := id, id), ^.maxHeight:=2.px ,  ^.paddingLeft := 10.px),
         <.td(<.label(^.`for` := m, m), ^.maxHeight:=2.px ,  ^.paddingLeft := 10.px))
   }
-  def buildLabel(id:String , value:Option[Integer], defValue:Integer) = {
-    val m = value getOrElse  defValue
+  def buildLabel(id:String , value:Option[Integer], defValue:Integer) =
     List(<.td(<.label(^.`for` := id, id), ^.maxHeight:=2.px ,  ^.paddingLeft := 10.px),
-      <.td(<.input.text(^.id := id, ^.value := m.toString,
-        ^.placeholder := id), ^.maxHeight:=2.px,  ^.paddingLeft := 10.px))
-  }
+       <.td(buildInputField(id, <.input.text,value,defValue ), ^.maxHeight:=2.px,  ^.paddingLeft := 10.px))
 
-  def buildItem[A](id:String , value:Option[A], defValue:A) = {
-    val m = value getOrElse  defValue
+  def buildItem[A](id:String , value:Option[A], defValue:A) =
     List(<.td(<.label(^.`for` := id, id), ^.maxHeight:=2.px),
-      <.td(<.input.text(bss.formControl, ^.id := id, ^.value := m.toString,
-        ^.placeholder := id), ^.maxHeight:=2.px,  ^.paddingLeft := 10.px))
-  }
+      <.td(buildInputField(id, <.input.text,value,defValue ), ^.maxHeight:=2.px,  ^.paddingLeft := 10.px))
 
   def buildSItem(id:String,  itemsx:List[String], defValue:String, evt:String => Callback) =
     List(
@@ -112,42 +85,39 @@ object Utils {
        )
     )
 
-  def buildDateN(id:String, value:Option[Date], defValue:Date, evt:ReactEventI=> Callback, offset:String) = {
-    val m = value getOrElse defValue
-    <.div( ^.cls := offset,
-    <.label(^.`for` := id, id),
-      <.input.date(bss.formControl, ^.id := id, //^.value := m,
-        ^.placeholder := id), ^.onChange ==> evt,   ^.autoFocus := true)
-  }
+  def buildDateN(id:String,  evt:ReactEventI=> Callback, offset:String) = buildField(id, evt, offset)
+
   def buildSItemN(id:String,  itemsx:List[String], defValue:String, evt:String => Callback, offset:String) =
   <.div( ^.cls := offset,
       <.label(^.`for` := id, id),
       IWSSelect(label = id, value = defValue, onChange = evt, items = itemsx)
     )
-  def buildWItemN[A](id:String , value:Option[A], defValue:A, evt:ReactEventI=> Callback, offset:String) = {
-    val m = value getOrElse defValue
+  def buildWItemN[A](id:String , value:Option[A], defValue:A, evt:ReactEventI=> Callback, offset:String) =
     <.div( ^.cls := offset,
       <.label(^.`for` := id, id),
-      <.input.text(bss.formControl, ^.id := id, ^.value := m.toString,
-        ^.placeholder := id), ^.onChange ==> evt, ^.maxHeight:=10, ^.autoFocus := true)
-  }
-  def buildDItem2[A](id:String , value:Option[A], defValue:A, evt:ReactKeyboardEventI=> Option[Callback] , offset:String) = {
-  //  val m = value getOrElse defValue
+      buildInputField(id, <.input.text,value,defValue ), ^.onChange ==> evt, ^.maxHeight:=10, ^.autoFocus := true)
+
+  def buildDItem2[A](id:String , value:Option[A], defValue:A, evt:ReactKeyboardEventI=> Option[Callback] , offset:String) =
     <.div( ^.cls := offset,
        <.label(^.`for` := id, id),
-          <.input.text(bss.formControl, ^.id := id, //^.value := m.toString,
-        ^.placeholder := id), ^.onKeyUp ==>?evt , ^.maxHeight:=2.px, ^.paddingLeft := 10.px,  ^.autoFocus := true)
-  }
+          buildInputField0 [A](id,  <.input.text), ^.onKeyUp ==>?evt , ^.maxHeight:=2.px, ^.paddingLeft := 10.px,  ^.autoFocus := true)
 
-  def buildDateN2(id:String, value:Option[Date], defValue:Date, evt:ReactEventI=> Callback, offset:String) = {
-  //  val m = value getOrElse defValue
-    <.div( ^.cls := offset,
+  private def buildInputField0[A](id: String,tm:ReactTagOf[*.Input]) =  tm(bss.formControl, ^.id := id,^.placeholder := id)
+
+  private def buildInputField[A](id: String,tm:ReactTagOf[*.Input], value:Option[A], defValue:A) =
+    tm(bss.formControl, ^.id := id, ^.value := value.getOrElse(defValue).toString, ^.placeholder := id)
+
+  private def buildTextAreaField[A](id: String,tm:ReactTagOf[*.TextArea], value:Option[A], defValue:A) =
+    tm(bss.formControl, ^.id := id, ^.value := value.getOrElse(defValue).toString, ^.placeholder := id)
+
+  def buildDateN2(id:String, value:Option[Date], defValue:Date, evt:ReactEventI=> Callback, offset:String) = buildField(id, evt, offset)
+
+   def buildField(id: String, evt: (_root_.japgolly.scalajs.react.ReactEventI) => Callback, offset: String) =
+    <.div(^.cls := offset,
       <.label(^.`for` := id, id),
-      <.input.date(bss.formControl, ^.id := id, //^.value := m,
-        ^.placeholder := id), ^.onChange ==> evt,   ^.autoFocus := true)
-  }
+      buildInputField0(id,<.input.date), ^.onChange ==> evt, ^.autoFocus := true)
 
-  def renderHeader (headers:Seq[String], padding:Int =10) =
+  def renderHeader(headers:Seq[String], padding:Int =10) =
     <.li(bss.listGroup.itemOpt(CommonStyle.info),^.fontSize:=12,^.fontWeight:=50,^.maxHeight:=30,^.height:=30, ^.tableLayout:="fixed",
        headers.map( field => (<.span(field ,^.padding:=padding)))
     )

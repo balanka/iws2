@@ -94,11 +94,10 @@ object LineVendorInvoiceList {
       def editLine : Seq [TagMod] = List(
           <.div(^.cls :="row",
             buildSItemN("Account", itemsx = buildIdNameList(items), defValue = "0001", evt = updateAccount, "col-xs-3"),
-            buildBItem("D/C", s.item.map(_.side), true, evt = updateSide, "col-xs-1" ),
+            buildWItemN[Boolean]("D/C", s.item.map(_.side), true, evt = updateSide, "col-xs-1" ),
             buildSItemN("OAccount", itemsx = buildIdNameList(items), defValue = "7", evt = updateOAccount, "col-xs-3"),
             buildWItemN[BigDecimal]("Amount", s.item.map(_.amount), 0.0, updateAmount(_, s),"col-xs-2"),
-            buildDateN("Duedate", s.item.map(_.duedate.getOrElse(new Date())), new Date(), updateDuedate,"col-xs-2")),
-            //  saveButton, newButton),
+            buildField("Duedate", updateDuedate,"col-xs-2")),
           <.div(^.cls :="row",buildAreaItem("Text", s.item.map(_.text), "", updateText,"col-xs-12"))
          )
 
@@ -110,9 +109,6 @@ object LineVendorInvoiceList {
                            newx: ()    => ReactComponentU[Button.Props, Unit, Unit, TopNode],
                            editLine: () => Seq[TagMod]) = {
       <.div(bss.formGroup,
-        //<.ul(style.listGroup)(all.filter(p.predicate (_,s.search)).sortBy(_.tid)(Ordering[Long].reverse) map (e =>renderItem(e,p))),
-       // <.ul(bss.listGroup.listGroup)(renderHeader2(LineFin_Trans_Headers, List(savex(), newx())))(lines.sortBy(_.tid)(Ordering[Long].reverse) map (e => renderItem(e, p, s))),
-
         BasePanel2(renderHeader2(LineFin_Trans_Headers,List(savex(), newx()), 15), lines.sortBy(_.tid)(Ordering[Long].reverse) map (e => renderItem(e, p, s))),
         <.table(^.className := "table-responsive table-condensed", ^.tableLayout := "fixed",
           <.tbody(
