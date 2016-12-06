@@ -176,7 +176,7 @@ object VENDORINVOICE {
               buildItem[String]("Id", s.item.map(_.id), "id"),
               //buildWItem[Long]("oid", s.item.map(_.oid), 1L, updateOid),
               buildSItem("oid", itemsx = buildTransIdList(items) , defValue = "001", evt = updateStore),
-              buildSItem("Store", itemsx=storeList,defValue = "0001", evt = updateStore),
+              buildSItem("Store", itemsx = storeList,defValue = "0001", evt = updateStore),
               buildSItem("Supplier", itemsx = supplierList, defValue = "KG", evt = updateAccount),
               buildWItem("Text", s.item.map(_.text), defValue = "txt", evt = updateText)
             )

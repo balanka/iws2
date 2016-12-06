@@ -27,10 +27,11 @@ object Utils {
 
   // def format(d:String) = LocalDate.of(2016,7,7) //parse(d,DateTimeFormatter.ISO_LOCAL_DATE)
   //def format(d:String) = com.zoepepper.facades.jsjoda.LocalDate.parse(d,DateTimeFormatter.ISO_LOCAL_DATE)
+  def buildIdNameList [A<:Masterfile](list: Seq[A]): Seq[String]= list.filter(_.id != "-1") .sortBy(_.id) map (iws =>(iws.id+"|"+iws.name))
 
   def noAction(e: ReactEventI):Callback = Callback {}
 
-  def buildIdNameList [A<:Masterfile](list: List[A]): List[String]= list map (iws =>(iws.id+":"+iws.name))
+  //def buildIdNameList [A<:Masterfile](list: List[A]): List[String]= list map (iws =>(iws.id+":"+iws.name))
   def buildTransIdList [A<:IWS](list: List[A]): List[String]= list map (iws =>(iws.id))
 
   def buildDate(id:String, value:Option[Date], defValue:Date, evt:ReactEventI=> Callback) =
@@ -77,11 +78,11 @@ object Utils {
     List(<.td(<.label(^.`for` := id, id), ^.maxHeight:=2.px),
       <.td(buildInputField(id, <.input.text,value,defValue ), ^.maxHeight:=2.px,  ^.paddingLeft := 10.px))
 
-  def buildSItem(id:String,  itemsx:List[String], defValue:String, evt:String => Callback) =
+  def buildSItem(id:String,  itemsx:Seq[String], defValue:String, evt:String => Callback) =
     List(
      <.td(<.label(^.`for` := id, id), ^.maxHeight:=20.px),
      <.td(
-         IWSSelect(label = id, value = defValue, onChange = evt, items = itemsx)
+         IWSSelect(label = id, value = defValue, onChange = evt, items = itemsx.toList)
        )
     )
 
@@ -95,7 +96,8 @@ object Utils {
   def buildWItemN[A](id:String , value:Option[A], defValue:A, evt:ReactEventI=> Callback, offset:String) =
     <.div( ^.cls := offset,
       <.label(^.`for` := id, id),
-      buildInputField(id, <.input.text,value,defValue ), ^.onChange ==> evt, ^.maxHeight:=10, ^.autoFocus := true)
+      buildInputField(id, if(defValue.isInstanceOf[Boolean]) <.input.checkbox else <.input.text,value,defValue ),
+                   ^.onChange ==> evt, ^.maxHeight:=10, ^.autoFocus := true)
 
   def buildDItem2[A](id:String , value:Option[A], defValue:A, evt:ReactKeyboardEventI=> Option[Callback] , offset:String) =
     <.div( ^.cls := offset,
@@ -127,6 +129,7 @@ object Utils {
       headers.map( field => (<.span(field ,^.padding:=padding))),
       buttons
     ))
+
 }
 
 //https://oldfashionedsoftware.com/2009/07/30/lots-and-lots-of-foldleft-examples/
