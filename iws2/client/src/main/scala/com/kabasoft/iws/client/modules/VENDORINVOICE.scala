@@ -39,9 +39,10 @@ object VENDORINVOICE {
     bs.modState(s => s.copy(item = s.item.map(_.copy(account = Some(supplierId)))))
   }
   def updateText(e: ReactEventI, bs: BackendScope[Props,State]) = {
-    val txt = e.target.value
-    log.debug(s"txt is ${txt}")
-    bs.modState(s => s.copy(item = s.item.map(_.copy(text = txt))))
+    e.extract(_.target.value)(value =>{
+    log.debug(s"txt is ${value}")
+    bs.modState(s => s.copy(item = s.item.map(_.copy(text = value))))
+    })
   }
   class Backend($: BackendScope[Props, State]) {
 
@@ -78,11 +79,13 @@ object VENDORINVOICE {
       $.modState(s => s.copy(item = s.item.map(_.copy(store = Some(storeId))))) >>setModified
     }
 
-    def updateAccount(idx: String) = {
-      val supplierId=idx.substring(0, idx.indexOf("|"))
-      log.debug(s"ItemId Key is ${supplierId}  ")
-      $.modState(s => s.copy(item = s.item.map(_.copy(account = Some(supplierId))))) >>setModified
-    }
+    def updateAccount(idx: String) =VENDORINVOICE.updateAccount(idx,$)
+
+//    def updateAccount(idx: String) = {
+//      val supplierId=idx.substring(0, idx.indexOf("|"))
+//      log.debug(s"ItemId Key is ${supplierId}  ")
+//      $.modState(s => s.copy(item = s.item.map(_.copy(account = Some(supplierId))))) >>setModified
+//    }
     def updateText(e: ReactEventI) = {
       val txt = e.target.value
       log.debug(s"txt is ${txt}")

@@ -26,3 +26,27 @@ object IWSSelect {
             value: String, onChange: String => Callback,
             items:List[String]) = component.set(key, ref)(Props(label, value, onChange,items))
 }
+
+object DataList {
+
+  case class Props(label: String, value:String, onChange: String => Callback, items:List[String])
+
+  def onChange(P: Props)(e: ReactEventI) = { val r = e.target.value; P.onChange(r) }
+  def render(P: Props) =
+    <.div( //^.padding := "10px",
+      <.input.text(^.padding := "5px", ^.id := "ip",  ^.list := "datalist"),
+      <.datalist(^.padding := "5px", ^.id := "datalist", ^.value := P.value, ^.fontSize:=12.px,
+        ^.onChange ==> onChange(P))(
+        P.items.map(item => (<.option(item)))
+      )
+    )
+
+  val component = ReactComponentB[Props]("datalist")
+    .stateless
+    .render_P (P =>render(P))
+    .build
+
+  def apply(ref: js.UndefOr[String] = "", key: js.Any = {}, label: String,
+            value: String, onChange: String => Callback,
+            items:List[String]) = component.set(key, ref)(Props(label, value, onChange,items))
+}

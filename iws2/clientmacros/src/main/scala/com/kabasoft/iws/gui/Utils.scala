@@ -93,11 +93,17 @@ object Utils {
       <.label(^.`for` := id, id),
       IWSSelect(label = id, value = defValue, onChange = evt, items = itemsx)
     )
+
+  def buildSItemNX(id:String , itemsx:List[String], defValue:String, evt:String=> Callback, offset:String) =
+    <.div( ^.cls := offset,
+      <.label(^.`for` := id, id),
+      DataList(label = id,  value = defValue, onChange = evt, items = itemsx))
+
   def buildWItemN[A](id:String , value:Option[A], defValue:A, evt:ReactEventI=> Callback, offset:String) =
     <.div( ^.cls := offset,
       <.label(^.`for` := id, id),
       buildInputField(id, if(defValue.isInstanceOf[Boolean]) <.input.checkbox else <.input.text,value,defValue ),
-                   ^.onChange ==> evt, ^.maxHeight:=10, ^.autoFocus := true)
+      ^.onChange ==> evt, ^.maxHeight:=10, ^.autoFocus := true)
 
   def buildDItem2[A](id:String , value:Option[A], defValue:A, evt:ReactKeyboardEventI=> Option[Callback] , offset:String) =
     <.div( ^.cls := offset,
@@ -111,6 +117,9 @@ object Utils {
 
   private def buildTextAreaField[A](id: String,tm:ReactTagOf[*.TextArea], value:Option[A], defValue:A) =
     tm(bss.formControl, ^.id := id, ^.value := value.getOrElse(defValue).toString, ^.placeholder := id)
+
+   def buildDataListField[A](id: String,tm:ReactTagOf[*.DataList], value:List[A]) =
+           tm(bss.formControl, ^.id := id, ^.list:= value, ^.placeholder := id)
 
   def buildDateN2(id:String, value:Option[Date], defValue:Date, evt:ReactEventI=> Callback, offset:String) = buildField(id, evt, offset)
 
@@ -129,6 +138,16 @@ object Utils {
       headers.map( field => (<.span(field ,^.padding:=padding))),
       buttons
     ))
+
+ /* def buildDItem2[A](id:String , value:Option[A], defValue:A, evt:ReactKeyboardEventI=> Option[Callback] , offset:String) =
+    value match  {
+      case _: Date =>
+        <.div( ^.cls := offset,
+
+          <.label(^.`for` := id, id),
+          buildInputField0 [A](id,  <.input.text), ^.onKeyUp ==>?evt , ^.maxHeight:=2.px, ^.paddingLeft := 10.px,  ^.autoFocus := true)
+    } */
+
 
 }
 

@@ -21,24 +21,50 @@ object Settings {
     //"-Xfatal-warnings"
 
   )
-
-  /** Declare global dependency versions here to avoid mismatches in multi part dependencies */
   object versions {
     val scala = "2.11.8"
-    val scalaDom = "0.9.0"
-    //val scalajsReact = "0.10.4"
-    val scalajsReact = "0.11.1"
-    val monocleVersion = "1.2.1"
-    val scalaz ="7.1.2"
-    val scalazstream="0.7.2a"
-    val scalaCSS = "0.4.1"
+    val scalaDom = "0.9.1"
+    val scalajsReact = "0.11.3"
+    val monocleVersion = "1.3.2"
+    val scalaCSS = "0.5.0"
     val log4js = "1.4.10"
     val autowire = "0.2.5"
-    val booPickle = "1.1.2"
+    val booPickle = "1.2.5"
+    val diode = "1.1.0"
+    val uTest = "0.4.4"
+    val scalazstream="0.8"
+    val scalaz ="7.1.0"
+    val react = "15.3.1"
+    val jQuery = "1.11.1"
+    val bootstrap = "3.3.6"
+    val chartjs = "2.1.3"
+    val doobie ="0.2.4"
+
+    val scalajsScripts = "1.0.0"
+    val jsjoda = "1.0.2"
+    val js_joda ="1.1.8"
+    val akka ="2.4.14"
+  }
+
+
+
+  /** Declare global dependency versions here to avoid mismatches in multi part dependencies */
+  /*object versions {
+    val scala = "2.12.1"
+    val scalaDom = "0.9.1"
+    val scalajsReact = "0.11.3"
+    val monocleVersion = "1.3.2"
+    val scalaz ="7.2.7"
+    //val scalazstream="0.8"
+    val fs2 = "0.9.2"
+    val scalaCSS = "0.4.1"
+    val log4js = "1.4.10"
+    val autowire = "0.2.6"
+    val booPickle = "1.2.5"
     //val diode = "0.5.0"
-    val diode ="1.0.0"
-    val doobie ="0.2.3"
-    val uTest = "0.3.1"
+    val diode ="1.1.0"
+    val doobie ="0.3.1-M3"
+    val uTest = "0.4.4"
     //val react = "0.14.7"
     val react = "15.0.1"
     val jQuery = "1.12.0"
@@ -48,8 +74,9 @@ object Settings {
     val javaTime ="0.1.0"
     val jsjoda = "1.0.2"
     val js_joda ="1.1.8"
-    val akka ="2.4.4"
-  }
+    val akka ="2.4.14"
+    val scalajsScripts="1.0.0"
+  } */
 
   /**
    * These dependencies are shared between JS and JVM projects
@@ -61,7 +88,9 @@ object Settings {
     "org.scalaz"  %% "scalaz-core" % versions.scalaz,
     "org.scalaz" %% "scalaz-effect" % versions.scalaz,
     "org.scalaz.stream" %% "scalaz-stream" % versions.scalazstream,
+    //"co.fs2" %%% "fs2-core"  %versions.fs2,
     "org.tpolecat"%% "doobie-core" % versions.doobie,
+    //"org.tpolecat"%% "doobie-postgres" % versions.doobie,
     "org.tpolecat"%% "doobie-contrib-postgresql" % versions.doobie,
     //"com.github.julien-truffaut"  %%%  "monocle-macro"  % versions.monocleVersion,
     //"com.github.japgolly.scalajs-react" %%% "ext-monocle" % "0.11.0",
@@ -71,7 +100,8 @@ object Settings {
 
   /** Dependencies only used by the JVM project */
   val jvmDependencies = Def.setting(Seq(
-    "com.vmunier" %% "play-scalajs-scripts" % versions.playScripts,
+   // "com.vmunier" %% "play-scalajs-scripts" % versions.playScripts,
+    "com.vmunier" %% "scalajs-scripts" % versions.scalajsScripts,
     "org.webjars" % "font-awesome" % "4.3.0-1" % Provided,
     "org.webjars" % "bootstrap" % versions.bootstrap % Provided,
     "com.typesafe.akka" %% "akka-actor" %  versions.akka,
@@ -94,8 +124,7 @@ object Settings {
     // "com.github.japgolly.scalajs-react" %%% "ext-scalaz72" %  versions.scalajsReact
     "io.github.widok" %%% "scala-js-momentjs" % "0.1.5"
     //"com.github.japgolly.scalajs-react" %%% "ext-monocle" % versions.monocleVersion
-    //"com.acework" %%% "core" % "0.0.1-SNAPSHOT",
-    //"com.acework" %%% "macro" % "0.0.1-SNAPSHOT"
+
   ))
 
   /** Dependencies for external JS libs that are bundled into a single .js file according to dependency order */

@@ -99,7 +99,7 @@ sealed trait LineTransaction extends IWS {
 sealed trait  LineInventoryTransaction extends LineTransaction {
    def item: Option[String]
    def unit: Option[String]
-  def price: Amount
+   def price: Amount
    def quantity: Amount
    }
 sealed trait  LineFinancialsTransaction extends LineTransaction {

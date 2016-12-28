@@ -4,9 +4,11 @@ import java.nio.ByteBuffer
 
 import boopickle.Default._
 import com.kabasoft.iws.shared.common._
+import play.api.{Configuration, Environment}
 import play.api.mvc._
 import services.ApiService
 import com.kabasoft.iws.shared._
+import com.google.inject.Inject
 import com.kabasoft.iws.shared.Model._
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -16,7 +18,7 @@ object Router extends autowire.Server[ByteBuffer, Pickler, Pickler] {
   override def write[R: Pickler](r: R) = Pickle.intoBytes(r)
 }
 
-object Application extends Controller {
+class  Application  @Inject() (implicit val config: Configuration, env: Environment) extends Controller {
 
    import com.kabasoft.iws.shared.{Store => MStore}
 

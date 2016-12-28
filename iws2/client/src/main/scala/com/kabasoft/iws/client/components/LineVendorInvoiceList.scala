@@ -5,6 +5,7 @@ import java.util.Date
 import com.kabasoft.iws.gui.BasePanel2
 import com.kabasoft.iws.gui.StringUtils._
 import com.kabasoft.iws.gui.Utils._
+import com.kabasoft.iws.gui.DataList
 import com.kabasoft.iws.gui.logger._
 import com.kabasoft.iws.gui.macros.Bootstrap.Button.Props
 import com.kabasoft.iws.gui.macros.Bootstrap.{Button, CommonStyle}
@@ -93,12 +94,13 @@ object LineVendorInvoiceList {
 
       def editLine : Seq [TagMod] = List(
           <.div(^.cls :="row",
-            buildSItemN("Account", itemsx = buildIdNameList(items), defValue = "0001", evt = updateAccount, "col-xs-3"),
+            buildSItemNX("Account", itemsx = buildIdNameList(items), defValue = "0001", evt = updateAccount, "col-xs-3"),
             buildWItemN[Boolean]("D/C", s.item.map(_.side), true, evt = updateSide, "col-xs-1" ),
-            buildSItemN("OAccount", itemsx = buildIdNameList(items), defValue = "7", evt = updateOAccount, "col-xs-3"),
+            buildSItemNX("OAccount", itemsx = buildIdNameList(items), defValue = "7", evt = updateOAccount, "col-xs-3"),
             buildWItemN[BigDecimal]("Amount", s.item.map(_.amount), 0.0, updateAmount(_, s),"col-xs-2"),
             buildField("Duedate", updateDuedate,"col-xs-2")),
           <.div(^.cls :="row",buildAreaItem("Text", s.item.map(_.text), "", updateText,"col-xs-12"))
+
          )
 
       renderBase(p, s, lines, saveButton _, newButton _, editLine _)

@@ -16,8 +16,8 @@ object Main  {
    def main(args: Array[String]) {
   
   import com.kabasoft.iws.shared.{Store => MStore}
-  implicit val amountPickler = transformPickler[BigDecimal,String](b=> String.valueOf(b.doubleValue()),
-    t =>  scala.math.BigDecimal(t))
+ // implicit val amountPickler = transformPickler[BigDecimal,String](b=> String.valueOf(b.doubleValue()),
+//    t =>  scala.math.BigDecimal(t))
   implicit val datePickler = transformPickler[java.util.Date, Long](_.getTime,t => new java.util.Date(t))
   implicit val pickler = compositePickler[IWS]
   //pickler.addConcreteType[TodoItem]

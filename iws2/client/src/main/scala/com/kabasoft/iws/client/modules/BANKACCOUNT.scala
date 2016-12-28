@@ -25,21 +25,19 @@ object BANKACCOUNT {
        Callback {
          IWSCircuit.dispatch(Refresh(BankAccount()))
        }
-      def edit(itemx:Option[BankAccount]) = {
-      $.modState(s => s.copy(item = itemx))
-    }
 
+     def edit(itemx:Option[BankAccount]) = {
+      $.modState(s => s.copy(item = itemx))
+      }
 
     def edited(item:BankAccount) = {
-      Callback.log("BankAccount edited>>>>> " +item)  >>
       $.props >>= (_.proxy.dispatch(Update(item)))
-
      }
 
     def delete(item:BankAccount) = {
-      val cb = Callback.log("BankAccount deleted>>>>> " +item)  >>
+      //val cb = Callback.log("BankAccount deleted>>>>> " +item)  >>
         $.props >>= (_.proxy.dispatch(Delete(item)))
-       cb >> $.modState(s => s.copy(name = "BankAccount"))
+      // >> $.modState(s => s.copy(name = "BankAccount"))
     }
 
 
@@ -70,6 +68,7 @@ object BANKACCOUNT {
           <.span(item.id),
           <.span(item.name ,^.paddingLeft:=5),
           <.span(item.description ,^.paddingLeft:=5)
+
         )
 
         def buildForm(s:State): ReactElement =
@@ -94,11 +93,12 @@ object BANKACCOUNT {
            TabItem("vtab2", "Form", "#vtab2", false,buildForm(s))))
        ))
      def render(p: Props, s: State) = {
-       val items =  IWSCircuit.zoom(_.store.get.models.get(12)).eval(IWSCircuit.getRootModel).get.get.items.asInstanceOf[List[BankAccount]]
+       val items =  IWSCircuit.zoom(_.store.get.models.get(12)).eval(IWSCircuit.getRootModel).get.get.items.asInstanceOf[List[BankAccount]].toSet
+        println("items"+items)
        def saveButton = Button(Button.Props(edited(s.item.getOrElse(BankAccount())), addStyles = Seq(bss.pullRight, bss.buttonXS,
          bss.buttonOpt(CommonStyle.success))), Icon.circleO, "Save")
        def newButton =  Button(Button.Props(edit(Some(BankAccount())), addStyles = Seq(bss.pullRight, bss.buttonXS)), Icon.plusSquare, "New")
-         BasePanel("BankAccount", buildFormTab(p,s, items), List(newButton,saveButton))
+         BasePanel("BankAccount", buildFormTab(p,s, items.toList), List(newButton,saveButton))
 
      }
 
