@@ -1,23 +1,16 @@
 package com.kabasoft.iws.gui
 
-import java.time.LocalDate
 import java.util.Date
 
-import japgolly.scalajs.react.vdom.prefix_<^._
-import com.kabasoft.iws.gui.logger._
-import com.kabasoft.iws.gui.StringUtils._
 import com.kabasoft.iws.gui.macros.Bootstrap.CommonStyle
 import com.kabasoft.iws.gui.macros.GlobalStyles
 import com.kabasoft.iws.shared._
 import japgolly.scalajs.react._
-import japgolly.scalajs.react.vdom.Namespace
 import japgolly.scalajs.react.vdom.prefix_<^._
-import org.scalajs.dom.html.TextArea
 import org.scalajs.dom.{html => *}
+import org.widok.moment._
 
 import scalacss.ScalaCssReact._
-import scalacss.Defaults._
-import org.widok.moment._
 
 object Utils {
   @inline private def bss = GlobalStyles.bootstrapStyles
@@ -49,7 +42,7 @@ object Utils {
   def buildWItem1[A](id:String , value:Option[A], defValue:A, evt:ReactEventI=> Callback) =
     List(<.td(<.label(bss.td(50), ^.`for` := id, id), ^.maxHeight:=2.px),
       <.td(buildInputField(id, <.input.text,value,defValue ),^.onChange ==> evt, ^.maxHeight:=2.px, ^.paddingLeft := 10.px,  ^.autoFocus := true))
-
+  
   def buildAreaItem(id:String , value:Option[String], defValue:String, evt:ReactEventI=> Callback  , offset:String) =
      <.div(^.cls :="form-group".concat( offset),
        <.label(^.`for` := id, id),
@@ -74,9 +67,20 @@ object Utils {
     List(<.td(<.label(^.`for` := id, id), ^.maxHeight:=2.px ,  ^.paddingLeft := 10.px),
        <.td(buildInputField(id, <.input.text,value,defValue ), ^.maxHeight:=2.px,  ^.paddingLeft := 10.px))
 
+  def buildItemZ[A](id:String , value:Option[A], defValue:A, offset:String) =
+    <.div( ^.cls := offset,
+        <.label(^.`for` := id, id),
+      buildInputField(id, <.input.text,value, defValue ),  ^.padding := 10.px, ^.paddingLeft := 10.px, ^.paddingBottom := 10.px, ^.height := 25.px, ^.fontSize:=10.px)
+
+  def buildItemZ1[A](id:String , value:Option[A], defValue:A) =
+    <.div(
+      <.label(^.`for` := id, id),
+      buildInputField(id, <.input.text,value, defValue ),  ^.padding := 10.px, ^.paddingLeft := 10.px, ^.paddingBottom := 10.px, ^.height := 25.px, ^.fontSize:=10.px)
+
+
   def buildItem[A](id:String , value:Option[A], defValue:A) =
     List(<.td(<.label(^.`for` := id, id), ^.maxHeight:=2.px),
-      <.td(buildInputField(id, <.input.text,value,defValue ), ^.maxHeight:=2.px,  ^.paddingLeft := 10.px))
+      <.td(buildInputField(id, <.input.text,value,defValue ), ^.maxHeight:=2.px,   ^.paddingLeft := 10.px))
 
   def buildSItem(id:String,  itemsx:Seq[String], defValue:String, evt:String => Callback) =
     List(
@@ -86,7 +90,19 @@ object Utils {
        )
     )
 
+
   def buildDateN(id:String,  evt:ReactEventI=> Callback, offset:String) = buildField(id, evt, offset)
+
+  def ComboBox(id:String , itemsx:List[String], defValue:String, evt:String=> Callback) =
+    <.div(
+      <.label(^.`for` := id, id),
+      ComboList(label = id,  value = defValue, onChange = evt, items = itemsx))
+
+  def ComboBox(id:String , itemsx:List[String], defValue:String, evt:String=> Callback, offset:String) =
+    <.div( ^.cls := offset,
+      <.label(^.`for` := id, id),
+      ComboList(label = id,  value = defValue, onChange = evt, items = itemsx))
+
 
   def buildSItemN(id:String,  itemsx:List[String], defValue:String, evt:String => Callback, offset:String) =
   <.div( ^.cls := offset,
@@ -107,7 +123,8 @@ object Utils {
   private def buildInputField0[A](id: String,tm:ReactTagOf[*.Input]) =  tm(bss.formControl, ^.id := id,^.placeholder := id)
 
   private def buildInputField[A](id: String,tm:ReactTagOf[*.Input], value:Option[A], defValue:A) =
-    tm(bss.formControl, ^.id := id, ^.value := value.getOrElse(defValue).toString, ^.placeholder := id)
+    tm(bss.formControl, ^.id := id, ^.value := value.getOrElse(defValue).toString, ^.placeholder := id,
+      ^.padding := 10.px, ^.paddingLeft := 10.px, ^.height := 10.px, ^.fontSize:=10.px)
 
   private def buildTextAreaField[A](id: String,tm:ReactTagOf[*.TextArea], value:Option[A], defValue:A) =
     tm(bss.formControl, ^.id := id, ^.value := value.getOrElse(defValue).toString, ^.placeholder := id)
@@ -130,6 +147,8 @@ object Utils {
       buttons
     ))
 
+  // def buildDataListField[A](id: String,tm:ReactTagOf[*.DataList], value:List[A]) =
+  //         tm(bss.formControl, ^.id := id, ^.list := value, ^.placeholder := id)
 }
 
 //https://oldfashionedsoftware.com/2009/07/30/lots-and-lots-of-foldleft-examples/
