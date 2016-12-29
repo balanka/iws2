@@ -14,33 +14,11 @@ import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.prefix_<^._
 import japgolly.scalajs.react.{BackendScope, Callback, ReactElement}
 
-import scala.scalajs.js
+
 import scalacss.ScalaCssReact._
 
-case class Props(proxy: ModelProxy[Pot[Data]])
+case class Props(proxy: ModelProxy[Pot[Data]], modelId:Int,otransModelId:Int,storeModelId:Int,accountModelId:Int )
 case class State(item: Option[VendorInvoice[LineVendorInvoice]] = None)
-//@volatile var gitems = Set.empty[VendorInvoice[LineVendorInvoice]]
-/*def updateOid1(idx:String,  bs: BackendScope[Props,State]) = {
-// val oId = idx.substring(0, idx.indexOf("|"))
-//  log.debug(s"oid is "+oId)
-bs.modState(s => s.copy(item = s.item.map(_.copy(oid = idx.toLong))))
-}
-def updateStore(idx:String, bs: BackendScope[Props,State]) = {
-val storeId = idx.substring(0, idx.indexOf("|"))
-log.debug(s"store is "+storeId)
-bs.modState(s => s.copy(item = s.item.map(_.copy(store = Some(storeId)))))
-}
-def updateAccount(idx: String, bs: BackendScope[Props,State]) = {
-val supplierId=idx.substring(0, idx.indexOf("|"))
-log.debug(s"ItemId Key is ${supplierId}  ")
-bs.modState(s => s.copy(item = s.item.map(_.copy(account = Some(supplierId)))))
-}
-def updateText(e: ReactEventI, bs: BackendScope[Props,State]) = {
-val txt = e.target.value
-log.debug(s"txt is ${txt}")
-bs.modState(s => s.copy(item = s.item.map(_.copy(text = txt))))
-} */
-
 class InvoiceBackend($: BackendScope[Props, State]) {
 
   @inline private def bss = GlobalStyles.bootstrapStyles
@@ -100,14 +78,15 @@ class InvoiceBackend($: BackendScope[Props, State]) {
 
   }
   def setModified  = $.modState(s => s.copy(item = if(!s.item.map(_.created).getOrElse(false)) s.item.map(_.copy(modified = true)) else s.item) )
-  def runCB (itemx:VendorInvoice[LineVendorInvoice]) = Callback {
+
+  def runCB(itemx: VendorInvoice[LineVendorInvoice]) = Callback {
     IWSCircuit.dispatch(Update(itemx))
 
     val ro = itemx.getLines.filter(_.created == true).map(e => itemx.replaceLine(e.copy(created = false).copy(modified = false)))
     if (!ro.isEmpty) {
       val setLineID = ro.head.copy(lines = Some(itemx.getLines map (e => if (e.tid <= 0) e.copy(tid = e.tid - 1) else e)))
       $.modState(s => s.copy(item = Some(setLineID))).runNow()
-    }else {
+    } else {
       $.modState(s => s.copy(item = Some(itemx.copy(modified = false)))).runNow()
     }
 
@@ -148,22 +127,23 @@ class InvoiceBackend($: BackendScope[Props, State]) {
     def newButton = Button(Button.Props(edit(Some(VendorInvoice[LineVendorInvoice]())),
       addStyles = Seq(bss.pullRight, bss.buttonXS)), Icon.plusSquare, " New")
 
-    gitems = IWSCircuit.zoom(_.store.get.models.get(112)).eval(IWSCircuit.getRootModel).get.get.items.asInstanceOf[List[VendorInvoice[LineVendorInvoice]]].toSet
+    gitems = IWSCircuit.zoom(_.store.get.models.get(p.modelId)).eval(IWSCircuit.getRootModel).get.get.items.asInstanceOf[List[VendorInvoice[LineVendorInvoice]]].toSet
     val items = gitems.toList.sorted
     val header = List(saveButton, newButton)
-    buildFormTab(p, s, items, header)
+    val contentTab1 = VendorInvoiceList( items, "VendorInvoice", item => edit(Some(item)), item => p.proxy.dispatch(Delete(item)))
+    val contentTab2 = buildForm(p, s, items,header)
+    buildFormTab(p, s, contentTab1, contentTab2)
   }
 
-  def buildFormTab(p: Props, s: State, items:List[VendorInvoice[LineVendorInvoice]],header:Seq[ReactElement]): ReactElement =
-    TabComponent(Seq(
-      TabItem("vtab1", "List", "#vtab1", true,
-        VendorInvoiceList( items, "VendorInvoice", item => edit(Some(item)), item => p.proxy.dispatch(Delete(item)))),
-      TabItem("vtab2", "Form", "#vtab2", false, buildForm(p, s, items,header))
-    ))
+  def buildFormTab(p: Props, s: State, content1:ReactElement, content2:ReactElement): ReactElement =
+    TabComponent(Seq( TabItem("vtab1", "List", "#vtab1", true, content1),
+                      TabItem("vtab2", "Form", "#vtab2", false, content2)
+                     )
+                   )
 
   def buildForm (p: Props, s:State, items:List[VendorInvoice[LineVendorInvoice]], header:Seq[ReactElement]) = {
-    val supplier =  IWSCircuit.zoom(_.store.get.models.get(1)).eval(IWSCircuit.getRootModel).getOrElse(Ready(Data(List.empty[Supplier]))).get.items.asInstanceOf[List[Supplier]].toSet
-    val store =  IWSCircuit.zoom(_.store.get.models.get(2)).eval(IWSCircuit.getRootModel).getOrElse(Ready(Data(List.empty[Store]))).get.items.asInstanceOf[List[Store]].toSet
+    val supplier =  IWSCircuit.zoom(_.store.get.models.get(p.accountModelId)).eval(IWSCircuit.getRootModel).getOrElse(Ready(Data(List.empty[Supplier]))).get.items.asInstanceOf[List[Supplier]].toSet
+    val store =  IWSCircuit.zoom(_.store.get.models.get(p.storeModelId)).eval(IWSCircuit.getRootModel).getOrElse(Ready(Data(List.empty[Store]))).get.items.asInstanceOf[List[Store]].toSet
     val porder = s.item.getOrElse(VendorInvoice[LineVendorInvoice]().add(LineVendorInvoice(account = Some("4711"))))
     val  storeList=store.toList.filter(_.id !="-1") .sortBy(_.id) map (iws =>(iws.id+"|"+iws.name))
     val  supplierList=supplier.toList.filter(_.id !="-1") .sortBy(_.id) map (iws =>(iws.id+"|"+iws.name))
