@@ -96,13 +96,7 @@ class InvoiceBackend($: BackendScope[Props, State]) {
     Callback.log("VendorInvoice deleted>>>>> ${item}")
     $.props >>= (_.proxy.dispatch(Delete(item)))
   }
-  def runDelete(item1:VendorInvoice[LineVendorInvoice]) =   {
-    log.debug(s"  VendorInvoice to delete line from  >>>>>  ${item1}")
-    IWSCircuit.dispatch(Update(item1))
-    Callback {
-      $.modState(s => s.copy(item = Some(item1))).runNow()
-    }
-  }
+
   def deleteLine(line1:LineVendorInvoice) = {
     val  deleted =line1.copy(deleted = true)
     val k =$.state.runNow().item.getOrElse(VendorInvoice[LineVendorInvoice]())
@@ -120,12 +114,11 @@ class InvoiceBackend($: BackendScope[Props, State]) {
   def filterWith(line:LineVendorInvoice, search:String) = line.account.getOrElse("").contains(search)
 
   def render(p: Props, s: State) = {
+     val addStylesNew = Seq(bss.pullRight, bss.buttonXS)
+     val addStylesSave = Seq(bss.pullRight, bss.buttonXS, bss.buttonOpt(CommonStyle.success))
 
-    def saveButton = Button(Button.Props(edited(s.item.getOrElse(VendorInvoice[LineVendorInvoice]())),
-      addStyles = Seq(bss.pullRight, bss.buttonXS, bss.buttonOpt(CommonStyle.success))), Icon.circleO, " Save")
-
-    def newButton = Button(Button.Props(edit(Some(VendorInvoice[LineVendorInvoice]())),
-      addStyles = Seq(bss.pullRight, bss.buttonXS)), Icon.plusSquare, " New")
+    def saveButton = Button(Button.Props(edited(s.item.getOrElse(VendorInvoice[LineVendorInvoice]())), addStyles = addStylesSave), Icon.circleO, " Save")
+    def newButton = Button(Button.Props(edit(Some(VendorInvoice[LineVendorInvoice]())), addStyles=addStylesNew), Icon.plusSquare, " New")
 
     gitems = IWSCircuit.zoom(_.store.get.models.get(p.modelId)).eval(IWSCircuit.getRootModel).get.get.items.asInstanceOf[List[VendorInvoice[LineVendorInvoice]]].toSet
     val items = gitems.toList.sorted
