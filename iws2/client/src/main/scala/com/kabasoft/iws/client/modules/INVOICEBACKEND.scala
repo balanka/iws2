@@ -1,5 +1,6 @@
 package com.kabasoft.iws.client.modules
 
+import com.kabasoft.iws.client.modules.Utilities._
 import com.kabasoft.iws.client.components.{LineVendorInvoiceList, VendorInvoiceList}
 import com.kabasoft.iws.gui.BasePanel
 import com.kabasoft.iws.gui.Utils._
@@ -26,7 +27,7 @@ class InvoiceBackend($: BackendScope[Props, State]) {
 
   implicit def orderingById[A <: VendorInvoice[LineVendorInvoice]]: Ordering[A] = {Ordering.by(e => (e.tid, e.tid))}
 
-  val r = List( updateOid1 _, updateStore _, updateAccount _, updateText _, edit _,  edited _)
+  val r = List( updateOid1 _, updateStore _, updateAccount _, updateText _, edit _)
 
   def mounted(props: Props) = {
 
@@ -36,41 +37,34 @@ class InvoiceBackend($: BackendScope[Props, State]) {
       IWSCircuit.dispatch(Refresh(VendorInvoice[LineVendorInvoice]()))
     }
   }
-  def edit(item:Option[VendorInvoice[LineVendorInvoice]]) = {
-    val d =item.getOrElse(VendorInvoice[LineVendorInvoice]())
+  def editFx(d:VendorInvoice[LineVendorInvoice]) = {
+   // val d =item.getOrElse(VendorInvoice[LineVendorInvoice]())
     $.modState(s => s.copy(item = Some(d)))
   }
 
-  def updateOid(idx:String) = {
+  def updateOidFx(idx:String) = $.modState(s => s.copy(item = s.item.map(_.copy(oid = idx.toLong)))) >>setModified
+  //def updateOid1(idx:String,  bs: BackendScope[Props,State]) = bs.modState(s => s.copy(item = s.item.map(_.copy(oid = idx.toLong)))) >>setModified
 
-    $.modState(s => s.copy(item = s.item.map(_.copy(oid = idx.toLong)))) >>setModified
-  }
-  def updateOid1(idx:String,  bs: BackendScope[Props,State]) = {
-
-    bs.modState(s => s.copy(item = s.item.map(_.copy(oid = idx.toLong)))) >>setModified
-  }
-  def updateStore(idx:String) = {
+  def updateStoreFx(idx:String) = {
     val storeId = idx.substring(0, idx.indexOf("|"))
     log.debug(s"store is "+storeId)
     $.modState(s => s.copy(item = s.item.map(_.copy(store = Some(storeId))))) >>setModified
   }
 
-  def updateAccount(idx: String) = {
+  def updateAccountFx(idx: String) = {
     val supplierId=idx.substring(0, idx.indexOf("|"))
     log.debug(s"ItemId Key is ${supplierId}  ")
     $.modState(s => s.copy(item = s.item.map(_.copy(account = Some(supplierId))))) >>setModified
   }
-  def updateText(e: ReactEventI) = {
+  def updateTextFx(e: ReactEventI) = {
     val txt = e.target.value
     log.debug(s"txt is ${txt}")
     $.modState(s => s.copy(item = s.item.map(_.copy(text = txt))))  >>setModified
   }
-  def edited(order:VendorInvoice[LineVendorInvoice]) = {
-    $.modState(s => s.copy(item =Some(order)))
-    Callback {IWSCircuit.dispatch(Update(order))}
-  }
+
   def runIt = $.state.runNow().item.getOrElse(VendorInvoice[LineVendorInvoice]())
-  def saveLine(linex:LineVendorInvoice) =  {
+
+  def saveLineFx(linex:LineVendorInvoice) =  {
     val k = runIt
     val k2 = k.replaceLine( linex.copy(transid = k.tid))
 
@@ -92,38 +86,51 @@ class InvoiceBackend($: BackendScope[Props, State]) {
 
   }
 
-  def delete(item:VendorInvoice[LineVendorInvoice]) = {
+  def deleteFx(item:VendorInvoice[LineVendorInvoice]) = {
     Callback.log("VendorInvoice deleted>>>>> ${item}")
-    $.props >>= (_.proxy.dispatch(Delete(item)))
+    Callback {IWSCircuit.dispatch(Delete(item))}
+    //$.props >>= (_.proxy.dispatch(Delete(item)))
   }
 
-  def deleteLine(line1:LineVendorInvoice) = {
+  def deleteLineFx(line1:LineVendorInvoice) = {
     val  deleted =line1.copy(deleted = true)
     val k =$.state.runNow().item.getOrElse(VendorInvoice[LineVendorInvoice]())
     val k2 = k.replaceLine(deleted)
-    edited(k2)
+    $.modState(s => s.copy(item =Some(k2)))
+    Callback {IWSCircuit.dispatch(Update(k2))}
+    //edited(k2)
   }
 
-  def AddNewLine(line:LineVendorInvoice) = {
+  def AddNewLineFx(line:LineVendorInvoice) = {
     val  created =line.copy(created = true)
     log.debug(s"New Line VendorInvoice  created>>>>>  ${line}")
-    $.modState(s => s.copy(item = s.item.map(_.add(created.copy(transid=
+    $.modState(s => s.copy(item = s.item.map(_.add(created.copy(transid =
       s.item.getOrElse(VendorInvoice[LineVendorInvoice]()).tid)))))
   }
+  def  AddNewLine(line:LineVendorInvoice) = runLine[LineVendorInvoice](line , AddNewLineFx)
+  def  deleteLine(line:LineVendorInvoice) = runLine[LineVendorInvoice](line , deleteLineFx)
+  def  saveLine(line:LineVendorInvoice) = runLine[LineVendorInvoice](line , saveLineFx)
+  def  delete(item:VendorInvoice[LineVendorInvoice]) = deletex[VendorInvoice[LineVendorInvoice]](item , deleteFx)
+  def  edit(item:VendorInvoice[LineVendorInvoice]) = editx[VendorInvoice[LineVendorInvoice]](item , editFx)
+  def  updateOid (idx:String) = updateCBField(idx, updateOidFx)
+  def  updateAccount (idx:String) = updateCBField(idx, updateAccountFx)
+  def  updateStore (idx:String) = updateCBField(idx, updateStoreFx)
+  def  updateText (idx:String) = updateTxtField(updateTextFx)
 
-  def filterWith(line:LineVendorInvoice, search:String) = line.account.getOrElse("").contains(search)
+  def  filterWith(line:LineVendorInvoice, search:String) = line.account.getOrElse("").contains(search)
 
   def render(p: Props, s: State) = {
      val addStylesNew = Seq(bss.pullRight, bss.buttonXS)
      val addStylesSave = Seq(bss.pullRight, bss.buttonXS, bss.buttonOpt(CommonStyle.success))
+     def  fx(d:VendorInvoice[LineVendorInvoice]):Callback = $.modState(s => s.copy(item = Some(d)))
 
-    def saveButton = Button(Button.Props(edited(s.item.getOrElse(VendorInvoice[LineVendorInvoice]())), addStyles = addStylesSave), Icon.circleO, " Save")
-    def newButton = Button(Button.Props(edit(Some(VendorInvoice[LineVendorInvoice]())), addStyles=addStylesNew), Icon.plusSquare, " New")
+    def saveButton = saveButtonx[VendorInvoice[LineVendorInvoice]](s.item.getOrElse(VendorInvoice[LineVendorInvoice]()),addStylesSave, " Save", fx )
+    def newButton = newButtonx[VendorInvoice[LineVendorInvoice]](VendorInvoice[LineVendorInvoice](),addStylesNew, " New", fx )
 
     gitems = IWSCircuit.zoom(_.store.get.models.get(p.modelId)).eval(IWSCircuit.getRootModel).get.get.items.asInstanceOf[List[VendorInvoice[LineVendorInvoice]]].toSet
     val items = gitems.toList.sorted
     val header = List(saveButton, newButton)
-    val contentTab1 = VendorInvoiceList( items, "VendorInvoice", item => edit(Some(item)), item => p.proxy.dispatch(Delete(item)))
+    val contentTab1 = VendorInvoiceList( items, "VendorInvoice", item => edit(item), item => p.proxy.dispatch(Delete(item)))
     val contentTab2 = buildForm(p, s, items,header)
     buildFormTab(p, s, contentTab1, contentTab2)
   }
