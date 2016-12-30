@@ -5,7 +5,7 @@ import com.kabasoft.iws.gui.logger._
 import com.kabasoft.iws.gui.macros.Bootstrap.Button
 import com.kabasoft.iws.gui.macros.{Delete, Icon, Update}
 import com.kabasoft.iws.gui.services.IWSCircuit
-import com.kabasoft.iws.shared.IWS
+import com.kabasoft.iws.shared.{IWS, Transaction, LineTransaction}
 import scalacss.ScalaCssReact._
 
 
@@ -44,22 +44,24 @@ object Utilities {
         s.item
       }
     ))
-  def edit[A<:IWS](itemx:Option[A], bs: BackendScope[Props, Statex[A]]) = bs.modState(s => s.copy(item = itemx))
+  def runLine [B<:LineTransaction](line:B, fx:B =>Callback):Callback = fx(line)
 
+  def editx[A<:IWS](itemx:A, fx:A =>Callback):Callback = fx(itemx)
 
-  def editedx[A<:IWS](itemx:A, bs: BackendScope[Props, Statex[A]]) = {
-    //bs.modState(s => s.copy(item = itemx))
-    edit(Some(itemx), bs)
+  def editedx[A<:IWS](itemx:A,  fx:A =>Callback):Callback = {
+    editx(itemx, fx)
     Callback {IWSCircuit.dispatch(Update(itemx))}
   }
-  def delete [A<:IWS] (item:A, bs: BackendScope[Props, Statex[A]]) = {
-    Callback.log("VendorInvoice deleted>>>>> ${item}")
-    Callback {IWSCircuit.dispatch(Delete(item))}
-    //bs.props >>= (_.proxy.dispatch(Delete(item)))
-  }
-  def newButton[A<:IWS](item:A, css:Seq[scalacss.StyleA], title:String,  bs: BackendScope[Props, Statex[A]])=
-    Button(Button.Props(edit(Some(item),bs), addStyles = css), Icon.plusSquare, title)
+  def deletex [A<:IWS] (item:A, fx:A =>Callback):Callback = fx(item)//Callback {IWSCircuit.dispatch(Delete(item))}
 
-  def saveButton[A<:IWS](item:A, css:Seq[scalacss.StyleA], title:String,  bs: BackendScope[Props, Statex[A]]) =
-    Button(Button.Props(editedx(item, bs), addStyles = css), Icon.circleO, title)
+  def newButtonx[A<:IWS](item:A, css:Seq[scalacss.StyleA], title:String,  fx:A =>Callback) =
+    Button(Button.Props(editx(item,fx), addStyles = css), Icon.plusSquare, title)
+
+  def saveButtonx[A<:IWS](item:A, css:Seq[scalacss.StyleA], title:String,  fx:A =>Callback) =
+    Button(Button.Props(editedx(item, fx), addStyles = css), Icon.circleO, title)
+
+  def updateTxtField(fx:ReactEventI =>Callback) =  fx
+  def updateCBField(idx:String,  fx:String =>Callback) =  fx(idx)
+
+
 }
