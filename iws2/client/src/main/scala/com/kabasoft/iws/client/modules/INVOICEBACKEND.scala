@@ -18,16 +18,16 @@ import japgolly.scalajs.react.{BackendScope, Callback, ReactElement}
 
 import scalacss.ScalaCssReact._
 
-case class Props(proxy: ModelProxy[Pot[Data]], modelId:Int,otransModelId:Int,storeModelId:Int,accountModelId:Int )
-case class State(item: Option[VendorInvoice[LineVendorInvoice]] = None)
-class InvoiceBackend($: BackendScope[Props, State]) {
+
+class InvoiceBackend($: BackendScope[Props, State[VendorInvoice[LineVendorInvoice]]]) extends
+      Backendx [VendorInvoice[LineVendorInvoice], Props, State[VendorInvoice[LineVendorInvoice]]] ($){
 
   @inline private def bss = GlobalStyles.bootstrapStyles
   @volatile var gitems = Set.empty[VendorInvoice[LineVendorInvoice]]
 
   implicit def orderingById[A <: VendorInvoice[LineVendorInvoice]]: Ordering[A] = {Ordering.by(e => (e.tid, e.tid))}
 
-  val r = List( updateOid1 _, updateStore _, updateAccount _, updateText _, edit _)
+  //val r = List( updateOid1 _, updateStore _, updateAccount _, updateText _, edit _)
 
   def mounted(props: Props) = {
 
@@ -107,6 +107,7 @@ class InvoiceBackend($: BackendScope[Props, State]) {
     $.modState(s => s.copy(item = s.item.map(_.add(created.copy(transid =
       s.item.getOrElse(VendorInvoice[LineVendorInvoice]()).tid)))))
   }
+
   def  AddNewLine(line:LineVendorInvoice) = runLine[LineVendorInvoice](line , AddNewLineFx)
   def  deleteLine(line:LineVendorInvoice) = runLine[LineVendorInvoice](line , deleteLineFx)
   def  saveLine(line:LineVendorInvoice) = runLine[LineVendorInvoice](line , saveLineFx)
@@ -119,7 +120,7 @@ class InvoiceBackend($: BackendScope[Props, State]) {
 
   def  filterWith(line:LineVendorInvoice, search:String) = line.account.getOrElse("").contains(search)
 
-  def render(p: Props, s: State) = {
+   override def render(p: Props, s: State [VendorInvoice[LineVendorInvoice]] ):ReactElement = {
      val addStylesNew = Seq(bss.pullRight, bss.buttonXS)
      val addStylesSave = Seq(bss.pullRight, bss.buttonXS, bss.buttonOpt(CommonStyle.success))
      def  fx(d:VendorInvoice[LineVendorInvoice]):Callback = $.modState(s => s.copy(item = Some(d)))
@@ -135,13 +136,8 @@ class InvoiceBackend($: BackendScope[Props, State]) {
     buildFormTab(p, s, contentTab1, contentTab2)
   }
 
-  def buildFormTab(p: Props, s: State, content1:ReactElement, content2:ReactElement): ReactElement =
-    TabComponent(Seq( TabItem("vtab1", "List", "#vtab1", true, content1),
-                      TabItem("vtab2", "Form", "#vtab2", false, content2)
-                     )
-                   )
 
-  def buildForm (p: Props, s:State, items:List[VendorInvoice[LineVendorInvoice]], header:Seq[ReactElement]) = {
+  def buildForm (p: Props, s:State[VendorInvoice[LineVendorInvoice]], items:List[VendorInvoice[LineVendorInvoice]], header:Seq[ReactElement]) = {
     val supplier =  IWSCircuit.zoom(_.store.get.models.get(p.accountModelId)).eval(IWSCircuit.getRootModel).getOrElse(Ready(Data(List.empty[Supplier]))).get.items.asInstanceOf[List[Supplier]].toSet
     val store =  IWSCircuit.zoom(_.store.get.models.get(p.storeModelId)).eval(IWSCircuit.getRootModel).getOrElse(Ready(Data(List.empty[Store]))).get.items.asInstanceOf[List[Store]].toSet
     val porder = s.item.getOrElse(VendorInvoice[LineVendorInvoice]().add(LineVendorInvoice(account = Some("4711"))))
@@ -154,14 +150,14 @@ class InvoiceBackend($: BackendScope[Props, State]) {
         <.div(^.cls := "container-fluid",
           <.div(^.cls := "row",
             <.div(^.cls := "col-md-24",
-              <.table(^.className := "table-responsive table-condensed", ^.tableLayout := "fixed", ^.cellSpacing := 2.px,
+              <.table(^.className := "table-responsive table-condensed", ^.tableLayout := "fixed", //^.cellSpacing := 2.px,
                 <.tbody(
-                  <.tr(bss.formGroup, ^.height := 10.px, ^.cellSpacing := 2.px, ^.cellPadding := 5.px,
+                  <.tr(bss.formGroup, ^.height := 10.px, ^.cellSpacing := 2.px, ^.cellPadding := 2.px,
                     // <.td(^.cls :="col-xs-24 col-md-2",   ^.width:="10%",  buildItemZ1[String]("Id", s.item.map(_.id), "id")),
                     <.td(^.cls := "col-md-24 col-md-2", ^.width := "10%", ComboBox("id", itemsx = buildTransIdList(items), defValue = "002", evt = updateOid)),
                     <.td(^.cls := "col-md-24 col-md-2", ^.width := "10%", ComboBox("oid", itemsx = buildTransIdList(items), defValue = "001", evt = updateOid)),
                     <.td(^.cls := "col-md-24 col-md-8 col-md-offset-2", ^.width := "50%", ComboBox("Store", itemsx = storeList, defValue = s.item.map(_.store.getOrElse("50001")).getOrElse("50001"), updateStore _)),
-                    <.td(^.cls := "col-md-24 col-md-12 col-md-offset-3", ^.width := "50%", ComboBox("Supplier", itemsx = supplierList, defValue = s.item.map(_.account.getOrElse("70002")).getOrElse("70002"), updateAccount _))
+                    <.td(^.cls := "col-md-24 col-md-12", ^.width := "50%", ComboBox("Supplier", itemsx = supplierList, defValue = s.item.map(_.account.getOrElse("70002")).getOrElse("70002"), updateAccount _))
                   ),
 
                   <.tr(bss.formGroup,
