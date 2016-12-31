@@ -48,10 +48,11 @@ object IWSMain extends js.JSApp {
                MenuItem("022","Goods receipt","#good"),
                MenuItem("023","Inventory Invoice","#iinv"),
                MenuItem("024","Vendor Invoice","#vinv"),
-              MenuItem("025","Payment","#pay")
+               MenuItem("025","Payment","#pay")
     ))
   val v3 = MenuItem("030","Dashboard", "#Dashboard" ,
-    List(MenuItem("031","Dashboard","#scalacss"))
+          List(MenuItem("031","Dashboard","#scalacss"),
+               MenuItem("032","Catalog","#catalog"))
 
     )
   val vm=MenuItem("000","IWS", "#IWS" ,List(v1,v2,v3))
@@ -100,8 +101,9 @@ object IWSMain extends js.JSApp {
       | staticRoute("#bank", BankPage$) ~> renderR(ctl => x11(p11 =>(BANK(p11.asInstanceOf[ModelProxy[Pot[Data]]]))))
       | staticRoute("#bacc", BankAccountPage$) ~> renderR(ctl => x12(p12 =>(BANKACCOUNT(p12.asInstanceOf[ModelProxy[Pot[Data]]]))))
       | staticRoute("#iinv", InventoryInvoicePage$) ~> renderR(ctl => x110(proxy110 => INVENTORYINVOICE("INVENTORYINVOICE",  {"110"},proxy110.asInstanceOf[ModelProxy[Pot[Data]]])))
-      | staticRoute("#vinv", VendorInvoicePage$) ~> renderR(ctl => x112(proxy112 => VENDORINVOICE(proxy112.asInstanceOf[ModelProxy[Pot[Data]]])))
+      | staticRoute("#vinv", VendorInvoicePage$) ~> renderR(ctl => x112(proxy112 => VENDORINVOICE(proxy112.asInstanceOf[ModelProxy[Pot[Data]]],112,112,2,1)))
       | staticRoute("#pay", PaymentPage$) ~> renderR(ctl => x114(proxy114 => PAYMENT(proxy114.asInstanceOf[ModelProxy[Pot[Data]]])))
+      | staticRoute("#catalog", CatalogPage$) ~> renderR(ctl => ProductCalalog.FilterableProductTable(ProductCalalog.PRODUCTS))
        ).notFound(redirectToPage(DashboardPage$)(Redirect.Replace))
    // ).notFound(redirectToPage(Home)(Redirect.Replace))
   }.renderWith(layout)
