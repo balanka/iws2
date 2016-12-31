@@ -26,6 +26,7 @@ object AppRouter {
   case object ScalaCSSDoc extends Page
   case object Components2Doc  extends Page
   case object DropDownDoc  extends Page
+  case object CatalogPage$  extends Page
 
 
 
