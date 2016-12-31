@@ -5,16 +5,20 @@ import com.kabasoft.iws.gui.logger._
 import com.kabasoft.iws.gui.macros.Bootstrap.Button
 import com.kabasoft.iws.gui.macros.{Delete, Icon, Update}
 import com.kabasoft.iws.gui.services.IWSCircuit
-import com.kabasoft.iws.shared.{IWS, Transaction, LineTransaction}
+import com.kabasoft.iws.shared.{Data, IWS, LineTransaction, Transaction}
+import diode.data.Pot
+import diode.react.ModelProxy
+
 import scalacss.ScalaCssReact._
 
 
 object Utilities {
 
-  case class Statex [A](item: Option[A] = None)
-  def updateOid1(idx: String, bs: BackendScope[Props, State]) = {
-    // val oId = idx.substring(0, idx.indexOf("|"))
-    //  log.debug(s"oid is "+oId)
+  case class Props(proxy: ModelProxy[Pot[Data]], modelId:Int,otransModelId:Int,storeModelId:Int,accountModelId:Int )
+  //case class State(item: Option[VendorInvoice[LineVendorInvoice]] = None)
+  case class State [A](item: Option[A] = None)
+  /*def updateOid1(idx: String, bs: BackendScope[Props, State]) = {
+
     bs.modState(s => s.copy(item = s.item.map(_.copy(oid = idx.toLong))))
   }
 
@@ -44,6 +48,7 @@ object Utilities {
         s.item
       }
     ))
+  */
   def runLine [B<:LineTransaction](line:B, fx:B =>Callback):Callback = fx(line)
 
   def editx[A<:IWS](itemx:A, fx:A =>Callback):Callback = fx(itemx)
