@@ -66,14 +66,6 @@ class  DataList {
       )
     )
 
-//  val component = ReactComponentB[Props]("datalist")
-//    .stateless
-//    .render_P (P =>render(P))
-//    .build
-//
-//  def apply(ref: js.UndefOr[String] = "", key: js.Any = {}, label: String,
-//            value: String, onChange: String => Callback,
-//            items:List[String]) = component.set(key, ref)(Props(label, value, onChange,items))
 }
 
 
