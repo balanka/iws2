@@ -17,6 +17,7 @@ import com.kabasoft.iws.dao._
 import com.kabasoft.iws.shared.DAO
 import com.kabasoft.iws.shared.Model._
 import com.kabasoft.iws.dao.Queries._
+import com.kabasoft.iws.shared.common._
 
 
 object DAOObjects  {
@@ -25,57 +26,35 @@ object DAOObjects  {
 
   implicit def accountDAO = new DAO[Account] {
 
-    def insert(model: List[Account]): Int = doobie.imports.Update[Queries.ACCOUNT_TYPE](Queries.accountInsertSQL).
+    def insert(model: List[Account]): Int = doobie.imports.Update[ACCOUNT_TYPE](Queries.accountInsertSQL).
       updateMany(model.map(x =>
       (x.id, x.name, x.modelId, x.description, x.groupId.getOrElse(""), x.dateOfOpen.getOrElse(new Date()), x.dateOfClose.getOrElse(new Date())))).transact(xa).run
 
     def create (modelId:Int)= Queries.createAccount.run.transact(xa).run
     def update(model: Account): Int = Queries.accountUpdateName(model).run.transact(xa).run
     def delete(model: Account): Int = Queries.accountDelete(model.id).run.transact(xa).run
-    def all(model:Account): List[Account] = Queries.accountSelect.process.list.transact(xa).run.map(x =>
-      Account(x._1, x._2, x._3, x._4, Some(x._5),None, Some(x._6), Some(x._7)).copy(accounts = Some(findSome2(x._1))))
-
-    def find(model: Account): List[Account] = Queries.accountIdSelect(model.id).process.list.transact(xa).run.map(x =>
-     Account(x._1, x._2, x._3, x._4, Some(x._5), None, Some(x._6), Some(x._7)).copy(accounts = Some(findSome2(x._1))))
-
-    def findSome(model: Account): List[Account] = Queries.accountSelectSome(model.id).process.list.transact(xa).run.map(x =>
-     Account(x._1, x._2, x._3, x._4, Some(x._5),None, Some(x._6), Some(x._7)).copy(accounts = Some(findSome2(x._1))))
-
-    def findSome1(id: Long): List[Account] = Queries.accountSelectSome(id + "").process.list.transact(xa).run.map(x =>
-      Account(x._1, x._2, x._3, x._4, Some(x._5), None, Some(x._6), Some(x._7)).copy(accounts = Some(findSome2(x._1))))
-
-    def findSome2(groupid: String): List[Account] = Queries.accountSelectByGroupId(groupid).process.list.transact(xa).run.map(x =>
-      Account(x._1, x._2, x._3, x._4, Some(x._5), None, Some(x._6), Some(x._7)).copy(accounts = Some(findSome2(x._1))))
+    def all(model:Account): List[Account] = Queries.accountSelect.process.list.transact(xa).run.map(x =>Account_(x).copy(accounts = Some(findSome2(x._1))))
+    def find(model: Account): List[Account] = Queries.accountIdSelect(model.id).process.list.transact(xa).run.map(x =>Account_(x).copy(accounts = Some(findSome2(x._1))))
+    def findSome(model: Account): List[Account] = Queries.accountSelectSome(model.id).process.list.transact(xa).run.map(x =>Account_(x).copy(accounts = Some(findSome2(x._1))))
+    def findSome1(id: Long): List[Account] = Queries.accountSelectSome(id + "").process.list.transact(xa).run.map(x =>Account_(x).copy(accounts = Some(findSome2(x._1))))
+    def findSome2(groupid: String): List[Account] = Queries.accountSelectByGroupId(groupid).process.list.transact(xa).run.map(x => Account_(x).copy(accounts = Some(findSome2(x._1))))
 
   }
 
   implicit def articleDAO = new DAO[Article]
   {
-     def insert(model: List[Article]): Int = doobie.imports.Update[Queries.ARTICLE_TYPE](Queries.articleInsertSQL).
+     def insert(model: List[Article]): Int = doobie.imports.Update[ARTICLE_TYPE](Queries.articleInsertSQL).
       updateMany(model.map(x =>
         (x.id, x.name, x.modelId, x.description, x.price,  x.avgPrice, x.salesPrice, x.qttyUnit, x.packUnit,  x.groupId.getOrElse(""), x.vat.getOrElse("0")))).transact(xa).run
 
      def create (modelId:Int)= Queries.createArticle.run.transact(xa).run
      def update(model:Article) = Queries.articleUpdateName(model).run.transact(xa).run
      def delete(model:Article)= Queries.articleDelete(model.id).run.transact(xa).run
-     def all(model:Article): List[Article] = Queries.articleSelect.process.list.transact(xa).run.map(x =>
-      Article(x._1, x._2, x._3, x._4, x._5, x._6, x._7, x._8, x._9, Some(x._10), Some(x._11)).copy(articles = Some(findSome2(x._1))))
-
-    def find(model:Article)= Queries.articleIdSelect(model.id).process.list.transact(xa).run.map(x =>
-      Article(x._1, x._2, x._3, x._4, x._5, x._6, x._7,  x._8, x._9, Some(x._10), Some(x._11)).copy(articles = Some(findSome2(x._1))))
-
-  
-    def findSome(model:Article)= Queries.articleSelectSome(model.id).process.list.transact(xa).run.map(x =>
-      Article(x._1, x._2, x._3, x._4, x._5, x._6, x._7,  x._8, x._9, Some(x._10), Some(x._11)).copy(articles = Some(findSome2(x._1))))
-
-    // def update(model:Article): List[Article] = Queries.articleSelectSome(model.id).process.list.transact(xa).run.map(x =>
-    //  Article(x._1, x._2, x._3, x._4, x._5, x._6, x._7,  x._8, x._9, Some(x._10), Some(x._11)).copy(articles = Some(findSome2(x._1))))
-
-    def findSome1(id: Long): List[Article] = Queries.articleSelectSome(id + "").process.list.transact(xa).run.map(x =>
-      Article(x._1, x._2, x._3, x._4, x._5, x._6, x._7,  x._8, x._9, Some(x._10), Some(x._11)).copy(articles = Some(findSome2(x._1))))
-
-    def findSome2(groupId: String): List[Article] = Queries.articleSelectByGroupId(groupId).process.list.transact(xa).run.map(x =>
-      Article(x._1, x._2, x._3, x._4, x._5, x._6, x._7,  x._8, x._9, Some(x._10), Some(x._11)).copy(articles = Some(findSome2(x._1))))
+     def all(model:Article): List[Article] = Queries.articleSelect.process.list.transact(xa).run.map(x => Article_(x).copy(articles = Some(findSome2(x._1))))
+     def find(model:Article)= Queries.articleIdSelect(model.id).process.list.transact(xa).run.map(x => Article_(x).copy(articles = Some(findSome2(x._1))))
+     def findSome(model:Article)= Queries.articleSelectSome(model.id).process.list.transact(xa).run.map(x =>Article_(x).copy(articles = Some(findSome2(x._1))))
+     def findSome1(id: Long): List[Article] = Queries.articleSelectSome(id + "").process.list.transact(xa).run.map(x => Article_(x).copy(articles = Some(findSome2(x._1))))
+     def findSome2(groupId: String): List[Article] = Queries.articleSelectByGroupId(groupId).process.list.transact(xa).run.map(x =>Article_(x).copy(articles = Some(findSome2(x._1))))
   }
 
   implicit def bankDAO = new DAO[Bank]

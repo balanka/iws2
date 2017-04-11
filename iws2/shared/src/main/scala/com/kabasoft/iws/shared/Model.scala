@@ -3,7 +3,7 @@ package com.kabasoft.iws.shared
 import java.util.Date
 
 import boopickle.Default._
-import com.kabasoft.iws.shared.common.Amount
+import com.kabasoft.iws.shared.common._
 
 import util.{Failure, Success, Try}
 import scalaz._
@@ -13,9 +13,36 @@ import Scalaz._
 //import monocle.macros._
 //import monocle.macros.GenLens
 
+
+
 object common {
   type Amount = scala.math.BigDecimal
   def today = new Date()
+  type ACCOUNT_TYPE =(String, String, Int, String, String,  Date, Date)
+  type ARTICLE_TYPE =(String, String, Int, String, scala.math.BigDecimal, scala.math.BigDecimal, scala.math.BigDecimal,String, String, String, String)
+  type STORE_TYPE = (String, String, Int, String,  String, String, String, String)
+
+  type SalesOrder_TYPE =(Long,Long,Int, String,String, String)
+  type Goodreceiving_TYPE =(Long,Long,Int, String,String, String)
+  type InventoryInvoice_TYPE =(Long,Long,Int, String,String, String)
+  type LineVendorInvoice_TYPE = (Long,Long,Int, String,Boolean, String, BigDecimal, Date, String)
+  type VendorInvoice_TYPE =(Long,Long,Int, String,String, String)
+  type LinePayment_TYPE = (Long,Long,Int, String,Boolean, String, BigDecimal, Date, String)
+  type Payment_TYPE =(Long,Long,Int, String,String, String)
+  type LineSalesOrder_TYPE = (Long,Long,Int, String,String,BigDecimal,BigDecimal,String, Date, String)
+  type PurchaseOrder_TYPE =(Long,Long,Int, String,String, String)
+  type LinePurchaseOrder_TYPE = (Long,Long,Int, String,String,BigDecimal,BigDecimal,String, Date, String)
+  type LineGoodreceiving_TYPE = (Long,Long,Int, String,String,BigDecimal,BigDecimal,String, Date, String)
+  type LineInventoryInvoice_TYPE = (Long,Long,Int, String,String,BigDecimal,BigDecimal,String, Date, String)
+  type LineBillOfDelivery_TYPE = (Long,Long,Int, String,String,BigDecimal,BigDecimal,String, Date, String)
+  type LineSalesInvoice_TYPE = (Long,Long,Int, String,String,BigDecimal,BigDecimal,String, Date, String)
+  type SalesInvoice_TYPE =(Long,Long,Int, String,String, String)
+  type LineCustomerInvoice_TYPE = (Long,Long,Int, String,Boolean, String, BigDecimal, Date, String)
+  type CustomerInvoice_TYPE =(Long,Long,Int, String,String, String)
+  type LineSettlement_TYPE = (Long,Long,Int, String,Boolean, String, BigDecimal, Date, String)
+  type Settlement_TYPE =(Long,Long,Int, String,String, String)
+  type BillOfDelivery_TYPE =(Long,Long,Int, String,String, String)
+
 }
 sealed trait IWS {
   def id:String
@@ -696,9 +723,12 @@ object  CostCenter_{ def unapply (in:CostCenter) =Some(in.id,in.name, in.modelId
 object  QuantityUnit_{ def unapply (in:QuantityUnit) =Some(in.id,in.name,in.modelId, in.description)}
 object  Bank_{ def unapply (in:Bank) =Some(in.id,in.name,in.modelId, in.description)}
 object  BankAccount_{ def unapply (in:BankAccount) =Some(in.id,in.name,in.modelId, in.description, in.bic, in.debit, in.credit)}
-object  Account_{ def unapply (in:Account) =Some(in.id,in.name,in.modelId, in.description, in.groupId, in.accounts, in.dateOfOpen,in.dateOfClose,in.balance)}
+object  Account_{ def unapply (in:Account) =Some(in.id,in.name,in.modelId, in.description, in.groupId, in.accounts, in.dateOfOpen,in.dateOfClose,in.balance)
+         def apply(x:ACCOUNT_TYPE) =Account(x._1, x._2, x._3, x._4, Some(x._5),None, Some(x._6), Some(x._7))}
 object  Article_{ def unapply (in:Article) =Some(in.id,in.name, in.modelId, in.description, in.price,
-  in.avgPrice, in.salesPrice, in.qttyUnit, in.packUnit, in.vat, in.articles)}
+  in.avgPrice, in.salesPrice, in.qttyUnit, in.packUnit, in.vat, in.articles)
+ def apply( x :ARTICLE_TYPE) = Article(x._1, x._2, x._3, x._4, x._5, x._6, x._7,  x._8, x._9, Some(x._10), Some(x._11))
+}
 object  PeriodicAccountBalance_{ def unapply (in:PeriodicAccountBalance) =Some(in.id,in.name,in.description, in.accountId, in.periode, in.debit, in.credit)}
 object  Stock_{ def unapply (in:Stock) =Some(in.id,in.name,in.description, in.itemId, in.storeId, in.quantity, in.minStock)}
 object  ArticleGroup_{ def unapply (in:ArticleGroup) =Some(in.id,in.name,in.modelId, in.description)}

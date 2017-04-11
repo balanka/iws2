@@ -12,13 +12,10 @@ import doobie.free.connection.ConnectionIO
 import doobie.imports._
 import doobie.syntax._
 import com.kabasoft.iws.shared._
+import com.kabasoft.iws.shared.common._
 import com.kabasoft.iws.shared.Model._
 
 object Queries  {
-
-  type ACCOUNT_TYPE =(String, String, Int, String, String,  Date, Date)
-  type ARTICLE_TYPE =(String, String, Int, String, scala.math.BigDecimal, scala.math.BigDecimal, scala.math.BigDecimal,String, String, String, String)
-  type STORE_TYPE = (String, String, Int, String,  String, String, String, String)
 
   def create: Update0 = createSchema.update
   def bankInsertSQL= "INSERT INTO Bank (id, name, modelId, description)  VALUES (?, ?, ?, ?)"
@@ -133,7 +130,7 @@ object Queries  {
   def vatSelectSome  = { id:String =>sql"SELECT * FROM vat where id =$id".query[Vat]}
   def vatUpdateName= {(model:Vat) =>sql"Update vat set  name =${model.name}, description=${model.description},percent=${model.percent}, inputVatAccountId=${model.inputVatAccountId},  outputVatAccountId=${model.outputVatAccountId},  revenueAccountId=${model.revenueAccountId}, stockAccountId=${model.stockAccountId},  expenseAccountId=${model.expenseAccountId}, where id =${model.id}".update}
   def vatDelete = {id:String =>sql"Delete FROM vat where id =$id".update}
-  type LinePurchaseOrder_TYPE = (Long,Long,Int, String,String,BigDecimal,BigDecimal,String, Date, String)
+
   def linePurchaseOrderInsertSQL = "INSERT INTO LinePurchaseOrder ( id, transid, modelId, item, unit,price, quantity, vat, duedate, text)  VALUES (?, ?, ?,?,?,?,?,?,?,?)"
   def linePurchaseOrderSelect = sql"SELECT * FROM LinePurchaseOrder".query[LinePurchaseOrder_TYPE]
   def linePurchaseOrderIdSelect1(id:String) = sql"SELECT * FROM LinePurchaseOrder  where id =$id".query[LinePurchaseOrder_TYPE]
@@ -143,7 +140,8 @@ object Queries  {
     sql"Update LinePurchaseOrder set transid=${model.transid}, item=${model.item.get}, modelId=${model.modelId}, unit=${model.unit.get},quantity = ${model.quantity}, price=${model.price},vat=${model.vat.get},duedate=${model.duedate.get}, text =${model.text} where id =${model.tid}".update}
   def linePurchaseOrderDelete = {(id:Long) =>sql"Delete FROM LinePurchaseOrder where id =$id".update}
   //INSERT INTO PurchaseOrder ( oid, modelId, store, account) VALUES (0,101,'200','1000');
-  type PurchaseOrder_TYPE =(Long,Long,Int, String,String, String)
+
+
   def purchaseOrderInsertSQL = "INSERT INTO PurchaseOrder (id, oid, modelId, store, account, text) VALUES (?, ?, ?,?,?, ?)"
   def purchaseOrderSelect = sql"SELECT * FROM PurchaseOrder".query[PurchaseOrder_TYPE]
   def purchaseOrderIdSelect1(id:String) = sql"SELECT * FROM PurchaseOrder  where id =$id.toLong".query[PurchaseOrder_TYPE]
@@ -153,7 +151,7 @@ object Queries  {
     sql"Update PurchaseOrder set oid =${model.oid}, store=${model.store.get}, account=${model.account.get} where id =${model.tid}".update}
   def purchaseOrderDelete = {id:Long =>sql"Delete FROM PurchaseOrder where id =$id".update}
 
-  type LineGoodreceiving_TYPE = (Long,Long,Int, String,String,BigDecimal,BigDecimal,String, Date, String)
+
   def lineGoodreceivingInsertSQL = "INSERT INTO LineGoodreceiving ( id, transid, modelId, item, unit,price, quantity, vat, duedate, text)  VALUES (?, ?, ?,?,?,?,?,?,?,?)"
   def lineGoodreceivingSelect = sql"SELECT * FROM LineGoodreceiving".query[LineGoodreceiving_TYPE]
   def lineGoodreceivingIdSelect1(id:String) = sql"SELECT * FROM LineGoodreceiving  where id =$id".query[LineGoodreceiving_TYPE]
@@ -162,7 +160,7 @@ object Queries  {
   def lineGoodreceivingUpdateName = {(model:LineGoodreceiving) =>
     sql"Update LineGoodreceiving set transid=${model.transid}, item=${model.item.get}, modelId=${model.modelId}, unit=${model.unit.get},quantity = ${model.quantity}, price=${model.price},vat=${model.vat.get},duedate=${model.duedate.get}, text =${model.text} where id =${model.tid}".update}
   def lineGoodreceivingDelete = {(id:Long) =>sql"Delete FROM LineGoodreceiving where id =$id".update}
-  type Goodreceiving_TYPE =(Long,Long,Int, String,String, String)
+
   def goodreceivingInsertSQL = "INSERT INTO Goodreceiving (id, oid, modelId, store, account, text) VALUES (?, ?, ?, ?, ?, ?)"
   def goodreceivingSelect = sql"SELECT * FROM Goodreceiving".query[Goodreceiving_TYPE]
   def goodreceivingIdSelect1(id:String) = sql"SELECT * FROM Goodreceiving  where id =$id.toLong".query[Goodreceiving_TYPE]
@@ -172,7 +170,7 @@ object Queries  {
     sql"Update Goodreceiving set oid =${model.oid}, store=${model.store.get}, account=${model.account.get} where id =${model.tid}".update}
   def goodreceivingDelete = {id:Long =>sql"Delete FROM Goodreceiving where id =$id".update}
 
- type LineInventoryInvoice_TYPE = (Long,Long,Int, String,String,BigDecimal,BigDecimal,String, Date, String)
+
   def lineInventoryInvoiceInsertSQL = "INSERT INTO LineInventoryInvoice ( id, transid, modelId, item, unit,price, quantity, vat, duedate, text)  VALUES (?, ?, ?,?,?,?,?,?,?,?)"
   def lineInventoryInvoiceSelect = sql"SELECT * FROM LineInventoryInvoice".query[LineInventoryInvoice_TYPE]
   def lineInventoryInvoiceIdSelect1(id:String) = sql"SELECT * FROM LineInventoryInvoice  where id =$id".query[LineInventoryInvoice_TYPE]
@@ -181,7 +179,7 @@ object Queries  {
   def lineInventoryInvoiceUpdateName = {(model:LineInventoryInvoice) =>
     sql"Update LineInventoryInvoice set transid=${model.transid}, item=${model.item.get}, modelId=${model.modelId}, unit=${model.unit.get},quantity = ${model.quantity}, price=${model.price},vat=${model.vat.get},duedate=${model.duedate.get}, text =${model.text} where id =${model.tid}".update}
   def lineInventoryInvoiceDelete = {(id:Long) =>sql"Delete FROM LineInventoryInvoice where id =$id".update}
-  type InventoryInvoice_TYPE =(Long,Long,Int, String,String, String)
+
   def inventoryInvoiceInsertSQL = "INSERT INTO InventoryInvoice (id, oid, modelId, store, account, text) VALUES (?, ?, ?, ?, ?, ?)"
   def inventoryInvoiceSelect = sql"SELECT * FROM InventoryInvoice".query[InventoryInvoice_TYPE]
   def inventoryInvoiceIdSelect1(id:String) = sql"SELECT * FROM InventoryInvoice  where id =$id.toLong".query[InventoryInvoice_TYPE]
@@ -191,7 +189,7 @@ object Queries  {
     sql"Update InventoryInvoice set oid =${model.oid}, store=${model.store.get}, account=${model.account.get} where id =${model.tid}".update}
   def inventoryInvoiceDelete = {id:Long =>sql"Delete FROM InventoryInvoice where id =$id".update}
 
-  type LineVendorInvoice_TYPE = (Long,Long,Int, String,Boolean, String, BigDecimal, Date, String)
+
   def lineVendorInvoiceInsertSQL = "INSERT INTO LineVendorInvoice ( id, transid, modelId, account, side ,oaccount, amount,  duedate, text)  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
   def lineVendorInvoiceSelect = sql"SELECT * FROM LineVendorInvoice".query[LineVendorInvoice_TYPE]
   def lineVendorInvoiceIdSelect1(id:String) = sql"SELECT * FROM LineVendorInvoice  where id =$id".query[LineVendorInvoice_TYPE]
@@ -200,7 +198,7 @@ object Queries  {
   def lineVendorInvoiceUpdateName = {(model:LineVendorInvoice) =>
     sql"Update LineVendorInvoice set transid=${model.transid},  modelId=${model.modelId}, account=${model.account.get}, side = ${model.side}, oaccount=${model.oaccount.get}, amount=${model.amount}, duedate=${model.duedate.get}, text =${model.text} where id =${model.tid}".update}
   def lineVendorInvoiceDelete = {(id:Long) =>sql"Delete FROM LineVendorInvoice where id =$id".update}
-  type VendorInvoice_TYPE =(Long,Long,Int, String,String, String)
+
   def vendorInvoiceInsertSQL = "INSERT INTO VendorInvoice (id, oid, modelId, store, account, text) VALUES (?, ?, ?, ?, ?, ?)"
   def vendorInvoiceSelect = sql"SELECT * FROM VendorInvoice".query[VendorInvoice_TYPE]
   def vendorInvoiceIdSelect1(id:String) = sql"SELECT * FROM VendorInvoice  where id =$id.toLong".query[VendorInvoice_TYPE]
@@ -210,7 +208,8 @@ object Queries  {
     sql"Update VendorInvoice set oid =${model.oid}, store=${model.store.get}, account=${model.account.get} where id =${model.tid}".update}
   def vendorInvoiceDelete = {id:Long =>sql"Delete FROM VendorInvoice where id =$id".update}
 
-  type LinePayment_TYPE = (Long,Long,Int, String,Boolean, String, BigDecimal, Date, String)
+
+
   def linePaymentInsertSQL = "INSERT INTO LinePayment ( id, transid, modelId, account, side ,oaccount, amount,  duedate, text)  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
   def linePaymentSelect = sql"SELECT * FROM LinePayment".query[LinePayment_TYPE]
   def linePaymentIdSelect1(id:String) = sql"SELECT * FROM LinePayment  where id =$id".query[LinePayment_TYPE]
@@ -220,7 +219,7 @@ object Queries  {
     sql"Update LinePayment set transid=${model.transid},  modelId=${model.modelId}, account=${model.account.get}, side = ${model.side}, oaccount=${model.oaccount.get}, amount=${model.amount}, duedate=${model.duedate.get}, text =${model.text} where id =${model.tid}".update}
   def linePaymentDelete = {(id:Long) =>sql"Delete FROM LinePayment where id =$id".update}
   
-  type Payment_TYPE =(Long,Long,Int, String,String, String)
+
   def paymentInsertSQL = "INSERT INTO Payment (id, oid, modelId, store, account, text) VALUES (?, ?, ?, ?, ?, ?)"
   def paymentSelect = sql"SELECT * FROM Payment".query[Payment_TYPE]
   def paymentIdSelect1(id:String) = sql"SELECT * FROM Payment  where id =$id.toLong".query[Payment_TYPE]
@@ -230,7 +229,7 @@ object Queries  {
     sql"Update payment set oid =${model.oid}, store=${model.store.get}, account=${model.account.get} where id =${model.tid}".update}
   def paymentDelete = {id:Long =>sql"Delete FROM Payment where id =$id".update}
 
-  type LineSalesOrder_TYPE = (Long,Long,Int, String,String,BigDecimal,BigDecimal,String, Date, String)
+
   def lineSalesOrderInsertSQL = "INSERT INTO LineSalesOrder ( id, transid, modelId, item, unit,price, quantity, vat, duedate, text)  VALUES (?, ?, ?,?,?,?,?,?,?,?)"
   def lineSalesOrderSelect = sql"SELECT * FROM LineSalesOrder".query[LineSalesOrder_TYPE]
   def lineSalesOrderIdSelect1(id:String) = sql"SELECT * FROM LineSalesOrder  where id =$id".query[LineSalesOrder_TYPE]
@@ -240,7 +239,7 @@ object Queries  {
     sql"Update LineSalesOrder set transid=${model.transid}, item=${model.item.get}, modelId=${model.modelId}, unit=${model.unit.get},quantity = ${model.quantity}, price=${model.price},vat=${model.vat.get},duedate=${model.duedate.get}, text =${model.text} where id =${model.tid}".update}
   def lineSalesOrderDelete = {(id:Long) =>sql"Delete FROM LineSalesOrder where id =$id".update}
   //INSERT INTO SalesOrder ( oid, modelId, store, account) VALUES (0,101,'200','1000');
-  type SalesOrder_TYPE =(Long,Long,Int, String,String, String)
+
   def salesOrderInsertSQL = "INSERT INTO SalesOrder (id, oid, modelId, store, account, text) VALUES (?, ?, ?,?,?, ?)"
   def salesOrderSelect = sql"SELECT * FROM SalesOrder".query[SalesOrder_TYPE]
   def salesOrderIdSelect1(id:String) = sql"SELECT * FROM SalesOrder  where id =$id.toLong".query[SalesOrder_TYPE]
@@ -250,7 +249,7 @@ object Queries  {
     sql"Update SalesOrder set oid =${model.oid}, store=${model.store.get}, account=${model.account.get} where id =${model.tid}".update}
   def salesOrderDelete = {id:Long =>sql"Delete FROM SalesOrder where id =$id".update}
 
-  type LineBillOfDelivery_TYPE = (Long,Long,Int, String,String,BigDecimal,BigDecimal,String, Date, String)
+
   def lineBillOfDeliveryInsertSQL = "INSERT INTO LineBillOfDelivery ( id, transid, modelId, item, unit,price, quantity, vat, duedate, text)  VALUES (?, ?, ?,?,?,?,?,?,?,?)"
   def lineBillOfDeliverySelect = sql"SELECT * FROM LineBillOfDelivery".query[LineBillOfDelivery_TYPE]
   def lineBillOfDeliveryIdSelect1(id:String) = sql"SELECT * FROM LineBillOfDelivery  where id =$id".query[LineBillOfDelivery_TYPE]
@@ -259,7 +258,7 @@ object Queries  {
   def lineBillOfDeliveryUpdateName = {(model:LineBillOfDelivery) =>
     sql"Update LineBillOfDelivery set transid=${model.transid}, item=${model.item.get}, modelId=${model.modelId}, unit=${model.unit.get},quantity = ${model.quantity}, price=${model.price},vat=${model.vat.get},duedate=${model.duedate.get}, text =${model.text} where id =${model.tid}".update}
   def lineBillOfDeliveryDelete = {(id:Long) =>sql"Delete FROM LineBillOfDelivery where id =$id".update}
-  type BillOfDelivery_TYPE =(Long,Long,Int, String,String, String)
+
   def billOfDeliveryInsertSQL = "INSERT INTO BillOfDelivery (id, oid, modelId, store, account, text) VALUES (?, ?, ?, ?, ?, ?)"
   def billOfDeliverySelect = sql"SELECT * FROM BillOfDelivery".query[BillOfDelivery_TYPE]
   def billOfDeliveryIdSelect1(id:String) = sql"SELECT * FROM BillOfDelivery  where id =$id.toLong".query[BillOfDelivery_TYPE]
@@ -269,7 +268,7 @@ object Queries  {
     sql"Update BillOfDelivery set oid =${model.oid}, store=${model.store.get}, account=${model.account.get} where id =${model.tid}".update}
   def billOfDeliveryDelete = {id:Long =>sql"Delete FROM BillOfDelivery where id =$id".update}
 
-  type LineSalesInvoice_TYPE = (Long,Long,Int, String,String,BigDecimal,BigDecimal,String, Date, String)
+
   def lineSalesInvoiceInsertSQL = "INSERT INTO LineSalesInvoice ( id, transid, modelId, item, unit,price, quantity, vat, duedate, text)  VALUES (?, ?, ?,?,?,?,?,?,?,?)"
   def lineSalesInvoiceSelect = sql"SELECT * FROM LineSalesInvoice".query[LineSalesInvoice_TYPE]
   def lineSalesInvoiceIdSelect1(id:String) = sql"SELECT * FROM LineSalesInvoice  where id =$id".query[LineSalesInvoice_TYPE]
@@ -278,7 +277,7 @@ object Queries  {
   def lineSalesInvoiceUpdateName = {(model:LineSalesInvoice) =>
     sql"Update LineSalesInvoice set transid=${model.transid}, item=${model.item.get}, modelId=${model.modelId}, unit=${model.unit.get},quantity = ${model.quantity}, price=${model.price},vat=${model.vat.get},duedate=${model.duedate.get}, text =${model.text} where id =${model.tid}".update}
   def lineSalesInvoiceDelete = {(id:Long) =>sql"Delete FROM LineSalesInvoice where id =$id".update}
-  type SalesInvoice_TYPE =(Long,Long,Int, String,String, String)
+
   def salesInvoiceInsertSQL = "INSERT INTO SalesInvoice (id, oid, modelId, store, account, text) VALUES (?, ?, ?, ?, ?, ?)"
   def salesInvoiceSelect = sql"SELECT * FROM SalesInvoice".query[SalesInvoice_TYPE]
   def salesInvoiceIdSelect1(id:String) = sql"SELECT * FROM SalesInvoice  where id =$id.toLong".query[SalesInvoice_TYPE]
@@ -288,7 +287,8 @@ object Queries  {
     sql"Update SalesInvoice set oid =${model.oid}, store=${model.store.get}, account=${model.account.get} where id =${model.tid}".update}
   def salesInvoiceDelete = {id:Long =>sql"Delete FROM SalesInvoice where id =$id".update}
 
-  type LineCustomerInvoice_TYPE = (Long,Long,Int, String,Boolean, String, BigDecimal, Date, String)
+
+
   def lineCustomerInvoiceInsertSQL = "INSERT INTO LineCustomerInvoice ( id, transid, modelId, account, side ,oaccount, amount,  duedate, text)  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
   def lineCustomerInvoiceSelect = sql"SELECT * FROM LineCustomerInvoice".query[LineCustomerInvoice_TYPE]
   def lineCustomerInvoiceIdSelect1(id:String) = sql"SELECT * FROM LineCustomerInvoice  where id =$id".query[LineCustomerInvoice_TYPE]
@@ -297,7 +297,7 @@ object Queries  {
   def lineCustomerInvoiceUpdateName = {(model:LineCustomerInvoice) =>
     sql"Update LineCustomerInvoice set transid=${model.transid},  modelId=${model.modelId}, account=${model.account.get}, side = ${model.side}, oaccount=${model.oaccount.get}, amount=${model.amount}, duedate=${model.duedate.get}, text =${model.text} where id =${model.tid}".update}
   def lineCustomerInvoiceDelete = {(id:Long) =>sql"Delete FROM LineCustomerInvoice where id =$id".update}
-  type CustomerInvoice_TYPE =(Long,Long,Int, String,String, String)
+
   def customerInvoiceInsertSQL = "INSERT INTO CustomerInvoice (id, oid, modelId, store, account, text) VALUES (?, ?, ?, ?, ?, ?)"
   def customerInvoiceSelect = sql"SELECT * FROM CustomerInvoice".query[CustomerInvoice_TYPE]
   def customerInvoiceIdSelect1(id:String) = sql"SELECT * FROM CustomerInvoice  where id =$id.toLong".query[CustomerInvoice_TYPE]
@@ -307,7 +307,7 @@ object Queries  {
     sql"Update CustomerInvoice set oid =${model.oid}, store=${model.store.get}, account=${model.account.get} where id =${model.tid}".update}
   def customerInvoiceDelete = {id:Long =>sql"Delete FROM CustomerInvoice where id =$id".update}
 
-  type LineSettlement_TYPE = (Long,Long,Int, String,Boolean, String, BigDecimal, Date, String)
+
   def lineSettlementInsertSQL = "INSERT INTO LineSettlement ( id, transid, modelId, account, side ,oaccount, amount,  duedate, text)  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
   def lineSettlementSelect = sql"SELECT * FROM LineSettlement".query[LineSettlement_TYPE]
   def lineSettlementIdSelect1(id:String) = sql"SELECT * FROM LineSettlement  where id =$id".query[LineSettlement_TYPE]
@@ -317,7 +317,7 @@ object Queries  {
     sql"Update LineSettlement set transid=${model.transid},  modelId=${model.modelId}, account=${model.account.get}, side = ${model.side}, oaccount=${model.oaccount.get}, amount=${model.amount}, duedate=${model.duedate.get}, text =${model.text} where id =${model.tid}".update}
   def lineSettlementDelete = {(id:Long) =>sql"Delete FROM LineSettlement where id =$id".update}
 
-  type Settlement_TYPE =(Long,Long,Int, String,String, String)
+
   def settlementInsertSQL = "INSERT INTO Settlement (id, oid, modelId, store, account, text) VALUES (?, ?, ?, ?, ?, ?)"
   def settlementSelect = sql"SELECT * FROM Settlement".query[Settlement_TYPE]
   def settlementIdSelect1(id:String) = sql"SELECT * FROM Settlement  where id =$id.toLong".query[Settlement_TYPE]
