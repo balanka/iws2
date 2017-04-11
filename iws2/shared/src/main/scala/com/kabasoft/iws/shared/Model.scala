@@ -2,12 +2,8 @@ package com.kabasoft.iws.shared
 
 import java.util.Date
 
-import boopickle.Default._
 import com.kabasoft.iws.shared.common._
 
-import util.{Failure, Success, Try}
-import scalaz._
-import Scalaz._
 
 //import shapeless.lens
 //import monocle.macros._
@@ -778,6 +774,8 @@ object Lenses {
 
 }
 */
+
+/*
 object Account {
 
 
@@ -842,16 +840,16 @@ object Account {
       }
     }.disjunction
   }
-}
+}*/
 
 object Model {
 
   import common._
 
  val accounts=List(
-   Account("1000", "Kasse", 9, "Kasse",None, None, today.some, today.some),
-   Account("2000", "Bank", 9, "Bank", None, None, today.some, today.some),
-   Account("3000", "Forderung", 9, "Forderung", None, None, today.some, today.some)
+   Account("1000", "Kasse", 9, "Kasse",None, None, Some(today), Some(today)),
+   Account("2000", "Bank", 9, "Bank", None, None, Some(today),Some(today)),
+   Account("3000", "Forderung", 9, "Forderung", None, None, Some(today),Some(today))
  )
 
   val quantityUnits=List(

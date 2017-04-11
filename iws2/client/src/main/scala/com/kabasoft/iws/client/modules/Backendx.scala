@@ -10,7 +10,8 @@ abstract class Backendx [A,B, C, D, P<:Props[A,B, C, D], S<:State[A]]($: Backend
   def render(p:P, s:S): ReactElement
 
   def buildFormTab(p: Props[A, B, C, D], s: State [A], content1:ReactElement, content2:ReactElement): ReactElement =
-      TabComponent(Seq(
+      TabComponent(
+        Seq(
         TabItem("vtab1", "List", "#vtab1", true, content1),
         TabItem("vtab2", "Form", "#vtab2", false, content2)
        )
