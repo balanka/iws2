@@ -22,15 +22,14 @@ object MakeService {
 
     q"""
        implicit val api = new DAO[$t] {
-           def create():Int = {run.runG[Int](Create[$t])}
-           def all(): List[$t] = run.runG[List[$t]](new FindAll[$t])
+           def create(modelId:Int):Int = {run.runG[Int](Create[$t](modelId))}
+           def all(model:$t): List[$t] = run.runG[List[$t]](new FindAll[$t](model))
            def insert(model: List[$t]):Int = run.runG[Int](new Insert[$t](model))
-           def findSome(id: String): List[$t] = run.runG[List[$t]](new FindSome[$t](id))
-           def findSome1(id: Long): List[$t] = run.runG[List[$t]](new FindSome1[$t](id))
-           def find(id: String): List[$t] = run.runG[List[$t]](new Find[$t](id))
-           def delete(id: String): Int =  run.runG[Int](new Delete[$t](id))
+           def findSome(model: $t): List[$t] = run.runG[List[$t]](new FindSome[$t](model))
+           def find(model: $t): List[$t] = run.runG[List[$t]](new Find[$t](model))
+           def delete(model: $t): Int =  run.runG[Int](new Delete[$t](model))
            def update(item: $t):Int = {
-            val i = run.runG[List[$t]](new Find[$t](item.id))
+            val i = run.runG[List[$t]](new Find[$t](item))
             val k = if (i.size > 0) run.runG[Int](new Update[$t](item)) else run.runG[Int](new Insert[$t](List(item)))
             k
           }

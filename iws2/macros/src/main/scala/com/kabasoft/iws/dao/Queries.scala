@@ -133,7 +133,7 @@ object Queries  {
   def vatSelectSome  = { id:String =>sql"SELECT * FROM vat where id =$id".query[Vat]}
   def vatUpdateName= {(model:Vat) =>sql"Update vat set  name =${model.name}, description=${model.description},percent=${model.percent}, inputVatAccountId=${model.inputVatAccountId},  outputVatAccountId=${model.outputVatAccountId},  revenueAccountId=${model.revenueAccountId}, stockAccountId=${model.stockAccountId},  expenseAccountId=${model.expenseAccountId}, where id =${model.id}".update}
   def vatDelete = {id:String =>sql"Delete FROM vat where id =$id".update}
-   type LinePurchaseOrder_TYPE = (Long,Long,Int, String,String,BigDecimal,BigDecimal,String, Date, String)
+  type LinePurchaseOrder_TYPE = (Long,Long,Int, String,String,BigDecimal,BigDecimal,String, Date, String)
   def linePurchaseOrderInsertSQL = "INSERT INTO LinePurchaseOrder ( id, transid, modelId, item, unit,price, quantity, vat, duedate, text)  VALUES (?, ?, ?,?,?,?,?,?,?,?)"
   def linePurchaseOrderSelect = sql"SELECT * FROM LinePurchaseOrder".query[LinePurchaseOrder_TYPE]
   def linePurchaseOrderIdSelect1(id:String) = sql"SELECT * FROM LinePurchaseOrder  where id =$id".query[LinePurchaseOrder_TYPE]
@@ -219,6 +219,7 @@ object Queries  {
   def linePaymentUpdateName = {(model:LinePayment) =>
     sql"Update LinePayment set transid=${model.transid},  modelId=${model.modelId}, account=${model.account.get}, side = ${model.side}, oaccount=${model.oaccount.get}, amount=${model.amount}, duedate=${model.duedate.get}, text =${model.text} where id =${model.tid}".update}
   def linePaymentDelete = {(id:Long) =>sql"Delete FROM LinePayment where id =$id".update}
+  
   type Payment_TYPE =(Long,Long,Int, String,String, String)
   def paymentInsertSQL = "INSERT INTO Payment (id, oid, modelId, store, account, text) VALUES (?, ?, ?, ?, ?, ?)"
   def paymentSelect = sql"SELECT * FROM Payment".query[Payment_TYPE]
@@ -229,9 +230,111 @@ object Queries  {
     sql"Update payment set oid =${model.oid}, store=${model.store.get}, account=${model.account.get} where id =${model.tid}".update}
   def paymentDelete = {id:Long =>sql"Delete FROM Payment where id =$id".update}
 
+  type LineSalesOrder_TYPE = (Long,Long,Int, String,String,BigDecimal,BigDecimal,String, Date, String)
+  def lineSalesOrderInsertSQL = "INSERT INTO LineSalesOrder ( id, transid, modelId, item, unit,price, quantity, vat, duedate, text)  VALUES (?, ?, ?,?,?,?,?,?,?,?)"
+  def lineSalesOrderSelect = sql"SELECT * FROM LineSalesOrder".query[LineSalesOrder_TYPE]
+  def lineSalesOrderIdSelect1(id:String) = sql"SELECT * FROM LineSalesOrder  where id =$id".query[LineSalesOrder_TYPE]
+  def lineSalesOrderIdSelect(id:Long) = sql"SELECT * FROM LineSalesOrder  where transid =$id".query[LineSalesOrder_TYPE]
+  def lineSalesOrderSelectSome = { id:String =>sql"SELECT * FROM LineSalesOrder where id =$id".query[LineSalesOrder_TYPE]}
+  def lineSalesOrderUpdateName = {(model:LineSalesOrder) =>
+    sql"Update LineSalesOrder set transid=${model.transid}, item=${model.item.get}, modelId=${model.modelId}, unit=${model.unit.get},quantity = ${model.quantity}, price=${model.price},vat=${model.vat.get},duedate=${model.duedate.get}, text =${model.text} where id =${model.tid}".update}
+  def lineSalesOrderDelete = {(id:Long) =>sql"Delete FROM LineSalesOrder where id =$id".update}
+  //INSERT INTO SalesOrder ( oid, modelId, store, account) VALUES (0,101,'200','1000');
+  type SalesOrder_TYPE =(Long,Long,Int, String,String, String)
+  def salesOrderInsertSQL = "INSERT INTO SalesOrder (id, oid, modelId, store, account, text) VALUES (?, ?, ?,?,?, ?)"
+  def salesOrderSelect = sql"SELECT * FROM SalesOrder".query[SalesOrder_TYPE]
+  def salesOrderIdSelect1(id:String) = sql"SELECT * FROM SalesOrder  where id =$id.toLong".query[SalesOrder_TYPE]
+  def salesOrderIdSelect(id:Long) = sql"SELECT * FROM SalesOrder  where id =$id".query[SalesOrder_TYPE]
+  def salesOrderSelectSome = { id:String =>sql"SELECT * FROM SalesOrder where id =$id".query[SalesOrder_TYPE]}
+  def salesOrderUpdateName= {(model:SalesOrder[LineSalesOrder]) =>
+    sql"Update SalesOrder set oid =${model.oid}, store=${model.store.get}, account=${model.account.get} where id =${model.tid}".update}
+  def salesOrderDelete = {id:Long =>sql"Delete FROM SalesOrder where id =$id".update}
+
+  type LineBillOfDelivery_TYPE = (Long,Long,Int, String,String,BigDecimal,BigDecimal,String, Date, String)
+  def lineBillOfDeliveryInsertSQL = "INSERT INTO LineBillOfDelivery ( id, transid, modelId, item, unit,price, quantity, vat, duedate, text)  VALUES (?, ?, ?,?,?,?,?,?,?,?)"
+  def lineBillOfDeliverySelect = sql"SELECT * FROM LineBillOfDelivery".query[LineBillOfDelivery_TYPE]
+  def lineBillOfDeliveryIdSelect1(id:String) = sql"SELECT * FROM LineBillOfDelivery  where id =$id".query[LineBillOfDelivery_TYPE]
+  def lineBillOfDeliveryIdSelect(id:Long) = sql"SELECT * FROM LineBillOfDelivery  where transid =$id".query[LineBillOfDelivery_TYPE]
+  def lineBillOfDeliverySelectSome = { id:String =>sql"SELECT * FROM LineBillOfDelivery where id =$id".query[LineBillOfDelivery_TYPE]}
+  def lineBillOfDeliveryUpdateName = {(model:LineBillOfDelivery) =>
+    sql"Update LineBillOfDelivery set transid=${model.transid}, item=${model.item.get}, modelId=${model.modelId}, unit=${model.unit.get},quantity = ${model.quantity}, price=${model.price},vat=${model.vat.get},duedate=${model.duedate.get}, text =${model.text} where id =${model.tid}".update}
+  def lineBillOfDeliveryDelete = {(id:Long) =>sql"Delete FROM LineBillOfDelivery where id =$id".update}
+  type BillOfDelivery_TYPE =(Long,Long,Int, String,String, String)
+  def billOfDeliveryInsertSQL = "INSERT INTO BillOfDelivery (id, oid, modelId, store, account, text) VALUES (?, ?, ?, ?, ?, ?)"
+  def billOfDeliverySelect = sql"SELECT * FROM BillOfDelivery".query[BillOfDelivery_TYPE]
+  def billOfDeliveryIdSelect1(id:String) = sql"SELECT * FROM BillOfDelivery  where id =$id.toLong".query[BillOfDelivery_TYPE]
+  def billOfDeliveryIdSelect(id:Long) = sql"SELECT * FROM BillOfDelivery  where id =$id".query[BillOfDelivery_TYPE]
+  def billOfDeliverySelectSome = { id:String =>sql"SELECT * FROM BillOfDelivery where id =$id".query[BillOfDelivery_TYPE]}
+  def billOfDeliveryUpdateName= {(model:BillOfDelivery[LineBillOfDelivery]) =>
+    sql"Update BillOfDelivery set oid =${model.oid}, store=${model.store.get}, account=${model.account.get} where id =${model.tid}".update}
+  def billOfDeliveryDelete = {id:Long =>sql"Delete FROM BillOfDelivery where id =$id".update}
+
+  type LineSalesInvoice_TYPE = (Long,Long,Int, String,String,BigDecimal,BigDecimal,String, Date, String)
+  def lineSalesInvoiceInsertSQL = "INSERT INTO LineSalesInvoice ( id, transid, modelId, item, unit,price, quantity, vat, duedate, text)  VALUES (?, ?, ?,?,?,?,?,?,?,?)"
+  def lineSalesInvoiceSelect = sql"SELECT * FROM LineSalesInvoice".query[LineSalesInvoice_TYPE]
+  def lineSalesInvoiceIdSelect1(id:String) = sql"SELECT * FROM LineSalesInvoice  where id =$id".query[LineSalesInvoice_TYPE]
+  def lineSalesInvoiceIdSelect(id:Long) = sql"SELECT * FROM LineSalesInvoice  where transid =$id".query[LineSalesInvoice_TYPE]
+  def lineSalesInvoiceSelectSome = { id:String =>sql"SELECT * FROM LineSalesInvoice where id =$id".query[LineSalesInvoice_TYPE]}
+  def lineSalesInvoiceUpdateName = {(model:LineSalesInvoice) =>
+    sql"Update LineSalesInvoice set transid=${model.transid}, item=${model.item.get}, modelId=${model.modelId}, unit=${model.unit.get},quantity = ${model.quantity}, price=${model.price},vat=${model.vat.get},duedate=${model.duedate.get}, text =${model.text} where id =${model.tid}".update}
+  def lineSalesInvoiceDelete = {(id:Long) =>sql"Delete FROM LineSalesInvoice where id =$id".update}
+  type SalesInvoice_TYPE =(Long,Long,Int, String,String, String)
+  def salesInvoiceInsertSQL = "INSERT INTO SalesInvoice (id, oid, modelId, store, account, text) VALUES (?, ?, ?, ?, ?, ?)"
+  def salesInvoiceSelect = sql"SELECT * FROM SalesInvoice".query[SalesInvoice_TYPE]
+  def salesInvoiceIdSelect1(id:String) = sql"SELECT * FROM SalesInvoice  where id =$id.toLong".query[SalesInvoice_TYPE]
+  def salesInvoiceIdSelect(id:Long) = sql"SELECT * FROM SalesInvoice  where id =$id".query[SalesInvoice_TYPE]
+  def salesInvoiceSelectSome = { id:String =>sql"SELECT * FROM SalesInvoice where id =$id".query[SalesInvoice_TYPE]}
+  def salesInvoiceUpdateName= {(model:SalesInvoice[LineSalesInvoice]) =>
+    sql"Update SalesInvoice set oid =${model.oid}, store=${model.store.get}, account=${model.account.get} where id =${model.tid}".update}
+  def salesInvoiceDelete = {id:Long =>sql"Delete FROM SalesInvoice where id =$id".update}
+
+  type LineCustomerInvoice_TYPE = (Long,Long,Int, String,Boolean, String, BigDecimal, Date, String)
+  def lineCustomerInvoiceInsertSQL = "INSERT INTO LineCustomerInvoice ( id, transid, modelId, account, side ,oaccount, amount,  duedate, text)  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
+  def lineCustomerInvoiceSelect = sql"SELECT * FROM LineCustomerInvoice".query[LineCustomerInvoice_TYPE]
+  def lineCustomerInvoiceIdSelect1(id:String) = sql"SELECT * FROM LineCustomerInvoice  where id =$id".query[LineCustomerInvoice_TYPE]
+  def lineCustomerInvoiceIdSelect(id:Long) = sql"SELECT * FROM LineCustomerInvoice  where transid =$id".query[LineCustomerInvoice_TYPE]
+  def lineCustomerInvoiceSelectSome = { id:String =>sql"SELECT * FROM LineCustomerInvoice where id =$id".query[LineCustomerInvoice_TYPE]}
+  def lineCustomerInvoiceUpdateName = {(model:LineCustomerInvoice) =>
+    sql"Update LineCustomerInvoice set transid=${model.transid},  modelId=${model.modelId}, account=${model.account.get}, side = ${model.side}, oaccount=${model.oaccount.get}, amount=${model.amount}, duedate=${model.duedate.get}, text =${model.text} where id =${model.tid}".update}
+  def lineCustomerInvoiceDelete = {(id:Long) =>sql"Delete FROM LineCustomerInvoice where id =$id".update}
+  type CustomerInvoice_TYPE =(Long,Long,Int, String,String, String)
+  def customerInvoiceInsertSQL = "INSERT INTO CustomerInvoice (id, oid, modelId, store, account, text) VALUES (?, ?, ?, ?, ?, ?)"
+  def customerInvoiceSelect = sql"SELECT * FROM CustomerInvoice".query[CustomerInvoice_TYPE]
+  def customerInvoiceIdSelect1(id:String) = sql"SELECT * FROM CustomerInvoice  where id =$id.toLong".query[CustomerInvoice_TYPE]
+  def customerInvoiceIdSelect(id:Long) = sql"SELECT * FROM CustomerInvoice  where id =$id".query[CustomerInvoice_TYPE]
+  def customerInvoiceSelectSome = { id:String =>sql"SELECT * FROM CustomerInvoice where id =$id".query[CustomerInvoice_TYPE]}
+  def customerInvoiceUpdateName= {(model:CustomerInvoice[LineCustomerInvoice]) =>
+    sql"Update CustomerInvoice set oid =${model.oid}, store=${model.store.get}, account=${model.account.get} where id =${model.tid}".update}
+  def customerInvoiceDelete = {id:Long =>sql"Delete FROM CustomerInvoice where id =$id".update}
+
+  type LineSettlement_TYPE = (Long,Long,Int, String,Boolean, String, BigDecimal, Date, String)
+  def lineSettlementInsertSQL = "INSERT INTO LineSettlement ( id, transid, modelId, account, side ,oaccount, amount,  duedate, text)  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
+  def lineSettlementSelect = sql"SELECT * FROM LineSettlement".query[LineSettlement_TYPE]
+  def lineSettlementIdSelect1(id:String) = sql"SELECT * FROM LineSettlement  where id =$id".query[LineSettlement_TYPE]
+  def lineSettlementIdSelect(id:Long) = sql"SELECT * FROM LineSettlement  where transid =$id".query[LineSettlement_TYPE]
+  def lineSettlementSelectSome = { id:String =>sql"SELECT * FROM LineSettlement where id =$id".query[LineSettlement_TYPE]}
+  def lineSettlementUpdateName = {(model:LineSettlement) =>
+    sql"Update LineSettlement set transid=${model.transid},  modelId=${model.modelId}, account=${model.account.get}, side = ${model.side}, oaccount=${model.oaccount.get}, amount=${model.amount}, duedate=${model.duedate.get}, text =${model.text} where id =${model.tid}".update}
+  def lineSettlementDelete = {(id:Long) =>sql"Delete FROM LineSettlement where id =$id".update}
+
+  type Settlement_TYPE =(Long,Long,Int, String,String, String)
+  def settlementInsertSQL = "INSERT INTO Settlement (id, oid, modelId, store, account, text) VALUES (?, ?, ?, ?, ?, ?)"
+  def settlementSelect = sql"SELECT * FROM Settlement".query[Settlement_TYPE]
+  def settlementIdSelect1(id:String) = sql"SELECT * FROM Settlement  where id =$id.toLong".query[Settlement_TYPE]
+  def settlementIdSelect(id:Long) = sql"SELECT * FROM Settlement  where id =$id".query[Settlement_TYPE]
+  def settlementSelectSome = { id:String =>sql"SELECT * FROM Settlement where id =$id".query[Settlement_TYPE]}
+  def settlementUpdateName= {(model:Settlement[LineSettlement]) =>
+    sql"Update Settlement set oid =${model.oid}, store=${model.store.get}, account=${model.account.get} where id =${model.tid}".update}
+  def settlementDelete = {id:Long =>sql"Delete FROM Settlement where id =$id".update}
+
+
+
   def getSequence (tablename:String,columnname:String) = sql"SELECT nextval(pg_get_serial_sequence( ${tablename}, ${columnname}))".query[Long]
 
-
+val MAP:Map[Int, Map[String, Any]] = Map.empty[Int, Map[String, Any]]
+  Map(114 -> Map("TABLE" ->"Payment"),
+      115 -> Map("TABLE" ->"LinePayment"))
+def getTable(modelId:Int) =MAP.get(modelId).get("TABLE")
   val createBank=sql"""
   DROP TABLE IF EXISTS bank;
      CREATE TABLE bank(
@@ -271,6 +374,24 @@ object Queries  {
    taxCode VARCHAR NOT NULL,
    vatCode VARCHAR NOT NULL
   );""".update
+  val createSettlement = sql"""
+           DROP SEQUENCE IF EXISTS SettlementId_seq;
+           CREATE SEQUENCE SettlementId_seq
+             INCREMENT 1
+             MINVALUE 1
+             MAXVALUE 9223372036854775807
+             START 1
+             CACHE 1;
+           DROP TABLE IF EXISTS Settlement;
+           CREATE TABLE Settlement(
+                id bigserial NOT NULL PRIMARY KEY,
+                oid bigint NOT NULL ,
+                modelId int NOT NULL,
+                store   VARCHAR NOT NULL,
+                account   VARCHAR NOT NULL,
+                text  VARCHAR
+
+                );""".update
   val createPayment = sql"""
            DROP SEQUENCE IF EXISTS PaymentId_seq;
            CREATE SEQUENCE PaymentId_seq
@@ -310,6 +431,26 @@ object Queries  {
                 text  VARCHAR
                 );""".update
 
+  val createLineSettlement=sql"""
+           DROP SEQUENCE IF EXISTS LineSettlementId_seq;
+           CREATE SEQUENCE LineSettlementId_seq
+             INCREMENT 1
+             MINVALUE 1
+             MAXVALUE 9223372036854775807
+             START 1
+             CACHE 1;
+           DROP TABLE IF EXISTS LineSettlement;
+           CREATE TABLE LineSettlement(
+                id bigserial NOT NULL PRIMARY KEY,
+                transid     bigint  NOT NULL ,
+                modelId int NOT NULL,
+                account   VARCHAR NOT NULL,
+                side VARCHAR NOT NULL,
+                oaccount   VARCHAR NOT NULL,
+                amount  DECIMAL(20,2) NOT NULL,
+                duedate      DATE NOT NULL,
+                text  VARCHAR
+                );""".update
 
   val createVendorInvoice=sql"""
            DROP SEQUENCE IF EXISTS VendorInvoiceId_seq;
@@ -327,8 +468,25 @@ object Queries  {
                 store   VARCHAR NOT NULL,
                 account   VARCHAR NOT NULL,
                 text  VARCHAR
-
                 );""".update
+  val createCustomerInvoice=sql"""
+           DROP SEQUENCE IF EXISTS CustomerInvoiceId_seq;
+           CREATE SEQUENCE CustomerInvoiceId_seq
+             INCREMENT 1
+             MINVALUE 1
+             MAXVALUE 9223372036854775807
+             START 1
+             CACHE 1;
+           DROP TABLE IF EXISTS CustomerInvoice;
+           CREATE TABLE CustomerInvoice(
+                id bigserial NOT NULL PRIMARY KEY,
+                oid bigint NOT NULL ,
+                modelId int NOT NULL,
+                store   VARCHAR NOT NULL,
+                account   VARCHAR NOT NULL,
+                text  VARCHAR
+                );""".update
+
   val createLineVendorInvoice=sql"""
            DROP SEQUENCE IF EXISTS LineVendorInvoiceId_seq;
            CREATE SEQUENCE LineVendorInvoiceId_seq
@@ -339,6 +497,26 @@ object Queries  {
              CACHE 1;
            DROP TABLE IF EXISTS LineVendorInvoice;
            CREATE TABLE LineVendorInvoice(
+                id bigserial NOT NULL PRIMARY KEY,
+                transid     bigint  NOT NULL ,
+                modelId int NOT NULL,
+                account   VARCHAR NOT NULL,
+                side VARCHAR NOT NULL,
+                oaccount   VARCHAR NOT NULL,
+                amount  DECIMAL(20,2) NOT NULL,
+                duedate      DATE NOT NULL,
+                text  VARCHAR
+                );""".update
+  val createLineCustomerInvoice=sql"""
+           DROP SEQUENCE IF EXISTS LineCustomerInvoiceId_seq;
+           CREATE SEQUENCE LineCustomerInvoiceId_seq
+             INCREMENT 1
+             MINVALUE 1
+             MAXVALUE 9223372036854775807
+             START 1
+             CACHE 1;
+           DROP TABLE IF EXISTS LineCustomerInvoice;
+           CREATE TABLE LineCustomerInvoice(
                 id bigserial NOT NULL PRIMARY KEY,
                 transid     bigint  NOT NULL ,
                 modelId int NOT NULL,
@@ -367,6 +545,23 @@ object Queries  {
                 account   VARCHAR NOT NULL,
                 text  VARCHAR
                 );""".update
+  val createSalesInvoice=sql"""
+           DROP SEQUENCE IF EXISTS SalesInvoiceId_seq;
+           CREATE SEQUENCE SalesInvoiceId_seq
+             INCREMENT 1
+             MINVALUE 1
+             MAXVALUE 9223372036854775807
+             START 1
+             CACHE 1;
+           DROP TABLE IF EXISTS SalesInvoice;
+           CREATE TABLE SalesInvoice(
+                id bigserial NOT NULL PRIMARY KEY,
+                oid bigint NOT NULL ,
+                modelId int NOT NULL,
+                store   VARCHAR NOT NULL,
+                account   VARCHAR NOT NULL,
+                text  VARCHAR
+                );""".update
   val createLineInventoryInvoice=sql"""
            DROP SEQUENCE IF EXISTS LineInventoryInvoiceId_seq;
            CREATE SEQUENCE LineInventoryInvoiceId_seq
@@ -377,6 +572,27 @@ object Queries  {
              CACHE 1;
            DROP TABLE IF EXISTS LineInventoryInvoice;
            CREATE TABLE LineInventoryInvoice(
+                id bigserial NOT NULL PRIMARY KEY,
+                transid     bigint  NOT NULL ,
+                modelId int NOT NULL,
+                item   VARCHAR NOT NULL,
+                unit   VARCHAR NOT NULL,
+                price  DECIMAL(20,2) NOT NULL,
+                quantity    DECIMAL(20,2) NOT NULL,
+                vat    VARCHAR NOT NULL,
+                duedate      DATE NOT NULL,
+                text  VARCHAR
+                );""".update
+  val createLineSalesInvoice=sql"""
+           DROP SEQUENCE IF EXISTS LineSalesInvoiceId_seq;
+           CREATE SEQUENCE LineSalesInvoiceId_seq
+             INCREMENT 1
+             MINVALUE 1
+             MAXVALUE 9223372036854775807
+             START 1
+             CACHE 1;
+           DROP TABLE IF EXISTS LineSalesInvoice;
+           CREATE TABLE LineSalesInvoice(
                 id bigserial NOT NULL PRIMARY KEY,
                 transid     bigint  NOT NULL ,
                 modelId int NOT NULL,
@@ -405,6 +621,23 @@ object Queries  {
                 account   VARCHAR NOT NULL,
                 text  VARCHAR
                 );""".update
+  val createBillOfDelivery=sql"""
+           DROP SEQUENCE IF EXISTS BillOfDeliveryId_seq;
+           CREATE SEQUENCE BillOfDeliveryId_seq
+             INCREMENT 1
+             MINVALUE 1
+             MAXVALUE 9223372036854775807
+             START 1
+             CACHE 1;
+           DROP TABLE IF EXISTS BillOfDelivery;
+           CREATE TABLE BillOfDelivery(
+                id bigserial NOT NULL PRIMARY KEY,
+                oid bigint NOT NULL ,
+                modelId int NOT NULL,
+                store   VARCHAR NOT NULL,
+                account   VARCHAR NOT NULL,
+                text  VARCHAR
+                );""".update
   val createLineGoodreceiving=sql"""
            DROP SEQUENCE IF EXISTS LineGoodreceivingId_seq;
            CREATE SEQUENCE LinePurchaseOrderId_seq
@@ -415,6 +648,27 @@ object Queries  {
              CACHE 1;
            DROP TABLE IF EXISTS LineGoodreceiving;
            CREATE TABLE LineGoodreceiving(
+                id bigserial NOT NULL PRIMARY KEY,
+                transid     bigint  NOT NULL ,
+                modelId int NOT NULL,
+                item   VARCHAR NOT NULL,
+                unit   VARCHAR NOT NULL,
+                price  DECIMAL(20,2) NOT NULL,
+                quantity    DECIMAL(20,2) NOT NULL,
+                vat    VARCHAR NOT NULL,
+                duedate      DATE NOT NULL,
+                text  VARCHAR
+                );""".update
+  val createLineBillOfDelivery=sql"""
+           DROP SEQUENCE IF EXISTS LineBillOfDeliveryId_seq;
+           CREATE SEQUENCE LineBillOfDeliveryId_seq
+             INCREMENT 1
+             MINVALUE 1
+             MAXVALUE 9223372036854775807
+             START 1
+             CACHE 1;
+           DROP TABLE IF EXISTS LineBillOfDelivery;
+           CREATE TABLE LineBillOfDelivery(
                 id bigserial NOT NULL PRIMARY KEY,
                 transid     bigint  NOT NULL ,
                 modelId int NOT NULL,
@@ -443,7 +697,23 @@ object Queries  {
                 account   VARCHAR NOT NULL,
                 text  VARCHAR
                 );""".update
-
+  val createSalesOrder1=sql"""
+           DROP SEQUENCE IF EXISTS SalesOrderId_seq;
+           CREATE SEQUENCE SalesOrderId_seq
+             INCREMENT 1
+             MINVALUE 1
+             MAXVALUE 9223372036854775807
+             START 1
+             CACHE 1;
+           DROP TABLE IF EXISTS SalesOrder;
+           CREATE TABLE SalesOrder(
+                id bigserial NOT NULL PRIMARY KEY,
+                oid bigint NOT NULL ,
+                modelId int NOT NULL,
+                store   VARCHAR NOT NULL,
+                account   VARCHAR NOT NULL,
+                text  VARCHAR
+                );""".update
   val createLinePurchaseOrder=sql"""
            DROP SEQUENCE IF EXISTS LinePurchaseOrderId_seq;
            CREATE SEQUENCE LinePurchaseOrderId_seq
@@ -462,6 +732,27 @@ object Queries  {
                 price  DECIMAL(20,2) NOT NULL,
                 quantity    DECIMAL(20,2) NOT NULL,
                 vat    VARCHAR NOT NULL, 
+                duedate      DATE NOT NULL,
+                text  VARCHAR
+                );""".update
+  val createLineSalesOrder=sql"""
+           DROP SEQUENCE IF EXISTS LineSalesOrderId_seq;
+           CREATE SEQUENCE LineSalesOrderId_seq
+             INCREMENT 1
+             MINVALUE 1
+             MAXVALUE 9223372036854775807
+             START 1
+             CACHE 1;
+           DROP TABLE IF EXISTS LineSalesOrder;
+           CREATE TABLE LineSalesOrder(
+                id bigserial NOT NULL PRIMARY KEY,
+                transid     bigint  NOT NULL ,
+                modelId int NOT NULL,
+                item   VARCHAR NOT NULL,
+                unit   VARCHAR NOT NULL,
+                price  DECIMAL(20,2) NOT NULL,
+                quantity    DECIMAL(20,2) NOT NULL,
+                vat    VARCHAR NOT NULL,
                 duedate      DATE NOT NULL,
                 text  VARCHAR
                 );""".update
@@ -886,8 +1177,193 @@ object Queries  {
                 vat    VARCHAR NOT NULL, 
                 duedate      DATE NOT NULL,
                 text  VARCHAR
+                );
 
-                );"""
+                       |DROP TABLE IF EXISTS Settlement
+                       |CREATE TABLE Settlement(
+                       |  id bigserial NOT NULL PRIMARY KEY,
+                       |  oid bigint NOT NULL ,
+                       |  modelId int NOT NULL,
+                       |  store   VARCHAR NOT NULL,
+                       |  account   VARCHAR NOT NULL,
+                       |  text  VARCHAR
+                       |
+ |)
+                       |DROP SEQUENCE IF EXISTS SettlementId_seq
+                       |CREATE SEQUENCE SettlementId_seq
+                       |INCREMENT 1
+                       |MINVALUE 1
+                       |MAXVALUE 9223372036854775807
+                       |START 1
+                       |CACHE 1
+                       |DROP TABLE IF EXISTS LineSettlement
+                       |CREATE TABLE LineSettlement(
+                       |  id bigserial NOT NULL PRIMARY KEY,
+                       |  transid     bigint  NOT NULL ,
+                       |  modelId int NOT NULL,
+                       |  account   VARCHAR NOT NULL,
+                       |  side VARCHAR NOT NULL,
+                       |  oaccount   VARCHAR NOT NULL,
+                       |  amount  DECIMAL(20,2) NOT NULL,
+                       |  duedate      DATE NOT NULL,
+                       |  text  VARCHAR
+                       |)
+                       |DROP SEQUENCE IF EXISTS LineSettlementId_seq
+                       |CREATE SEQUENCE LineSettlementId_seq
+                       |INCREMENT 1
+                       |MINVALUE 1
+                       |MAXVALUE 9223372036854775807
+                       |START 1
+                       |CACHE 1
+                       |DROP TABLE IF EXISTS CustomerInvoice
+                       |CREATE TABLE CustomerInvoice(
+                       |  id bigserial NOT NULL PRIMARY KEY,
+                       |  oid bigint NOT NULL ,
+                       |  modelId int NOT NULL,
+                       |  store   VARCHAR NOT NULL,
+                       |  account   VARCHAR NOT NULL,
+                       |  text  VARCHAR
+                       |)
+                       |DROP SEQUENCE IF EXISTS CustomerInvoiceId_seq
+                       |CREATE SEQUENCE CustomerInvoiceId_seq
+                       |INCREMENT 1
+                       |MINVALUE 1
+                       |MAXVALUE 9223372036854775807
+                       |START 1
+                       |CACHE 1
+                       |DROP TABLE IF EXISTS LineCustomerInvoice
+                       |CREATE TABLE LineCustomerInvoice(
+                       |  id bigserial NOT NULL PRIMARY KEY,
+                       |  transid     bigint  NOT NULL ,
+                       |  modelId int NOT NULL,
+                       |  account   VARCHAR NOT NULL,
+                       |  side VARCHAR NOT NULL,
+                       |  oaccount   VARCHAR NOT NULL,
+                       |  amount  DECIMAL(20,2) NOT NULL,
+                       |  duedate      DATE NOT NULL,
+                       |  text  VARCHAR
+                       |)
+                       |DROP SEQUENCE IF EXISTS LineCustomerInvoiceId_seq
+                       |CREATE SEQUENCE LineCustomerInvoiceId_seq
+                       |INCREMENT 1
+                       |MINVALUE 1
+                       |MAXVALUE 9223372036854775807
+                       |START 1
+                       |CACHE 1
+                       |DROP TABLE IF EXISTS SalesInvoice
+                       |CREATE TABLE SalesInvoice(
+                       |  id bigserial NOT NULL PRIMARY KEY,
+                       |  oid bigint NOT NULL ,
+                       |  modelId int NOT NULL,
+                       |  store   VARCHAR NOT NULL,
+                       |  account   VARCHAR NOT NULL,
+                       |  text  VARCHAR
+                       |)
+                       |DROP SEQUENCE IF EXISTS SalesInvoiceId_seq
+                       |CREATE SEQUENCE SalesInvoiceId_seq
+                       |INCREMENT 1
+                       |MINVALUE 1
+                       |MAXVALUE 9223372036854775807
+                       |START 1
+                       |CACHE 1
+                       |DROP TABLE IF EXISTS LineSalesInvoice
+                       |CREATE TABLE LineSalesInvoice(
+                       |  id bigserial NOT NULL PRIMARY KEY,
+                       |  transid     bigint  NOT NULL ,
+                       |  modelId int NOT NULL,
+                       |  item   VARCHAR NOT NULL,
+                       |  unit   VARCHAR NOT NULL,
+                       |  price  DECIMAL(20,2) NOT NULL,
+                       |  quantity    DECIMAL(20,2) NOT NULL,
+                       |  vat    VARCHAR NOT NULL,
+                       |  duedate      DATE NOT NULL,
+                       |  text  VARCHAR
+                       |)
+                       |DROP SEQUENCE IF EXISTS LineSalesInvoiceId_seq
+                       |CREATE SEQUENCE LineSalesInvoiceId_seq
+                       |INCREMENT 1
+                       |MINVALUE 1
+                       |MAXVALUE 9223372036854775807
+                       |START 1
+                       |CACHE 1
+                       |
+ |DROP TABLE IF EXISTS BillOfDelivery
+                       |CREATE TABLE BillOfDelivery(
+                       |  id bigserial NOT NULL PRIMARY KEY,
+                       |  oid bigint NOT NULL ,
+                       |  modelId int NOT NULL,
+                       |  store   VARCHAR NOT NULL,
+                       |  account   VARCHAR NOT NULL,
+                       |  text  VARCHAR
+                       |)
+                       |
+ |DROP SEQUENCE IF EXISTS BillOfDeliveryId_seq
+                       |CREATE SEQUENCE BillOfDeliveryId_seq
+                       |INCREMENT 1
+                       |MINVALUE 1
+                       |MAXVALUE 9223372036854775807
+                       |START 1
+                       |CACHE 1
+                       |
+ |DROP TABLE IF EXISTS LineBillOfDelivery
+                       |CREATE TABLE LineBillOfDelivery(
+                       |  id bigserial NOT NULL PRIMARY KEY,
+                       |  transid     bigint  NOT NULL ,
+                       |  modelId int NOT NULL,
+                       |  item   VARCHAR NOT NULL,
+                       |  unit   VARCHAR NOT NULL,
+                       |  price  DECIMAL(20,2) NOT NULL,
+                       |  quantity    DECIMAL(20,2) NOT NULL,
+                       |  vat    VARCHAR NOT NULL,
+                       |  duedate      DATE NOT NULL,
+                       |  text  VARCHAR
+                       |)
+                       |DROP SEQUENCE IF EXISTS LineBillOfDeliveryId_seq
+                       |CREATE SEQUENCE LineBillOfDeliveryId_seq
+                       |INCREMENT 1
+                       |MINVALUE 1
+                       |MAXVALUE 9223372036854775807
+                       |START 1
+                       |CACHE 1
+                       |
+ |DROP TABLE IF EXISTS SalesOrder
+                       |CREATE TABLE SalesOrder(
+                       |  id bigserial NOT NULL PRIMARY KEY,
+                       |  oid bigint NOT NULL ,
+                       |  modelId int NOT NULL,
+                       |  store   VARCHAR NOT NULL,
+                       |  account   VARCHAR NOT NULL,
+                       |  text  VARCHAR
+                       |)
+                       |
+ |DROP SEQUENCE IF EXISTS SalesOrderId_seq
+                       |CREATE SEQUENCE SalesOrderId_seq
+                       |INCREMENT 1
+                       |MINVALUE 1
+                       |MAXVALUE 9223372036854775807
+                       |START 1
+                       |CACHE 1
+                       |DROP TABLE IF EXISTS LineSalesOrder
+                       |CREATE TABLE LineSalesOrder(
+                       |  id bigserial NOT NULL PRIMARY KEY,
+                       |  transid     bigint  NOT NULL ,
+                       |  modelId int NOT NULL,
+                       |  item   VARCHAR NOT NULL,
+                       |  unit   VARCHAR NOT NULL,
+                       |  price  DECIMAL(20,2) NOT NULL,
+                       |  quantity    DECIMAL(20,2) NOT NULL,
+                       |  vat    VARCHAR NOT NULL,
+                       |  duedate      DATE NOT NULL,
+                       |  text  VARCHAR
+                       |)
+                       |DROP SEQUENCE IF EXISTS LineSalesOrderId_seq
+                       |CREATE SEQUENCE LineSalesOrderId_seq
+                       |INCREMENT 1
+                       |MINVALUE 1
+                       |MAXVALUE 9223372036854775807
+                       |START 1
+                       |CACHE 1
+    """
 
   /*
 insert into account values ('100','IWS Masterfiles','IWS Masterfiles','2015/01/01','2015/12/31',0.0);

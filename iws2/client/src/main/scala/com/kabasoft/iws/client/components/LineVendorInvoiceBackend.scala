@@ -2,6 +2,8 @@ package com.kabasoft.iws.client.components
 
 import java.util.Date
 
+import com.kabasoft.iws.client.modules.Utilities.{PropsL}
+import com.kabasoft.iws.client.modules.Utilities.{StateL =>State}
 import com.kabasoft.iws.gui.BasePanel2
 import com.kabasoft.iws.gui.StringUtils._
 import com.kabasoft.iws.gui.Utils._
@@ -9,22 +11,22 @@ import com.kabasoft.iws.gui.logger._
 import com.kabasoft.iws.gui.macros.Bootstrap.{Button, CommonStyle}
 import com.kabasoft.iws.gui.macros._
 import com.kabasoft.iws.gui.services.IWSCircuit
-import com.kabasoft.iws.shared._
+import com.kabasoft.iws.shared.{LineVendorInvoice, _}
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.prefix_<^._
 import org.widok.moment.Moment
 
 import scalacss.ScalaCssReact._
 
-  case class State(item: Option[LineVendorInvoice]= None,  search:String="", edit:Boolean = false)
-  case class Props(porder: VendorInvoice[LineVendorInvoice], newLine:LineVendorInvoice =>Callback,
-                 saveLine:LineVendorInvoice =>Callback, deleteLine:LineVendorInvoice =>Callback)
-  class LineVendorInvoiceBackend($: BackendScope[Props, State]) {
+
+
+  class LineVendorInvoiceBackend ($: BackendScope[PropsL[VendorInvoice[LineVendorInvoice], LineVendorInvoice],
+             State[LineVendorInvoice]]) extends  BackendLinex [VendorInvoice[LineVendorInvoice], LineVendorInvoice, PropsL[VendorInvoice[LineVendorInvoice],LineVendorInvoice], State[LineVendorInvoice]] ($){
 
     @inline private def bss = GlobalStyles.bootstrapStyles
 
 
-    def mounted(props: Props) = Callback {
+    def mounted(props: PropsL[VendorInvoice[LineVendorInvoice], LineVendorInvoice]) = Callback {
         IWSCircuit.dispatch(Refresh(Account()))
       }
 
@@ -69,25 +71,26 @@ import scalacss.ScalaCssReact._
       $.modState(s => s.copy(item = s.item.map(_.copy(text = l))))>> setModified
     }
 
-    def updateAmount(e: ReactEventI, s1:State) = {
+    def updateAmount(e: ReactEventI, s1:State[LineVendorInvoice]) = {
       e.preventDefault()
       val l =e.target.value.toDouble
       $.modState(s => s.copy(item = s.item.map(_.copy(amount = l))))>> setModified
     }
 
-    def delete(line:LineVendorInvoice, deleteLineCallback:LineVendorInvoice =>Callback) = deleteLineCallback(line)
-    def save(line:LineVendorInvoice, saveLineCB:LineVendorInvoice =>Callback) = saveLineCB(line)   >> Callback {resetState }
-    def resetState =   $.modState(s => s.copy(item = None).copy(edit = false)).runNow()
+    def delete(item:VendorInvoice[LineVendorInvoice],line:LineVendorInvoice, deleteLineCallback:(VendorInvoice[LineVendorInvoice],LineVendorInvoice) =>Callback) = deleteLineCallback(item,line)
+    def save(item:VendorInvoice[LineVendorInvoice],line:LineVendorInvoice, saveLineCB:(VendorInvoice[LineVendorInvoice],LineVendorInvoice) =>Callback) = saveLineCB(item,line)   >> Callback {resetState }
+    //def resetState =   $.modState(s => s.copy(item = None).copy(edit = false)).runNow()
+    def resetState() =   $.modState(s => s.copy(item = s.item).copy(edit = false).copy(item =None)).runNow()
     def setModified  = $.modState(s => s.copy(item = if(!s.item.map(_.created).getOrElse(false)) s.item.map(_.copy(modified = true)) else s.item) )
-    def newLine(line:LineVendorInvoice, newLineCallback:LineVendorInvoice =>Callback) = newLineCallback(line)>> edit(line)
+    def newLine(item:VendorInvoice[LineVendorInvoice], line:LineVendorInvoice, newLineCallback:(VendorInvoice[LineVendorInvoice],LineVendorInvoice )=>Callback) = newLineCallback(item,line)>> edit(line)
 
 
-    def render(p:Props, s: State) = {
+    def render(p:PropsL[VendorInvoice[LineVendorInvoice],LineVendorInvoice], s: State[LineVendorInvoice]) = {
       val lines  = p.porder.lines.getOrElse(Seq.empty[LineVendorInvoice])
       def items =  IWSCircuit.zoom(_.store.get.models.get(9)).eval(IWSCircuit.getRootModel).get.get.items.asInstanceOf[List[Account]]
-      def saveButton = Button(Button.Props(save(s.item.getOrElse(LineVendorInvoice()),p.saveLine),
+      def saveButton = Button(Button.Props(save(p.porder, s.item.getOrElse(LineVendorInvoice()),p.saveLine),
         addStyles = Seq(bss.pullRight, bss.buttonXS, bss.buttonOpt(CommonStyle.success))), Icon.circleO, "")
-      def newButton = Button(Button.Props( newLine(LineVendorInvoice(created = true), p.newLine),
+      def newButton = Button(Button.Props(newLine(p.porder,LineVendorInvoice(created = true), p.newLine),
         addStyles = Seq(bss.pullRight, bss.buttonXS)), Icon.plusSquare, "")
       def buildIdNameList [A<:Masterfile](list: List[A]): List[String]= list.filter(_.id != "-1") .sortBy(_.id) map (iws =>(iws.id+"|"+iws.name))
 
@@ -104,7 +107,7 @@ import scalacss.ScalaCssReact._
       renderBase(p, s, lines, saveButton _, newButton _, editLine _)
     }
 
-    private def renderBase(p: Props, s: State, lines: Seq[LineVendorInvoice],
+    private def renderBase(p: PropsL[VendorInvoice[LineVendorInvoice], LineVendorInvoice], s: State[LineVendorInvoice], lines: Seq[LineVendorInvoice],
                            savex: ()   => ReactComponentU[Button.Props, Unit, Unit, TopNode],
                            newx: ()    => ReactComponentU[Button.Props, Unit, Unit, TopNode],
                            editLine: () => Seq[TagMod]): ReactElement = {
@@ -120,10 +123,10 @@ import scalacss.ScalaCssReact._
       )
     }
 
-    def renderItem(item:LineVendorInvoice, p: Props, s:State) = {
+    def renderItem(item:LineVendorInvoice, p: PropsL[VendorInvoice[LineVendorInvoice], LineVendorInvoice], s:State[LineVendorInvoice]) = {
       def editButton =  Button(Button.Props(edit(item), addStyles = Seq(bss.pullRight, bss.buttonXS,
                             bss.buttonOpt(CommonStyle.success))), Icon.edit, "")
-      def deleteButton = Button(Button.Props(delete (item,p.deleteLine), addStyles = Seq(bss.pullRight, bss.buttonXS,
+      def deleteButton = Button(Button.Props(delete (p.porder,item,p.deleteLine), addStyles = Seq(bss.pullRight, bss.buttonXS,
                             bss.buttonOpt(CommonStyle.danger))), Icon.trashO, "")
        val defaultL = LinePurchaseOrder()
        val cond = item.tid==s.item.getOrElse(defaultL).tid

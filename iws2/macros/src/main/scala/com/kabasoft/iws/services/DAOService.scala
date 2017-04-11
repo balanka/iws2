@@ -20,15 +20,15 @@ import com.kabasoft.iws.shared.DAO
 
 
 
-  override def create ():Int = run.runG[Int](Create[Account])
+  override def create (modelId:Int):Int = run.runG[Int](Create[Account](modelId))
   override def insert(model:List[Account]) = run.runG[Int](Insert[Account](model))
   //override def insert(model:List[Account]) = 1
-  override def all:List[Account] = run.runG[List[Account]](FindAll[Account])
-  override def find(id:String) :List[Account]= run.runG[List[Account]](Find[Account] (id))
+  override def all(model:Account):List[Account] = run.runG[List[Account]](FindAll[Account](model))
+  override def find(item:Account) :List[Account]= run.runG[List[Account]](Find[Account] (item))
   override def update(item:Account) :Int= run.runG[Int](Update[Account](item))
-  override def findSome(id:String) :List[Account]= run.runG[List[Account]](FindSome[Account](id))
-  override def findSome1(id:Long) :List[Account]= run.runG[List[Account]](FindSome1[Account](id))
-  override def delete(id:String) :Int= run.runG[Int](Delete[Account](id))
+  override def findSome(item:Account) :List[Account]= run.runG[List[Account]](FindSome[Account](item))
+ // override def findSome1(id:Long) :List[Account]= run.runG[List[Account]](FindSome1[Account](id))
+  override def delete(item:Account) :Int= run.runG[Int](Delete[Account](item))
   // def create = run.runF.run(Create[com.kabasoft.iws.shared.Model.Account](DAO.accountDAO))
   // def insert(model:List[Account]) = run.runF.run(Insert[com.kabasoft.iws.shared.Model.Account](model, DAO.accountDAO))
    // def all = run.runF.run(new FindAll[com.kabasoft.iws.shared.Model.Account](DAO.accountDAO))

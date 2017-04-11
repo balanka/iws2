@@ -90,11 +90,15 @@ sealed trait LineTransaction extends IWS {
   def id = tid.toString
   def tid: Long
   def transid: Long
+
   //def modelId: Int
 
 
   def duedate: Option[Date]
   def text: String
+  def modified:Boolean
+  def created:Boolean
+  def deleted:Boolean
  }
 sealed trait  LineInventoryTransaction extends LineTransaction {
    def item: Option[String]
@@ -228,6 +232,27 @@ case class LinePurchaseOrder  (tid:Long = 0L, transid:Long =0, modelId:Int = 102
      result
   }
 }
+case class LineSalesOrder  (tid:Long = 0L, transid:Long =0, modelId:Int = 117,item:Option[String] = None, unit:Option[String] = None, price: Amount = 0,
+                               quantity:Amount = 0,vat:Option[String] = None, duedate:Option[Date] = Some(new Date()),text:String ="txt",
+                               modified:Boolean= false, created:Boolean= false, deleted:Boolean= false) extends LineInventoryTransaction {
+  //def eq (l:LineSalesOrder):Boolean = tid == l.tid
+  def eq (id:Long):Boolean = tid == id
+  def eq0:Boolean = tid == 0L
+  def eqId(id:Long):Boolean = tid == id
+  def canEqual(a: Any) = a.isInstanceOf[LineSalesOrder]
+  override def equals(that: Any): Boolean =
+    that match {
+      case that: LineSalesOrder => that.canEqual(this) && this.hashCode == that.hashCode
+      case _ => false
+    }
+  override def hashCode:Int = {
+    val prime = 31
+    var result = 1
+    result = prime * result + tid.toInt
+    result = prime * result + transid.hashCode
+    result
+  }
+}
 case class LineGoodreceiving  (tid:Long = 0L, transid:Long =0, modelId:Int = 105,item:Option[String] = None, unit:Option[String] = None, price: Amount = 0,
                                quantity:Amount = 0,vat:Option[String] = None, duedate:Option[Date] = Some(new Date()),text:String ="txt",
                                modified:Boolean= false, created:Boolean= false, deleted:Boolean= false) extends LineInventoryTransaction {
@@ -249,6 +274,27 @@ case class LineGoodreceiving  (tid:Long = 0L, transid:Long =0, modelId:Int = 105
     result
   }
 }
+case class LineBillOfDelivery  (tid:Long = 0L, transid:Long =0, modelId:Int = 119,item:Option[String] = None, unit:Option[String] = None, price: Amount = 0,
+                               quantity:Amount = 0,vat:Option[String] = None, duedate:Option[Date] = Some(new Date()),text:String ="txt",
+                               modified:Boolean= false, created:Boolean= false, deleted:Boolean= false) extends LineInventoryTransaction {
+  //def eq (l:LineBillOfDelivery):Boolean = tid == l.tid
+  def eq (id:Long):Boolean = tid == id
+  def eq0:Boolean = tid == 0L
+  def eqId(id:Long):Boolean = tid == id
+  def canEqual(a: Any) = a.isInstanceOf[LineBillOfDelivery]
+  override def equals(that: Any): Boolean =
+    that match {
+      case that: LineBillOfDelivery => that.canEqual(this) && this.hashCode == that.hashCode
+      case _ => false
+    }
+  override def hashCode:Int = {
+    val prime = 31
+    var result = 1
+    result = prime * result + tid.toInt
+    result = prime * result + transid.hashCode
+    result
+  }
+}
 case class PurchaseOrder[LinePurchaseOrder] (tid:Long = 0L,oid:Long = 0L, modelId:Int = 101,store:Option[String]=None, account:Option[String]= None,
                                              text:String ="", lines:Option[List[LinePurchaseOrder]]=Some(List.empty[LinePurchaseOrder]),
                                               modified:Boolean =false, created:Boolean = false, deleted:Boolean = false) extends Transaction [LinePurchaseOrder]{
@@ -256,11 +302,24 @@ case class PurchaseOrder[LinePurchaseOrder] (tid:Long = 0L,oid:Long = 0L, modelI
  def getLines = lines.getOrElse(List.empty[LinePurchaseOrder])
  def getLinesWithId(id:Long) = getLines.filter(equals(_,id))
  def replaceLine( newLine:LinePurchaseOrder) = copy(lines = Some( getLines map ( old => if (newLine.equals(old)) newLine else old )))
-// def replaceLine( newLines: List[LinePurchaseOrder]):PurchaseOrder[LinePurchaseOrder] = (newLines map replaceLine).head
   override def  canEqual(a: Any) = a.isInstanceOf[PurchaseOrder[LinePurchaseOrder]]
   override def equals(that: Any): Boolean =
     that match {
       case that: PurchaseOrder[LinePurchaseOrder] => that.canEqual(this) && this.hashCode == that.hashCode
+      case _ => false
+    }
+}
+case class SalesOrder[LineSalesOrder] (tid:Long = 0L,oid:Long = 0L, modelId:Int = 116,store:Option[String]=None, account:Option[String]= None,
+                                             text:String ="", lines:Option[List[LineSalesOrder]]=Some(List.empty[LineSalesOrder]),
+                                             modified:Boolean =false, created:Boolean = false, deleted:Boolean = false) extends Transaction [LineSalesOrder]{
+  def add(line:LineSalesOrder) = copy(lines = Some(getLines ++: List(line)))
+  def getLines = lines.getOrElse(List.empty[LineSalesOrder])
+  def getLinesWithId(id:Long) = getLines.filter(equals(_,id))
+  def replaceLine( newLine:LineSalesOrder) = copy(lines = Some( getLines map ( old => if (newLine.equals(old)) newLine else old )))
+  override def  canEqual(a: Any) = a.isInstanceOf[SalesOrder[LineSalesOrder]]
+  override def equals(that: Any): Boolean =
+    that match {
+      case that: SalesOrder[LineSalesOrder] => that.canEqual(this) && this.hashCode == that.hashCode
       case _ => false
     }
 }
@@ -272,7 +331,6 @@ case class Goodreceiving[LineGoodreceiving] (tid:Long = 0L,oid:Long = 0L, modelI
   def getLinesWithId(id:Long) = getLines.filter(equals(_,id))
 
   def replaceLine( newLine:LineGoodreceiving) = copy(lines = Some( getLines map ( old => if (newLine.equals(old))  newLine else old )))
- // def setLineID = copy(lines = Some( getLines map ( e => if(e.tid != 0 ) e else  e.copy(tid = -1))))
   override def  canEqual(a: Any) = a.isInstanceOf[Goodreceiving[LineGoodreceiving]]
   override def equals(that: Any): Boolean =
     that match {
@@ -280,10 +338,24 @@ case class Goodreceiving[LineGoodreceiving] (tid:Long = 0L,oid:Long = 0L, modelI
       case _ => false
     }
 }
+case class BillOfDelivery[LineBillOfDelivery] (tid:Long = 0L,oid:Long = 0L, modelId:Int = 118,store:Option[String]=None, account:Option[String]= None,
+                                             text:String ="", lines:Option[List[LineBillOfDelivery]]=Some(List.empty[LineBillOfDelivery]),
+                                             modified:Boolean =false, created:Boolean = false, deleted:Boolean = false) extends Transaction [LineBillOfDelivery]{
+  def add(line:LineBillOfDelivery) = copy(lines = Some(getLines ++: List(line)))
+  def getLines:List[LineBillOfDelivery] = lines.getOrElse(List.empty[LineBillOfDelivery])
+  def getLinesWithId(id:Long) = getLines.filter(equals(_,id))
+
+  def replaceLine( newLine:LineBillOfDelivery) = copy(lines = Some( getLines map ( old => if (newLine.equals(old))  newLine else old )))
+  override def  canEqual(a: Any) = a.isInstanceOf[BillOfDelivery[LineBillOfDelivery]]
+  override def equals(that: Any): Boolean =
+    that match {
+      case that: BillOfDelivery[LineBillOfDelivery] => that.canEqual(this) && this.hashCode == that.hashCode
+      case _ => false
+    }
+}
 case class LineInventoryInvoice  (tid:Long = 0L, transid:Long =0, modelId:Int = 111,item:Option[String] = None, unit:Option[String] = None, price: Amount = 0,
                                quantity:Amount = 0,vat:Option[String] = None, duedate:Option[Date] = Some(new Date()),text:String ="txt",
                                modified:Boolean= false, created:Boolean= false, deleted:Boolean= false) extends LineInventoryTransaction {
-  //def eq (l:LinePurchaseOrder):Boolean = tid == l.tid
   def eq (id:Long):Boolean = tid == id
   def eq0:Boolean = tid == 0L
   def eqId(id:Long):Boolean = tid == id
@@ -301,9 +373,29 @@ case class LineInventoryInvoice  (tid:Long = 0L, transid:Long =0, modelId:Int = 
     result
   }
 }
+case class LineSalesInvoice  (tid:Long = 0L, transid:Long =0, modelId:Int = 121,item:Option[String] = None, unit:Option[String] = None, price: Amount = 0,
+                                  quantity:Amount = 0,vat:Option[String] = None, duedate:Option[Date] = Some(new Date()),text:String ="txt",
+                                  modified:Boolean= false, created:Boolean= false, deleted:Boolean= false) extends LineInventoryTransaction {
+  def eq (id:Long):Boolean = tid == id
+  def eq0:Boolean = tid == 0L
+  def eqId(id:Long):Boolean = tid == id
+  def canEqual(a: Any) = a.isInstanceOf[LineSalesInvoice]
+  override def equals(that: Any): Boolean =
+    that match {
+      case that: LineSalesInvoice => that.canEqual(this) && this.hashCode == that.hashCode
+      case _ => false
+    }
+  override def hashCode:Int = {
+    val prime = 31
+    var result = 1
+    result = prime * result + tid.toInt
+    result = prime * result + transid.hashCode
+    result
+  }
+}
 case class InventoryInvoice[LineInventoryInvoice] (tid:Long = 0L,oid:Long = 0L, modelId:Int = 110,store:Option[String]=None, account:Option[String]= None,
                                                    text:String ="", lines:Option[List[LineInventoryInvoice]]=Some(List.empty[LineInventoryInvoice]),
-                                             modified:Boolean =false, created:Boolean = false, deleted:Boolean = false) extends Transaction [LineInventoryInvoice]{
+                                             modified:Boolean =false, created:Boolean = true, deleted:Boolean = false) extends Transaction [LineInventoryInvoice]{
   def add(line:LineInventoryInvoice) = copy(lines = Some(getLines ++: List(line)))
   def getLines:List[LineInventoryInvoice] = lines.getOrElse(List.empty[LineInventoryInvoice])
   def getLinesWithId(id:Long) = getLines.filter(equals(_,id))
@@ -315,10 +407,23 @@ case class InventoryInvoice[LineInventoryInvoice] (tid:Long = 0L,oid:Long = 0L, 
       case _ => false
     }
 }
-
+case class SalesInvoice[LineSalesInvoice] (tid:Long = 0L,oid:Long = 0L, modelId:Int = 120,store:Option[String]=None, account:Option[String]= None,
+                                                   text:String ="", lines:Option[List[LineSalesInvoice]]=Some(List.empty[LineSalesInvoice]),
+                                                   modified:Boolean =false, created:Boolean = true, deleted:Boolean = false) extends Transaction [LineSalesInvoice]{
+  def add(line:LineSalesInvoice) = copy(lines = Some(getLines ++: List(line)))
+  def getLines:List[LineSalesInvoice] = lines.getOrElse(List.empty[LineSalesInvoice])
+  def getLinesWithId(id:Long) = getLines.filter(equals(_,id))
+  def replaceLine( newLine:LineSalesInvoice) = copy(lines = Some( getLines map ( old => if (newLine.equals(old))  newLine else old )))
+  override def  canEqual(a: Any) = a.isInstanceOf[SalesInvoice[LineSalesInvoice]]
+  override def equals(that: Any): Boolean =
+    that match {
+      case that: SalesInvoice[LineSalesInvoice] => that.canEqual(this) && this.hashCode == that.hashCode
+      case _ => false
+    }
+}
 case class LineVendorInvoice  (tid:Long = 0L, transid:Long =0, modelId:Int = 113,account:Option[String] = None,  side:Boolean = true, oaccount:Option[String] = None, amount: Amount = 0,
                                    duedate:Option[Date] = Some(new Date()),text:String ="txt",
-                                  modified:Boolean= false, created:Boolean= false, deleted:Boolean= false) extends LineFinancialsTransaction {
+                                  modified:Boolean= false, created:Boolean= true, deleted:Boolean= false) extends LineFinancialsTransaction {
   def eq (id:Long):Boolean = tid == id
   def eq0:Boolean = tid == 0L
   def eqId(id:Long):Boolean = tid == id
@@ -336,9 +441,38 @@ case class LineVendorInvoice  (tid:Long = 0L, transid:Long =0, modelId:Int = 113
     result
   }
 }
+object LineVendorInvoice
+{
+  def apply(l:LineFDocument) = new LineVendorInvoice(l.tid,l.transid, l.modelId, l.account, l.side, l.oaccount, l.amount, l.duedate, l.text, l.modified, l.created, l.deleted)
+}
+case class LineCustomerInvoice  (tid:Long = 0L, transid:Long =0, modelId:Int = 123,account:Option[String] = None,  side:Boolean = true, oaccount:Option[String] = None, amount: Amount = 0,
+                               duedate:Option[Date] = Some(new Date()),text:String ="txt",
+                               modified:Boolean= false, created:Boolean= true, deleted:Boolean= false) extends LineFinancialsTransaction {
+  def eq (id:Long):Boolean = tid == id
+  def eq0:Boolean = tid == 0L
+  def eqId(id:Long):Boolean = tid == id
+  def canEqual(a: Any) = a.isInstanceOf[LineCustomerInvoice]
+  override def equals(that: Any): Boolean =
+    that match {
+      case that: LineCustomerInvoice => that.canEqual(this) && this.hashCode == that.hashCode
+      case _ => false
+    }
+  override def hashCode:Int = {
+    val prime = 31
+    var result = 1
+    result = prime * result + tid.toInt
+    result = prime * result + transid.hashCode
+    result
+  }
+}
+
+object LineCustomerInvoice
+{
+  def apply(l:LineFDocument) = new LineCustomerInvoice(l.tid,l.transid, l.modelId, l.account, l.side, l.oaccount, l.amount, l.duedate, l.text, l.modified, l.created, l.deleted)
+}
 case class VendorInvoice[LineVendorInvoice] (tid:Long = 0L,oid:Long = 0L, modelId:Int = 112,store:Option[String]=None, account:Option[String]= None,
                                              text:String ="", lines:Option[List[LineVendorInvoice]]=Some(List.empty[LineVendorInvoice]),
-                                                   modified:Boolean =false, created:Boolean = false, deleted:Boolean = false) extends Transaction [LineVendorInvoice]{
+                                                   modified:Boolean =false, created:Boolean = true, deleted:Boolean = false) extends Transaction [LineVendorInvoice]{
   def add(line:LineVendorInvoice) = copy(lines = Some(getLines ++: List(line)))
   def getLines:List[LineVendorInvoice] = lines.getOrElse(List.empty[LineVendorInvoice])
   def getLinesWithId(id:Long) = getLines.filter(equals(_,id))
@@ -350,9 +484,37 @@ case class VendorInvoice[LineVendorInvoice] (tid:Long = 0L,oid:Long = 0L, modelI
       case _ => false
     }
 }
+object VendorInvoice 
+{
+
+  def apply(f:FDocument[LineFDocument])  =  new VendorInvoice[LineVendorInvoice] (f.tid, f.oid, f.modelId, f.store, f.account, f.text, f.lines.map( x => x.map (l =>(
+             LineVendorInvoice(l.tid,l.transid, l.modelId, l.account, l.side, l.oaccount, l.amount, l.duedate, l.text, l.modified, l.created, l.deleted)))))
+}
+
+case class CustomerInvoice[LineCustomerInvoice] (tid:Long = 0L,oid:Long = 0L, modelId:Int = 122,store:Option[String]=None, account:Option[String]= None,
+                                             text:String ="", lines:Option[List[LineCustomerInvoice]]=Some(List.empty[LineCustomerInvoice]),
+                                             modified:Boolean =false, created:Boolean = true, deleted:Boolean = false) extends Transaction [LineCustomerInvoice]{
+  def add(line:LineCustomerInvoice) = copy(lines = Some(getLines ++: List(line)))
+  def getLines:List[LineCustomerInvoice] = lines.getOrElse(List.empty[LineCustomerInvoice])
+  def getLinesWithId(id:Long) = getLines.filter(equals(_,id))
+  def replaceLine( newLine:LineCustomerInvoice) = copy(lines = Some( getLines map ( old => if (newLine.equals(old))  newLine else old )))
+  override def  canEqual(a: Any) = a.isInstanceOf[CustomerInvoice[LineCustomerInvoice]]
+  override def equals(that: Any): Boolean =
+    that match {
+      case that: CustomerInvoice[LineCustomerInvoice] => that.canEqual(this) && this.hashCode == that.hashCode
+      case _ => false
+    }
+}
+object CustomerInvoice
+{
+
+  def apply(f:FDocument[LineFDocument])  =  new CustomerInvoice[LineCustomerInvoice] (f.tid, f.oid, f.modelId, f.store, f.account, f.text, f.lines.map( x => x.map (l =>(
+    LineCustomerInvoice(l.tid,l.transid, l.modelId, l.account, l.side, l.oaccount, l.amount, l.duedate, l.text, l.modified, l.created, l.deleted)))))
+}
+
 case class LinePayment  (tid:Long = 0L, transid:Long =0, modelId:Int = 115,account:Option[String] = None,  side:Boolean = true, oaccount:Option[String] = None, amount: Amount = 0,
                                duedate:Option[Date] = Some(new Date()),text:String ="txt",
-                               modified:Boolean= false, created:Boolean= false, deleted:Boolean= false) extends LineFinancialsTransaction {
+                               modified:Boolean= false, created:Boolean= true, deleted:Boolean= false) extends LineFinancialsTransaction {
   def eq (id:Long):Boolean = tid == id
   def eq0:Boolean = tid == 0L
   def eqId(id:Long):Boolean = tid == id
@@ -369,22 +531,136 @@ case class LinePayment  (tid:Long = 0L, transid:Long =0, modelId:Int = 115,accou
     result = prime * result + transid.hashCode
     result
   }
+
 }
+object LinePayment 
+{
+ def apply(l:LineFDocument) = new LinePayment(l.tid,l.transid, l.modelId, l.account, l.side, l.oaccount, l.amount, l.duedate, l.text, l.modified, l.created, l.deleted)
+}
+
+case class LineSettlement  (tid:Long = 0L, transid:Long =0, modelId:Int = 125,account:Option[String] = None,  side:Boolean = true, oaccount:Option[String] = None, amount: Amount = 0,
+                         duedate:Option[Date] = Some(new Date()),text:String ="txt",
+                         modified:Boolean= false, created:Boolean= true, deleted:Boolean= false) extends LineFinancialsTransaction {
+  def eq (id:Long):Boolean = tid == id
+  def eq0:Boolean = tid == 0L
+  def eqId(id:Long):Boolean = tid == id
+  def canEqual(a: Any) = a.isInstanceOf[LinePayment]
+  override def equals(that: Any): Boolean =
+    that match {
+      case that: LineSettlement => that.canEqual(this) && this.hashCode == that.hashCode
+      case _ => false
+    }
+  override def hashCode:Int = {
+    val prime = 31
+    var result = 1
+    result = prime * result + tid.toInt
+    result = prime * result + transid.hashCode
+    result
+  }
+
+}
+object LineSettlement
+{
+  def apply(l:LineFDocument) = new LineSettlement(l.tid,l.transid, l.modelId, l.account, l.side, l.oaccount, l.amount, l.duedate, l.text, l.modified, l.created, l.deleted)
+}
+
 case class Payment[LinePayment] (tid:Long = 0L,oid:Long = 0L, modelId:Int = 114,store:Option[String]=None, account:Option[String]= None,
                                              text:String ="", lines:Option[List[LinePayment]]=Some(List.empty[LinePayment]),
-                                             modified:Boolean =false, created:Boolean = false, deleted:Boolean = false) extends Transaction [LinePayment]{
+                                             modified:Boolean =false, created:Boolean = true, deleted:Boolean = false) extends Transaction [LinePayment]{
   def add(line:LinePayment) = copy(lines = Some(getLines ++: List(line)))
   def getLines:List[LinePayment] = lines.getOrElse(List.empty[LinePayment])
   def getLinesWithId(id:Long) = getLines.filter(equals(_,id))
   def replaceLine( newLine:LinePayment) = copy(lines = Some( getLines map ( old => if (newLine.equals(old))  newLine else old )))
-  override def  canEqual(a: Any) = a.isInstanceOf[VendorInvoice[LinePayment]]
+  override def  canEqual(a: Any) = a.isInstanceOf[Payment[LinePayment]]
   override def equals(that: Any): Boolean =
     that match {
       case that: Payment[LinePayment] => that.canEqual(this) && this.hashCode == that.hashCode
       case _ => false
     }
 }
+object Payment 
+{
 
+  def apply(f:FDocument[LineFDocument])  =  new Payment[LinePayment]  (f.tid, f.oid, f.modelId, f.store, f.account, f.text, f.lines.map( x => x.map (l =>(
+             LinePayment(l.tid,l.transid, l.modelId, l.account, l.side, l.oaccount, l.amount, l.duedate, l.text, l.modified, l.created, l.deleted)))))
+}
+case class Settlement[LineSettlement] (tid:Long = 0L,oid:Long = 0L, modelId:Int = 124,store:Option[String]=None, account:Option[String]= None,
+                                 text:String ="", lines:Option[List[LineSettlement]]=Some(List.empty[LineSettlement]),
+                                 modified:Boolean =false, created:Boolean = true, deleted:Boolean = false) extends Transaction [LineSettlement]{
+  def add(line:LineSettlement) = copy(lines = Some(getLines ++: List(line)))
+  def getLines:List[LineSettlement] = lines.getOrElse(List.empty[LineSettlement])
+  def getLinesWithId(id:Long) = getLines.filter(equals(_,id))
+  def replaceLine( newLine:LineSettlement) = copy(lines = Some( getLines map ( old => if (newLine.equals(old))  newLine else old )))
+  override def  canEqual(a: Any) = a.isInstanceOf[Settlement[LineSettlement]]
+  override def equals(that: Any): Boolean =
+    that match {
+      case that: Settlement[LineSettlement] => that.canEqual(this) && this.hashCode == that.hashCode
+      case _ => false
+    }
+}
+object Settlement
+{
+
+  def apply(f:FDocument[LineFDocument])  =  new Settlement[LineSettlement]  (f.tid, f.oid, f.modelId, f.store, f.account, f.text, f.lines.map( x => x.map (l =>(
+    LineSettlement(l.tid,l.transid, l.modelId, l.account, l.side, l.oaccount, l.amount, l.duedate, l.text, l.modified, l.created, l.deleted)))))
+}
+
+
+case class LineFDocument  (tid:Long = 0L, transid:Long =0, modelId:Int,account:Option[String] = None,  side:Boolean = true, oaccount:Option[String] = None, amount: Amount = 0,
+                         duedate:Option[Date] = Some(new Date()),text:String ="txt",
+                         modified:Boolean= false, created:Boolean= true, deleted:Boolean= false) extends LineFinancialsTransaction {
+  def eq (id:Long):Boolean = tid == id
+  def eq0:Boolean = tid == 0L
+  def eqId(id:Long):Boolean = tid == id
+  def canEqual(a: Any) = a.isInstanceOf[LineFDocument]
+  override def equals(that: Any): Boolean =
+    that match {
+      case that: LineFDocument => that.canEqual(this) && this.hashCode == that.hashCode
+      case _ => false
+    }
+  override def hashCode:Int = {
+    val prime = 31
+    var result = 1
+    result = prime * result + tid.toInt
+    result = prime * result + transid.hashCode
+    result
+  }
+}
+object LineFDocument 
+{
+ def apply(l:LineFinancialsTransaction) = new LineFDocument(l.tid,l.transid, l.modelId, l.account, l.side, l.oaccount, l.amount, l.duedate, l.text, l.modified, l.created, l.deleted)
+}
+case class FDocument[LineFDocument] (tid:Long = 0L,oid:Long = 0L, modelId:Int ,store:Option[String]=None, account:Option[String]= None,
+                                 text:String ="", lines:Option[List[LineFDocument]]=Some(List.empty[LineFDocument]),
+                                 modified:Boolean =false, created:Boolean = true, deleted:Boolean = false) extends Transaction [LineFDocument]{
+  def add(line:LineFDocument) = copy(lines = Some(getLines ++: List(line)))
+  def getLines:List[LineFDocument] = lines.getOrElse(List.empty[LineFDocument])
+  def getLinesWithId(id:Long) = getLines.filter(equals(_,id))
+  def replaceLine( newLine:LineFDocument) = copy(lines = Some( getLines map ( old => if (newLine.equals(old))  newLine else old )))
+  override def  canEqual(a: Any) = a.isInstanceOf[FDocument[LineFDocument]]
+  override def equals(that: Any): Boolean =
+    that match {
+      case that: FDocument[LineFDocument] => that.canEqual(this) && this.hashCode == that.hashCode
+      case _ => false
+    }
+
+}
+object FDocument 
+{
+
+
+  def apply(f:CustomerInvoice[LineCustomerInvoice])  =  new FDocument (f.tid, f.oid, f.modelId, f.store, f.account, f.text, f.lines.map( x => x.map (l =>(
+    LineFDocument(l.tid,l.transid, l.modelId, l.account, l.side, l.oaccount, l.amount, l.duedate, l.text, l.modified, l.created, l.deleted)))))
+
+  def apply(f:Settlement[LineSettlement])  =  new FDocument (f.tid, f.oid, f.modelId, f.store, f.account, f.text, f.lines.map( x => x.map (l =>(
+    LineFDocument(l.tid,l.transid, l.modelId, l.account, l.side, l.oaccount, l.amount, l.duedate, l.text, l.modified, l.created, l.deleted)))))
+
+  def apply(f:VendorInvoice[LineVendorInvoice])  =  new FDocument (f.tid, f.oid, f.modelId, f.store, f.account, f.text, f.lines.map( x => x.map (l =>(
+             LineFDocument(l.tid,l.transid, l.modelId, l.account, l.side, l.oaccount, l.amount, l.duedate, l.text, l.modified, l.created, l.deleted)))))
+
+  def apply(f:Payment[LinePayment])  =  new FDocument (f.tid, f.oid, f.modelId, f.store, f.account, f.text, f.lines.map( x => x.map (l =>(
+             LineFDocument(l.tid,l.transid, l.modelId, l.account, l.side, l.oaccount, l.amount, l.duedate, l.text, l.modified, l.created, l.deleted)))))
+}
 
 // Registre general des affaires  frappees d'appel
 //N°d'ordre	Appelant	Intimé	Objet	Origine
@@ -427,15 +703,29 @@ object  PeriodicAccountBalance_{ def unapply (in:PeriodicAccountBalance) =Some(i
 object  Stock_{ def unapply (in:Stock) =Some(in.id,in.name,in.description, in.itemId, in.storeId, in.quantity, in.minStock)}
 object  ArticleGroup_{ def unapply (in:ArticleGroup) =Some(in.id,in.name,in.modelId, in.description)}
 object  LinePurchaseOrder_{ def unapply (in:LinePurchaseOrder) = Some(in.tid,in.transid, in.modelId, in.item, in.unit, in.price, in.quantity, in.vat, in.duedate, in.text)}
+object  LineSalesOrder_{ def unapply (in:LineSalesOrder) = Some(in.tid,in.transid, in.modelId, in.item, in.unit, in.price, in.quantity, in.vat, in.duedate, in.text)}
 object  PurchaseOrder_{ def unapply (in:PurchaseOrder[LinePurchaseOrder]) = Some(in.tid,in.oid, in.modelId, in.store, in.account, in.text, in.lines)}
+object  SalesOrder_{ def unapply (in:SalesOrder[LineSalesOrder]) = Some(in.tid,in.oid, in.modelId, in.store, in.account, in.text, in.lines)}
+
 object  LineGoodreceiving_{ def unapply (in:LineGoodreceiving) = Some(in.tid,in.transid, in.modelId, in.item, in.unit, in.price, in.quantity, in.vat, in.duedate, in.text)}
+object  LineBillOfDelivery_{ def unapply (in:LineBillOfDelivery) = Some(in.tid,in.transid, in.modelId, in.item, in.unit, in.price, in.quantity, in.vat, in.duedate, in.text)}
 object  Goodreceiving_{ def unapply (in:Goodreceiving[LineGoodreceiving]) = Some(in.tid,in.oid, in.modelId, in.store, in.account, in.text, in.lines)}
+object  BillOfDelivery_{ def unapply (in:BillOfDelivery[LineBillOfDelivery]) = Some(in.tid,in.oid, in.modelId, in.store, in.account, in.text, in.lines)}
 object  LineInventoryInvoice_{ def unapply (in:LineInventoryInvoice) = Some(in.tid,in.transid, in.modelId, in.item, in.unit, in.price, in.quantity, in.vat, in.duedate, in.text)}
+object  LineSalesInvoice_{ def unapply (in:LineSalesInvoice) = Some(in.tid,in.transid, in.modelId, in.item, in.unit, in.price, in.quantity, in.vat, in.duedate, in.text)}
 object  InventoryInvoice_{ def unapply (in:InventoryInvoice[LineInventoryInvoice]) = Some(in.tid,in.oid, in.modelId, in.store, in.account, in.text, in.lines)}
+object  SalesInvoice_{ def unapply (in:SalesInvoice[LineSalesInvoice]) = Some(in.tid,in.oid, in.modelId, in.store, in.account, in.text, in.lines)}
 object  LineVendorInvoice_{ def unapply (in:LineVendorInvoice) = Some(in.tid,in.transid, in.modelId, in.account, in.side, in.oaccount, in.amount,  in.duedate, in.text)}
+object  LineCustomerInvoice_{ def unapply (in:LineCustomerInvoice) = Some(in.tid,in.transid, in.modelId, in.account, in.side, in.oaccount, in.amount,  in.duedate, in.text)}
 object  VendorInvoice_{ def unapply (in:VendorInvoice[LineVendorInvoice]) = Some(in.tid,in.oid, in.modelId, in.store, in.account, in.text, in.lines)}
+object  CustomerInvoice_{ def unapply (in:CustomerInvoice[LineCustomerInvoice]) = Some(in.tid,in.oid, in.modelId, in.store, in.account, in.text, in.lines)}
 object  LinePayment_{ def unapply (in:LinePayment) = Some(in.tid,in.transid, in.modelId, in.account, in.side, in.oaccount, in.amount,  in.duedate, in.text)}
+object  LineSettlement_{ def unapply (in:LineSettlement) = Some(in.tid,in.transid, in.modelId, in.account, in.side, in.oaccount, in.amount,  in.duedate, in.text)}
 object  Payment_{ def unapply (in:Payment[LinePayment]) = Some(in.tid,in.oid, in.modelId, in.store, in.account, in.text, in.lines)}
+object  Settlement_{ def unapply (in:Settlement[LineSettlement]) = Some(in.tid,in.oid, in.modelId, in.store, in.account, in.text, in.lines)}
+object  LineFDocument_{ def unapply (in:LineFDocument) = Some(in.tid,in.transid, in.modelId, in.account, in.side, in.oaccount, in.amount,  in.duedate, in.text)}
+object  FDocument_{ def unapply (in:FDocument[LineFDocument]) = Some(in.tid,in.oid, in.modelId, in.store, in.account, in.text, in.lines)}
+
 //object  GeneralRegister_{ def unapply (in:GeneralRegister) = Some(in.id, in.modelId, in.appelandId, in.intimeId, in.enterdate,in.reason,in.origin)}
 //implicit def PurchaseOrderOrdering: Ordering[PurchaseOrder[LinePurchaseOrder]] = Ordering.fromLessThan(_.tid > _.tid)
 //implicit def orderingById[A <: PurchaseOrder[LinePurchaseOrder]]: Ordering[A] = Ordering.by(e => (e.tid, e.tid))

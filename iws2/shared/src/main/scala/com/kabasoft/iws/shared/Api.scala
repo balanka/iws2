@@ -16,12 +16,12 @@ trait Api {
 
 }
 trait DAO [A]  {
-  def create() :Int
+  def create(modelId:Int) :Int
   def insert (model:List[A]):Int
   def update (item:A):Int
-  def delete(id:String):Int
-  def all():List[A]
-  def find (id:String):List[A]
-  def findSome(id:String):List[A]
-  def findSome1(id:Long):List[A]
+  def delete(item:A):Int
+  def all(model:A):List[A]
+  def find (item:A):List[A]
+  def findSome(item:A):List[A]
+  //def findSome1(id:Long):List[A]
 }

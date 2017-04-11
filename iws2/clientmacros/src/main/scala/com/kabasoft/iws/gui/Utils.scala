@@ -25,7 +25,7 @@ object Utils {
   def noAction(e: ReactEventI):Callback = Callback {}
 
   //def buildIdNameList [A<:Masterfile](list: List[A]): List[String]= list map (iws =>(iws.id+":"+iws.name))
-  def buildTransIdList [A<:IWS](list: List[A]): List[String]= list map (iws =>(iws.id))
+  def buildTransIdList [A<:IWS](list: List[A]): List[String]= list map (iws =>iws.id +" "+iws.modelId)
 
   def buildDate(id:String, value:Option[Date], defValue:Date, evt:ReactEventI=> Callback) =
     List(<.td(<.label(^.`for` := id, id), ^.maxHeight:=2.px),
@@ -102,6 +102,16 @@ object Utils {
     <.div( ^.cls := offset,
       <.label(^.`for` := id, id),
       ComboList(label = id,  value = defValue, onChange = evt, items = itemsx))
+
+  def ComboBoxL(id:String , itemsx:List[String], defValue:Long, evt:Long=> Callback) =
+    <.div(
+      <.label(^.`for` := id, id),
+      ComboLongList(label = id,  value = defValue, onChange = evt, items = itemsx))
+
+  def ComboBoxL(id:String , itemsx:List[String], defValue:Long, evt:Long=> Callback, offset:String) =
+    <.div( ^.cls := offset,
+      <.label(^.`for` := id, id),
+      ComboLongList(label = id,  value = defValue, onChange = evt, items = itemsx))
 
 
   def buildSItemN(id:String,  itemsx:List[String], defValue:String, evt:String => Callback, offset:String) =

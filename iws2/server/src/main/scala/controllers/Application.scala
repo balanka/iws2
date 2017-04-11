@@ -18,7 +18,7 @@ object Router extends autowire.Server[ByteBuffer, Pickler, Pickler] {
 
 object Application extends Controller {
 
-   import com.kabasoft.iws.shared.{Store => MStore}
+   //import com.kabasoft.iws.shared.{Store => MStore}
 
    implicit val amountPickler = transformPickler[BigDecimal,String](b=> String.valueOf(b.doubleValue()),
      t =>  scala.math.BigDecimal(t))
@@ -34,15 +34,21 @@ object Application extends Controller {
    pickler.addConcreteType[QuantityUnit]
    pickler.addConcreteType[ArticleGroup]
    pickler.addConcreteType[PurchaseOrder[LinePurchaseOrder]].addConcreteType[LinePurchaseOrder]
+   pickler.addConcreteType[SalesOrder[LineSalesOrder]].addConcreteType[LineSalesOrder]
    pickler.addConcreteType[Goodreceiving[LineGoodreceiving]].addConcreteType[LineGoodreceiving]
+   pickler.addConcreteType[BillOfDelivery[LineBillOfDelivery]].addConcreteType[LineBillOfDelivery]
    pickler.addConcreteType[InventoryInvoice[LineInventoryInvoice]].addConcreteType[LineInventoryInvoice]
+   pickler.addConcreteType[SalesInvoice[LineSalesInvoice]].addConcreteType[LineSalesInvoice]
    pickler.addConcreteType[VendorInvoice[LineVendorInvoice]].addConcreteType[LineVendorInvoice]
+   pickler.addConcreteType[CustomerInvoice[LineCustomerInvoice]].addConcreteType[LineCustomerInvoice]
+   pickler.addConcreteType[Settlement[LineSettlement]].addConcreteType[LineSettlement]
    pickler.addConcreteType[Payment[LinePayment]].addConcreteType[LinePayment]
+   pickler.addConcreteType[FDocument[LineFDocument]].addConcreteType[LineFDocument]
    pickler.addConcreteType[Vat]
    pickler.addConcreteType[Bank]
    pickler.addConcreteType[BankAccount]
    pickler.addConcreteType[Company]
-   pickler.addConcreteType[MStore]
+   pickler.addConcreteType[Store]
 
   val apiService = new ApiService()
 

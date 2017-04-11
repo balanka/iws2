@@ -2,13 +2,13 @@ package com.kabasoft.iws.client.components
 
 import java.util.Date
 
-import com.kabasoft.iws.gui.Utils._
 import com.kabasoft.iws.gui.StringUtils._
+import com.kabasoft.iws.gui.Utils._
 import com.kabasoft.iws.gui.logger._
 import com.kabasoft.iws.gui.macros.Bootstrap.{Button, CommonStyle}
 import com.kabasoft.iws.gui.macros._
 import com.kabasoft.iws.gui.services.IWSCircuit
-import com.kabasoft.iws.shared.{Store => MStore, _}
+import com.kabasoft.iws.shared._
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.prefix_<^._
 import org.scalajs.dom.ext.KeyCode
@@ -35,7 +35,6 @@ object LineInventoryInvoiceList {
       }
 
     def edit(line:LineInventoryInvoice) = {
-      //log.debug(s" order to edit Line is ${line}")
        $.modState(s => s.copy(item = Some(line)))
     }
     def updateItem(id: String) = {
@@ -51,7 +50,6 @@ object LineInventoryInvoiceList {
 
     def updateVat(id: String) = {
       val vatId = id.substring(0, id.indexOf("|"))
-      //log.debug(s"ItemId Key is ${vatId}  ")
       $.modState(s => s.copy(item = s.item.map(_.copy(vat = Some(vatId)))))>>setModfied
     }
 

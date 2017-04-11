@@ -49,6 +49,7 @@ object Settings {
     val jsjoda = "1.0.2"
     val js_joda ="1.1.8"
     val akka ="2.4.4"
+    val meta="1.2.0"
   }
 
   /**
@@ -66,6 +67,7 @@ object Settings {
     //"com.github.julien-truffaut"  %%%  "monocle-macro"  % versions.monocleVersion,
     //"com.github.japgolly.scalajs-react" %%% "ext-monocle" % "0.11.0",
     //"com.github.nscala-time" %% "nscala-time" % "2.12.0",
+    //"org.scalameta" %%%"scalameta" % versions.meta,
     "com.lihaoyi" %%% "utest" % versions.uTest
   ))
 

@@ -1,28 +1,24 @@
 package com.kabasoft.iws.client.components
 
+import com.kabasoft.iws.client.modules.Utilities.Prop
 import com.kabasoft.iws.gui.StringUtils._
 import com.kabasoft.iws.gui.Utils._
 import com.kabasoft.iws.gui.macros.Bootstrap.{Button, CommonStyle}
 import com.kabasoft.iws.gui.macros.{GlobalStyles, Icon}
-import com.kabasoft.iws.client.modules.Utilities.Prop
 import com.kabasoft.iws.shared._
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.prefix_<^._
 
 import scalacss.ScalaCssReact._
 
-object VendorInvoiceList {
+object FDocumentList {
   @inline private def bss = GlobalStyles.bootstrapStyles
 
-  /*case class Props(items: Seq[VendorInvoice[LineVendorInvoice]],
-                   title:String,
-                   edit: VendorInvoice[LineVendorInvoice] => Callback,
-                   delete: VendorInvoice[LineVendorInvoice] => Callback)*/
-  private val vendorInvoiceList = ReactComponentB[Prop[VendorInvoice[LineVendorInvoice]]]("VendorInvoiceList")
+  private val list = ReactComponentB[Prop[FDocument[LineFDocument]]]("FDocumentList")
     .render_P(p => {
       val style = bss.listGroup
 
-      def renderItem(trans:VendorInvoice[LineVendorInvoice]) = {
+      def renderItem(trans:FDocument[LineFDocument]) = {
         def editButton =  Button(Button.Props(p.edit(trans), addStyles = Seq(bss.pullRight, bss.buttonXS, bss.buttonOpt(CommonStyle.success))), Icon.edit, "")
         def deleteButton = Button(Button.Props(p.delete(trans), addStyles = Seq(bss.pullRight, bss.buttonXS, bss.buttonOpt(CommonStyle.danger))), Icon.trash, "")
         <.li(style.itemOpt(CommonStyle.success),^.fontSize:=12.px,^.fontWeight:=50.px,^.maxHeight:=30.px)(
@@ -38,9 +34,9 @@ object VendorInvoiceList {
     })
     .build
 
-  def apply(items: Seq[VendorInvoice[LineVendorInvoice]],
+  def apply(items: Seq[FDocument[LineFDocument]],
             title:String,
-            edit: VendorInvoice[LineVendorInvoice] => Callback,
-            delete: VendorInvoice[LineVendorInvoice] => Callback) = vendorInvoiceList(Prop[VendorInvoice[LineVendorInvoice]](items, title, edit,delete))
+            edit: FDocument[LineFDocument] => Callback,
+            delete: FDocument[LineFDocument] => Callback) = list(Prop[FDocument[LineFDocument]](items, title, edit,delete))
 
 }

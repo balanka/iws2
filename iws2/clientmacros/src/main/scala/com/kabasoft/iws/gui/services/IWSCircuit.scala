@@ -64,11 +64,17 @@ class IWSHandler[M](modelRW: ModelRW[M, Pot[DStore[IWS,IWS]]]) extends ActionHan
    pickler.addConcreteType[QuantityUnit]
    pickler.addConcreteType[ArticleGroup]
    pickler.addConcreteType[PurchaseOrder[LinePurchaseOrder]].addConcreteType[LinePurchaseOrder]
+   pickler.addConcreteType[SalesOrder[LineSalesOrder]].addConcreteType[LineSalesOrder]
    pickler.addConcreteType[Goodreceiving[LineGoodreceiving]].addConcreteType[LineGoodreceiving]
+   pickler.addConcreteType[BillOfDelivery[LineBillOfDelivery]].addConcreteType[LineBillOfDelivery]
    pickler.addConcreteType[InventoryInvoice[LineInventoryInvoice]].addConcreteType[LineInventoryInvoice]
+   pickler.addConcreteType[SalesInvoice[LineSalesInvoice]].addConcreteType[LineSalesInvoice]
    pickler.addConcreteType[VendorInvoice[LineVendorInvoice]].addConcreteType[LineVendorInvoice]
+   pickler.addConcreteType[CustomerInvoice[LineCustomerInvoice]].addConcreteType[LineCustomerInvoice]
+   pickler.addConcreteType[Settlement[LineSettlement]].addConcreteType[LineSettlement]
    pickler.addConcreteType[Payment[LinePayment]].addConcreteType[LinePayment]
-   pickler.addConcreteType[Vat]
+   pickler.addConcreteType[FDocument[LineFDocument]].addConcreteType[LineFDocument]
+    pickler.addConcreteType[Vat]
    pickler.addConcreteType[Bank]
    pickler.addConcreteType[BankAccount]
    pickler.addConcreteType[Company]
@@ -132,8 +138,12 @@ object IWSCircuit extends Circuit[RootModel[IWS,IWS]] with ReactConnector[RootMo
      101 -> Ready(Data(Seq.empty[PurchaseOrder[LinePurchaseOrder]])),
      104 -> Ready(Data(Seq.empty[Goodreceiving[LineGoodreceiving]])),
      110 -> Ready(Data(Seq.empty[InventoryInvoice[LineInventoryInvoice]])),
-     112 -> Ready(Data(Seq.empty[VendorInvoice[LineVendorInvoice]])),
-     114 -> Ready(Data(Seq.empty[Payment[LinePayment]]))
+     112 -> Ready(Data(Seq.empty[FDocument[LineFDocument]])),
+     114 -> Ready(Data(Seq.empty[Payment[LinePayment]])),
+     122 -> Ready(Data(Seq.empty[FDocument[LineFDocument]])),
+     124 -> Ready(Data(Seq.empty[FDocument[LineFDocument]]))
+     // 112 -> Ready(Data(Seq.empty[VendorInvoice[LineVendorInvoice]])),
+     //114 -> Ready(Data(Seq.empty[Payment[LinePayment]]))
     )))
 
     RootModel(store, Empty)

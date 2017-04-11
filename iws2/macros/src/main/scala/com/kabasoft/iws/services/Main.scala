@@ -15,7 +15,7 @@ object Main  {
 
    def main(args: Array[String]) {
   
-  import com.kabasoft.iws.shared.{Store => MStore}
+  //import com.kabasoft.iws.shared.{Store => MStore}
   implicit val amountPickler = transformPickler[BigDecimal,String](b=> String.valueOf(b.doubleValue()),
     t =>  scala.math.BigDecimal(t))
   implicit val datePickler = transformPickler[java.util.Date, Long](_.getTime,t => new java.util.Date(t))
@@ -34,7 +34,7 @@ object Main  {
   pickler.addConcreteType[Vat]
   pickler.addConcreteType[Bank]
   pickler.addConcreteType[BankAccount]
-  pickler.addConcreteType[MStore]
+  pickler.addConcreteType[Store]
 
      println( "Running Line purchaseorder2  com.kabasoft.iws.services.Main:")
  
@@ -47,7 +47,8 @@ object Main  {
 //val buf = Pickle.intoBytes(f:+purchaseorder)
  //println( "purchaseorder2 :"+ Unpickle[List[PurchaseOrder[LinePurchaseOrder]]].fromBytes(buf))
 //val l= run.runG[Int](Update[PurchaseOrder[LinePurchaseOrder]](purchaseorder))
-val l2= run.runG[Int](Insert[LinePurchaseOrder](List(lineOrder2)))
- println( "Line purchaseorder2 :"+ l2)
+//val l2= run.runG[Int](Insert[LinePurchaseOrder](List(lineOrder2)))
+// println( "Line purchaseorder2 :"+ l2)
+     println( "Line purchaseorder2 :"+ run.runG[List[Store]](Find(Store())))
 }
 }

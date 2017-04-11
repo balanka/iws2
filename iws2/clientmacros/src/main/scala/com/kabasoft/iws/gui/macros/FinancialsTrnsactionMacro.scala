@@ -16,6 +16,8 @@ object FinancialsTrnsactionMacro {
 
     import c.universe._
 
+    val r = q""" printn($n) """
+
     q"""
        import java.util.Date
        import com.kabasoft.iws.gui.BasePanel2
@@ -51,6 +53,7 @@ object FinancialsTrnsactionMacro {
      def edit(line:$st0) =  bs.modState(s => s.copy(item = Some(line)))
 
      def updateAccount(id:String) = {
+
              val accountId = id.substring(0, id.indexOf(""))
               bs.modState(s => s.copy(item = s.item.map(_.copy(account = Some(accountId)))))>>
                setModified

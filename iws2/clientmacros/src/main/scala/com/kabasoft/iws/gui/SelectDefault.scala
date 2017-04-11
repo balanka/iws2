@@ -34,7 +34,6 @@ object IWSSelect {
             log.debug(" IWSSelect:: render if  "+item)
             <.option(item, ^.value:=item)
           } else {
-           // log.debug(" IWSSelect:: render else "+item)
             <.option(item,  ^.value:=item)
           }
   }))
@@ -44,7 +43,6 @@ object IWSSelect {
   val component = ReactComponentB[Props]("Select")
     .initialState(State())
     .renderBackend[Backend]
-   // .render_P (P =>render(P))
     .build
 
   def apply(ref: js.UndefOr[String] = "", key: js.Any = {}, label: String,
@@ -53,9 +51,10 @@ object IWSSelect {
 }
 
 class  DataList {
-
+  case class PropsL(label: String, value:Long, onChange: Long => Callback, items:List[String])
   case class Props(label: String, value:String, onChange: String => Callback, items:List[String])
   def onChange(P: Props)(e: ReactEventI) = { val r = e.target.value; log.debug(" DataList:: onChange:: "+r); P.onChange(r)}
+  def onChange(P: PropsL)(e: ReactEventI) = { val r = e.target.value; log.debug(" DataList:: onChange:: "+r); P.onChange(r.toLong)}
   def render(P: Props) =
     <.div( //^.padding := "10px",
       <.input.text( ^.paddingLeft := 5.px, ^.height := 25.px, ^.id := "inp"+P.label,
@@ -66,8 +65,17 @@ class  DataList {
       )
     )
 
-}
+  def render(P: PropsL) =
+    <.div( //^.padding := "10px",
+      <.input.text( ^.paddingLeft := 5.px, ^.height := 25.px, ^.id := "inp"+P.label,
+        ^.name :="inputtxt", ^.value := P.value, ^.list := "datalist"+P.label, ^.onChange ==> {onChange(P) }),
+      <.datalist(  ^.paddingLeft := 5.px, ^.height := 25.px, ^.id := "datalist"+P.label, ^.value := P.value, ^.fontSize:=10.px,
+        ^.onChange ==> onChange(P))(
+        P.items.map(item => (<.option(item,^.value:=item)))
+      )
+    )
 
+}
 
 object ComboList  extends DataList {
 
@@ -79,6 +87,20 @@ object ComboList  extends DataList {
   def apply(ref: js.UndefOr[String] = "combo", key: js.Any = {"combo"}, label: String,
             value: String, onChange: String => Callback,
             items:List[String]) = component.set(key, ref)(Props(label, value, onChange,items))
+
+}
+
+object ComboLongList  extends DataList {
+
+  val component = ReactComponentB[PropsL]("ComboLongList")
+    .stateless
+    .render_P (P =>render(P))
+    .build
+
+
+  def apply(ref: js.UndefOr[String] = "combo", key: js.Any = {"combo"}, label: String,
+            value: Long, onChange: Long => Callback,
+            items:List[String]) = component.set(key, ref)(PropsL(label, value, onChange,items))
 }
 
 
