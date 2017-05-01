@@ -826,141 +826,284 @@ implicit def purchaseOrderDAO = new DAO[PurchaseOrder[LinePurchaseOrder]]{
 
   }
 
-    implicit def fDocumentDAO = new DAO[FDocument[LineFDocument]]{
-          
-    def insert(model: List[FDocument[LineFDocument]]) :Int = insertDocument(model) //{val m = getModelList(model); getDAO(m(0).modelId).insert(m) }
+    implicit def fDocumentDAO = new DAO[FDocument[LineFDocument]]{          
+    def insert(model: List[FDocument[LineFDocument]]) :Int = insertFDocument(model) 
     def create (modelId:Int) = getDAO(modelId).create(modelId)
-    def update(model:FDocument[LineFDocument]) = updateDocument(model)   
-    def delete(model:FDocument[LineFDocument]):Int =  deleteDocument(model) 
+    def update(model:FDocument[LineFDocument]) = updateFDocument(model)   
+    def delete(model:FDocument[LineFDocument]):Int =  deleteFDocument(model) 
     def all(model:FDocument[LineFDocument]) = allFDocument(model)
     def find(model:FDocument[LineFDocument]) =findFDocument(model)
     def findSome(model:FDocument[LineFDocument]) = findSomeFDocument(model)
-   // def findSome1(model:FDocument[LineFDocument]) =getDAO(model(0).modelId).all(model)
+  }
+    implicit def iDocumentDAO = new DAO[IDocument[LineIDocument]]{          
+    def insert(model: List[IDocument[LineIDocument]]) :Int = insertIDocument(model) 
+    def create (modelId:Int) = getDAO(modelId).create(modelId)
+    def update(model:IDocument[LineIDocument]) = updateIDocument(model)   
+    def delete(model:IDocument[LineIDocument]):Int =  deleteIDocument(model) 
+    def all(model:IDocument[LineIDocument]) = allIDocument(model)
+    def find(model:IDocument[LineIDocument]) =findIDocument(model)
+    def findSome(model:IDocument[LineIDocument]) = findSomeIDocument(model)
   }
 
-
    implicit def lineFDocumentDAO = new DAO[LineFDocument]{
-     def insert(model: List[LineFDocument])  = insertLineDocument(model)
+    def insert(model: List[LineFDocument])  = insertLineFDocument(model)
     def create (modelId:Int) = getDAO(modelId).create(modelId)
-    def update(model:LineFDocument) = updateLineDocument(model)
-    def delete(model:LineFDocument):Int = deleteLineDocument(model) 
+    def update(model:LineFDocument) = updateLineFDocument(model)
+    def delete(model:LineFDocument):Int = deleteLineFDocument(model) 
     def all (model:LineFDocument) =   allLineFDocument(model)
     def find(model:LineFDocument) = findLineFDocument(model)
     def findSome(model:LineFDocument) = findSomeLineFDocument(model)
 
   }
-
-
-  def findSomeLineFDocument( model:LineFDocument):List[LineFDocument]= {
-    model.modelId match {
-      case 113  => lineVendorInvoiceDAO.findSome(LineVendorInvoice(model)).map(m =>LineFDocument(m))
-      case 115  => linePaymentDAO.findSome(LinePayment(model)).map(m =>LineFDocument(m))
-      case 123  => lineCustomerInvoiceDAO.findSome(LineCustomerInvoice(model)).map(m =>LineFDocument(m))
-      case 125  => lineSettlementDAO.findSome(LineSettlement(model)).map(m =>LineFDocument(m))
-    }
-  }
-   def findLineFDocument( model:LineFDocument):List[LineFDocument]= {
-    model.modelId match {
-      case 113  => lineVendorInvoiceDAO.find(LineVendorInvoice(model)).map(m =>LineFDocument(m))
-      case 115  => linePaymentDAO.find(LinePayment(model)).map(m =>LineFDocument(m))
-      case 123  => lineCustomerInvoiceDAO.find(LineCustomerInvoice(model)).map(m =>LineFDocument(m))
-      case 125  => lineSettlementDAO.find(LineSettlement(model)).map(m =>LineFDocument(m))
-    }
-  }
-  def findSomeFDocument( model:FDocument[LineFDocument]):List[FDocument[LineFDocument]]= {
-    model.modelId match {
-      case 112  => vendorInvoiceDAO.findSome(VendorInvoice(model)).map(m =>FDocument(m))
-      case 114  => paymentDAO.findSome(Payment(model)).map(m =>FDocument(m))
-      case 122  => customerInvoiceDAO.findSome(CustomerInvoice(model)).map(m =>FDocument(m))
-      case 124  => settlementDAO.findSome(Settlement(model)).map(m =>FDocument(m))
-    }
+   implicit def lineIDocumentDAO = new DAO[LineIDocument]{
+     def insert(model: List[LineIDocument])  = insertLineIDocument(model)
+    def create (modelId:Int) = getDAO(modelId).create(modelId)
+    def update(model:LineIDocument) = updateLineIDocument(model)
+    def delete(model:LineIDocument):Int = deleteLineIDocument(model) 
+    def all (model:LineIDocument) =   allLineIDocument(model)
+    def find(model:LineIDocument) = findLineIDocument(model)
+    def findSome(model:LineIDocument) = findSomeLineIDocument(model)
   }
 
-  def findFDocument( model:FDocument[LineFDocument]):List[FDocument[LineFDocument]]= {
-    model.modelId match {
-      case 112  => vendorInvoiceDAO.find(VendorInvoice(model)).map(m =>FDocument(m))
-      case 114  => paymentDAO.find(Payment(model)).map(m =>FDocument(m))
-      case 122  => customerInvoiceDAO.find(CustomerInvoice(model)).map(m =>FDocument(m))
-      case 124  => settlementDAO.find(Settlement(model)).map(m =>FDocument(m))
-    }
-  }
+   def getDAO(modelId:Int) = 
+   modelId match {
+      case 101  => purchaseOrderDAO
+      case 102  => linePurchaseOrderDAO
+      case 105  => lineGoodreceivingDAO      
+      case 110  => inventoryInvoiceDAO
+      case 111  => lineInventoryInvoiceDAO
+      case 112 => vendorInvoiceDAO
+      case 113 => lineVendorInvoiceDAO
+      case 114 => paymentDAO
+      case 115 => linePaymentDAO
+      case 116  => salesOrderDAO 
+      case 117  => lineSalesOrderDAO
+      case 118  => billOfDeliveryDAO 
+      case 119  => lineBillOfDeliveryDAO
+      case 120  => salesInvoiceDAO 
+      case 121  => lineSalesInvoiceDAO
+      case 122 => customerInvoiceDAO
+      case 124 => settlementDAO
+      case 125  => lineSettlementDAO 
+     
+   }
+ 
 
-  def allLineFDocument( model:LineFDocument):List[LineFDocument]= {
-    model.modelId match {
-      case 113  => lineVendorInvoiceDAO.all(LineVendorInvoice(model)).map(m =>LineFDocument(m))
-      case 115  => linePaymentDAO.all(LinePayment(model)).map(m =>LineFDocument(m))
-      case 123  => lineCustomerInvoiceDAO.all(LineCustomerInvoice(model)).map(m =>LineFDocument(m))
-      case 125  => lineSettlementDAO.all(LineSettlement(model)).map(m =>LineFDocument(m))
-    }
-  }
-  def allFDocument( model:FDocument[LineFDocument]):List[FDocument[LineFDocument]]= {
-    model.modelId match {
-      case 112  => vendorInvoiceDAO.all(VendorInvoice(model)).map(m =>FDocument(m))
-      case 114  => paymentDAO.all(Payment(model)).map(m =>FDocument(m))
-      case 122  => customerInvoiceDAO.all(CustomerInvoice(model)).map(m =>FDocument(m))
-      case 124  => settlementDAO.all(Settlement(model)).map(m =>FDocument(m))
-    }
-  }
- def insertDocument(models: List [FDocument[LineFDocument]]):Int = {
+ def insertFDocument(models: List [FDocument[LineFDocument]]):Int = 
    models(0).modelId match {
       case 112 => vendorInvoiceDAO.insert(models.map( model => VendorInvoice(model)))
       case 114 => paymentDAO.insert(models.map( model =>Payment(model)))
       case 122 => customerInvoiceDAO.insert(models.map( model => CustomerInvoice(model)))
       case 124 => settlementDAO.insert(models.map( model =>Settlement(model)))
    }
- } 
-  def insertLineDocument(models: List[LineFDocument]):Int= {
-   models(0).modelId match {
-      case 113 => lineVendorInvoiceDAO.insert(models.map( model =>LineVendorInvoice(model)))
-      case 115 => linePaymentDAO.insert(models.map( model =>LinePayment(model)))
-      case 123 => lineCustomerInvoiceDAO.insert(models.map( model =>LineCustomerInvoice(model)))
-      case 125 => lineSettlementDAO.insert(models.map( model =>LineSettlement(model)))
-   }
- } 
- def getDAO(modelId:Int) = {
-   modelId match {
-      case 112 => vendorInvoiceDAO
-      case 113 => lineVendorInvoiceDAO
-      case 114 => paymentDAO
-      case 115 => linePaymentDAO
-      case 122 => customerInvoiceDAO
-      case 124 => settlementDAO
+ 
+  def findSomeFDocument( model:FDocument[LineFDocument]):List[FDocument[LineFDocument]]= 
+    model.modelId match {
+      case 112  => vendorInvoiceDAO.findSome(VendorInvoice(model)).map(m =>FDocument(m))
+      case 114  => paymentDAO.findSome(Payment(model)).map(m =>FDocument(m))
+      case 122  => customerInvoiceDAO.findSome(CustomerInvoice(model)).map(m =>FDocument(m))
+      case 124  => settlementDAO.findSome(Settlement(model)).map(m =>FDocument(m))
+    }
 
-   }
- }
+  def findFDocument( model:FDocument[LineFDocument]):List[FDocument[LineFDocument]]= 
+    model.modelId match {
+      case 112  => vendorInvoiceDAO.find(VendorInvoice(model)).map(m =>FDocument(m))
+      case 114  => paymentDAO.find(Payment(model)).map(m =>FDocument(m))
+      case 122  => customerInvoiceDAO.find(CustomerInvoice(model)).map(m =>FDocument(m))
+      case 124  => settlementDAO.find(Settlement(model)).map(m =>FDocument(m))
+    }
 
-  def updateLineDocument( model:LineFDocument):Int= {
+
+  def allLineFDocument( model:LineFDocument):List[LineFDocument]= 
     model.modelId match {
-      case 113  => lineVendorInvoiceDAO.update(LineVendorInvoice(model))
-      case 115  => linePaymentDAO.update(LinePayment(model))
-      case 123  => lineCustomerInvoiceDAO.update(LineCustomerInvoice(model))
-      case 125  => lineSettlementDAO.update(LineSettlement(model))
+      case 113  => lineVendorInvoiceDAO.all(LineVendorInvoice(model)).map(m =>LineFDocument(m))
+      case 115  => linePaymentDAO.all(LinePayment(model)).map(m =>LineFDocument(m))
+      case 123  => lineCustomerInvoiceDAO.all(LineCustomerInvoice(model)).map(m =>LineFDocument(m))
+      case 125  => lineSettlementDAO.all(LineSettlement(model)).map(m =>LineFDocument(m))
     }
-  }
-  def updateDocument( model:FDocument[LineFDocument]):Int= {
+  
+  def allFDocument( model:FDocument[LineFDocument]):List[FDocument[LineFDocument]]= 
     model.modelId match {
-      case 112  => vendorInvoiceDAO.update(VendorInvoice(model))
-      case 114  => paymentDAO.update(Payment(model))
-      case 122  => customerInvoiceDAO.update(CustomerInvoice(model))
-      case 124  => settlementDAO.update(Settlement(model))
+      case 112  => vendorInvoiceDAO.all(VendorInvoice(model)).map(m =>FDocument(m))
+      case 114  => paymentDAO.all(Payment(model)).map(m =>FDocument(m))
+      case 122  => customerInvoiceDAO.all(CustomerInvoice(model)).map(m =>FDocument(m))
+      case 124  => settlementDAO.all(Settlement(model)).map(m =>FDocument(m))
     }
-  }
-  def deleteLineDocument( model:LineFDocument) = {
-    model.modelId match {
-      case 113  => lineVendorInvoiceDAO.delete(LineVendorInvoice(model))
-      case 115  => linePaymentDAO.delete(LinePayment(model))
-      case 123  => lineCustomerInvoiceDAO.delete(LineCustomerInvoice(model))
-      case 125  => lineSettlementDAO.delete(LineSettlement(model))
-    }
-  }
-  def deleteDocument( model:FDocument[LineFDocument]) = {
+
+      def deleteFDocument( model:FDocument[LineFDocument]) = 
     model.modelId match {
       case 112  => vendorInvoiceDAO.delete(VendorInvoice(model))
       case 114  => paymentDAO.delete(Payment(model))
       case 122  => customerInvoiceDAO.delete(CustomerInvoice(model))
       case 124  => settlementDAO.delete(Settlement(model))
     }
-  }
+
+   def findSomeLineFDocument( model:LineFDocument):List[LineFDocument]= 
+    model.modelId match {
+      case 113  => lineVendorInvoiceDAO.findSome(LineVendorInvoice(model)).map(m =>LineFDocument(m))
+      case 115  => linePaymentDAO.findSome(LinePayment(model)).map(m =>LineFDocument(m))
+      case 123  => lineCustomerInvoiceDAO.findSome(LineCustomerInvoice(model)).map(m =>LineFDocument(m))
+      case 125  => lineSettlementDAO.findSome(LineSettlement(model)).map(m =>LineFDocument(m))
+    }
+
+   def findLineFDocument( model:LineFDocument):List[LineFDocument]= 
+    model.modelId match {
+      case 113  => lineVendorInvoiceDAO.find(LineVendorInvoice(model)).map(m =>LineFDocument(m))
+      case 115  => linePaymentDAO.find(LinePayment(model)).map(m =>LineFDocument(m))
+      case 123  => lineCustomerInvoiceDAO.find(LineCustomerInvoice(model)).map(m =>LineFDocument(m))
+      case 125  => lineSettlementDAO.find(LineSettlement(model)).map(m =>LineFDocument(m))
+    }
+  
+  def insertLineFDocument(models: List[LineFDocument]):Int= 
+   models(0).modelId match {
+      case 113 => lineVendorInvoiceDAO.insert(models.map( model =>LineVendorInvoice(model)))
+      case 115 => linePaymentDAO.insert(models.map( model =>LinePayment(model)))
+      case 123 => lineCustomerInvoiceDAO.insert(models.map( model =>LineCustomerInvoice(model)))
+      case 125 => lineSettlementDAO.insert(models.map( model =>LineSettlement(model)))
+   }
+ 
+  def updateLineFDocument( model:LineFDocument):Int= 
+    model.modelId match {
+      case 113  => lineVendorInvoiceDAO.update(LineVendorInvoice(model))
+      case 115  => linePaymentDAO.update(LinePayment(model))
+      case 123  => lineCustomerInvoiceDAO.update(LineCustomerInvoice(model))
+      case 125  => lineSettlementDAO.update(LineSettlement(model))
+    }
+  
+  def updateFDocument( model:FDocument[LineFDocument]):Int= 
+    model.modelId match {
+      case 112  => vendorInvoiceDAO.update(VendorInvoice(model))
+      case 114  => paymentDAO.update(Payment(model))
+      case 122  => customerInvoiceDAO.update(CustomerInvoice(model))
+      case 124  => settlementDAO.update(Settlement(model))
+    }
+  
+  def deleteLineFDocument( model:LineFDocument) = 
+    model.modelId match {
+      case 113  => lineVendorInvoiceDAO.delete(LineVendorInvoice(model))
+      case 115  => linePaymentDAO.delete(LinePayment(model))
+      case 123  => lineCustomerInvoiceDAO.delete(LineCustomerInvoice(model))
+      case 125  => lineSettlementDAO.delete(LineSettlement(model))
+    }
+
+ def insertIDocument(models: List [IDocument[LineIDocument]]):Int = 
+   models(0).modelId match {
+      case 101  => purchaseOrderDAO.insert(models.map( model => PurchaseOrder(model))) 
+      case 110  => inventoryInvoiceDAO.insert(models.map( model => InventoryInvoice(model)))  
+      case 116  => salesOrderDAO.insert(models.map( model => SalesOrder(model)))  
+      case 118  => billOfDeliveryDAO.insert(models.map( model => BillOfDelivery(model)))  
+      case 120  => salesInvoiceDAO.insert(models.map( model => SalesInvoice(model)))  
+   }
+ 
+  def findSomeIDocument( model:IDocument[LineIDocument]):List[IDocument[LineIDocument]]= 
+    model.modelId match {
+      case 101  => purchaseOrderDAO.findSome(PurchaseOrder(model)).map(m =>IDocument(m))
+      case 110  => inventoryInvoiceDAO.findSome(InventoryInvoice(model)).map(m =>IDocument(m))
+      case 116  => salesOrderDAO.findSome(SalesOrder(model)).map(m =>IDocument(m))
+      case 118  => billOfDeliveryDAO.findSome(BillOfDelivery(model)).map(m =>IDocument(m))
+      case 120  => salesInvoiceDAO.findSome(SalesInvoice(model)).map(m =>IDocument(m))
+    }
+
+  def findIDocument( model:IDocument[LineIDocument]):List[IDocument[LineIDocument]]= 
+    model.modelId match {
+      case 101  => purchaseOrderDAO.find(PurchaseOrder(model)).map(m =>IDocument(m))
+      case 110  => inventoryInvoiceDAO.find(InventoryInvoice(model)).map(m =>IDocument(m))
+      case 116  => salesOrderDAO.find(SalesOrder(model)).map(m =>IDocument(m))
+      case 118  => billOfDeliveryDAO.find(BillOfDelivery(model)).map(m =>IDocument(m))
+      case 120  => salesInvoiceDAO.find(SalesInvoice(model)).map(m =>IDocument(m))
+    }
+  
+  def allIDocument( model:IDocument[LineIDocument]):List[IDocument[LineIDocument]]= 
+    model.modelId match {
+      case 101  => purchaseOrderDAO.all(PurchaseOrder(model)).map(m =>IDocument(m))
+      case 110  => inventoryInvoiceDAO.all(InventoryInvoice(model)).map(m =>IDocument(m))
+      case 116  => salesOrderDAO.all(SalesOrder(model)).map(m =>IDocument(m))
+      case 118  => billOfDeliveryDAO.all(BillOfDelivery(model)).map(m =>IDocument(m))
+      case 120  => salesInvoiceDAO.all(SalesInvoice(model)).map(m =>IDocument(m))
+    }
+
+  def updateIDocument( model:IDocument[LineIDocument]):Int= 
+    model.modelId match {
+      case 101  => purchaseOrderDAO.update(PurchaseOrder(model))
+      case 110  => inventoryInvoiceDAO.update(InventoryInvoice(model))
+      case 116  => salesOrderDAO.update(SalesOrder(model))
+      case 118  => billOfDeliveryDAO.update(BillOfDelivery(model))
+      case 120  => salesInvoiceDAO.update(SalesInvoice(model))
+    }
+
+      def deleteIDocument( model:IDocument[LineIDocument]) = 
+     model.modelId match {
+      case 101  => purchaseOrderDAO.delete(PurchaseOrder(model))
+      case 110  => inventoryInvoiceDAO.delete(InventoryInvoice(model))
+      case 116  => salesOrderDAO.delete(SalesOrder(model))
+      case 118  => billOfDeliveryDAO.delete(BillOfDelivery(model))
+      case 120  => salesInvoiceDAO.delete(SalesInvoice(model))
+    }
+
+  def allLineIDocument( model:LineIDocument):List[LineIDocument]= 
+    model.modelId match {
+      case 102  => linePurchaseOrderDAO.all(LinePurchaseOrder(model)).map(m =>LineIDocument(m))
+      case 105  => lineGoodreceivingDAO.all(LineGoodreceiving(model)).map(m =>LineIDocument(m))
+      case 111  => lineInventoryInvoiceDAO.all(LineInventoryInvoice(model)).map(m =>LineIDocument(m))
+      case 117  => lineSalesOrderDAO.all(LineSalesOrder(model)).map(m =>LineIDocument(m))
+      case 119  => lineBillOfDeliveryDAO.all(LineBillOfDelivery(model)).map(m =>LineIDocument(m))
+      case 121  => lineSalesInvoiceDAO.all(LineSalesInvoice(model)).map(m =>LineIDocument(m))
+    }
+
+   def findSomeLineIDocument( model:LineIDocument):List[LineIDocument]= 
+    model.modelId match {
+      case 102  => linePurchaseOrderDAO.findSome(LinePurchaseOrder(model)).map(m =>LineIDocument(m))
+      case 105  => lineGoodreceivingDAO.findSome(LineGoodreceiving(model)).map(m =>LineIDocument(m))
+      case 111  => lineInventoryInvoiceDAO.findSome(LineInventoryInvoice(model)).map(m =>LineIDocument(m))
+      case 117  => lineSalesOrderDAO.findSome(LineSalesOrder(model)).map(m =>LineIDocument(m))
+      case 119  => lineBillOfDeliveryDAO.findSome(LineBillOfDelivery(model)).map(m =>LineIDocument(m))
+      case 121  => lineSalesInvoiceDAO.findSome(LineSalesInvoice(model)).map(m =>LineIDocument(m))
+    }
+
+   def findLineIDocument( model:LineIDocument):List[LineIDocument]= 
+    model.modelId match {
+      case 102  => linePurchaseOrderDAO.find(LinePurchaseOrder(model)).map(m =>LineIDocument(m))
+      case 105  => lineGoodreceivingDAO.find(LineGoodreceiving(model)).map(m =>LineIDocument(m))
+      case 111  => lineInventoryInvoiceDAO.find(LineInventoryInvoice(model)).map(m =>LineIDocument(m))
+      case 117  => lineSalesOrderDAO.find(LineSalesOrder(model)).map(m =>LineIDocument(m))
+      case 119  => lineBillOfDeliveryDAO.find(LineBillOfDelivery(model)).map(m =>LineIDocument(m))
+      case 121  => lineSalesInvoiceDAO.find(LineSalesInvoice(model)).map(m =>LineIDocument(m))
+    }
+  
+  def insertLineIDocument(models: List[LineIDocument]):Int= 
+   models(0).modelId match {
+      case 102  => linePurchaseOrderDAO.insert(models.map( model =>LinePurchaseOrder(model)))
+      case 105  => lineGoodreceivingDAO.insert(models.map( model =>LineGoodreceiving(model)))
+      case 111  => lineInventoryInvoiceDAO.insert(models.map( model =>LineInventoryInvoice(model)))
+      case 117  => lineSalesOrderDAO.insert(models.map( model =>LineSalesOrder(model)))
+      case 119  => lineBillOfDeliveryDAO.insert(models.map( model =>LineBillOfDelivery(model)))
+      case 121  => lineSalesInvoiceDAO.insert(models.map( model =>LineSalesInvoice(model)))
+   }
+ 
+
+  def updateLineIDocument( model:LineIDocument):Int= 
+    model.modelId match {
+      case 102  => linePurchaseOrderDAO.update(LinePurchaseOrder(model))
+      case 105  => lineGoodreceivingDAO.update(LineGoodreceiving(model))
+      case 111  => lineInventoryInvoiceDAO.update(LineInventoryInvoice(model))
+      case 117  => lineSalesOrderDAO.update(LineSalesOrder(model))
+      case 119  => lineBillOfDeliveryDAO.update(LineBillOfDelivery(model))
+      case 121  => lineSalesInvoiceDAO.update(LineSalesInvoice(model))
+    }
+
+  
+  def deleteLineIDocument( model:LineIDocument) = 
+    model.modelId match {
+      case 102  => linePurchaseOrderDAO.delete(LinePurchaseOrder(model))
+      case 105  => lineGoodreceivingDAO.delete(LineGoodreceiving(model))
+      case 111  => lineInventoryInvoiceDAO.delete(LineInventoryInvoice(model))
+      case 117  => lineSalesOrderDAO.delete(LineSalesOrder(model))
+      case 119  => lineBillOfDeliveryDAO.delete(LineBillOfDelivery(model))
+      case 121 => lineSalesInvoiceDAO.delete(LineSalesInvoice(model))
+    }
+
+
+  
   def create: ConnectionIO[Int] = Queries.create.run
 
   def runNonParameterizedSingleObjectQuery[A](q: Query0[A]) = q.unique.transact(xa).run

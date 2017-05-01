@@ -141,7 +141,7 @@ sealed trait  LineInventoryTransaction extends LineTransaction {
    def unit: Option[String]
    def price: Amount
    def quantity: Amount
-  def vat:Option[String]
+   def vat:Option[String]
    }
 sealed trait  LineFinancialsTransaction extends LineTransaction {
   def account: Option[String]
@@ -339,6 +339,13 @@ case class PurchaseOrder[LinePurchaseOrder] (tid:Long = 0L,oid:Long = 0L, modelI
       case _ => false
     }
 }
+object PurchaseOrder 
+{
+
+  def apply(f:IDocument[LineIDocument])  =  new PurchaseOrder[LinePurchaseOrder] (f.tid, f.oid, f.modelId, f.store, f.account, f.text, f.lines.map( x =>  x.map (l =>LinePurchaseOrder(l))))
+}
+
+
 case class SalesOrder[LineSalesOrder] (tid:Long = 0L,oid:Long = 0L, modelId:Int = 116,store:Option[String]=None, account:Option[String]= None,
                                              text:String ="", lines:Option[List[LineSalesOrder]]=Some(List.empty[LineSalesOrder]),
                                              modified:Boolean =false, created:Boolean = false, deleted:Boolean = false) extends Transaction [LineSalesOrder]{
@@ -353,6 +360,13 @@ case class SalesOrder[LineSalesOrder] (tid:Long = 0L,oid:Long = 0L, modelId:Int 
       case _ => false
     }
 }
+object SalesOrder 
+{
+
+  def apply(f:IDocument[LineIDocument])  =  new SalesOrder[LineSalesOrder] (f.tid, f.oid, f.modelId, f.store, f.account, f.text, f.lines.map( x =>  x.map (l =>LineSalesOrder(l))))
+}
+
+
 case class Goodreceiving[LineGoodreceiving] (tid:Long = 0L,oid:Long = 0L, modelId:Int = 104,store:Option[String]=None, account:Option[String]= None,
                                              text:String ="", lines:Option[List[LineGoodreceiving]]=Some(List.empty[LineGoodreceiving]),
                                               modified:Boolean =false, created:Boolean = false, deleted:Boolean = false) extends Transaction [LineGoodreceiving]{
@@ -368,6 +382,12 @@ case class Goodreceiving[LineGoodreceiving] (tid:Long = 0L,oid:Long = 0L, modelI
       case _ => false
     }
 }
+object Goodreceiving 
+{
+
+  def apply(f:IDocument[LineIDocument])  =  new Goodreceiving[LineGoodreceiving] (f.tid, f.oid, f.modelId, f.store, f.account, f.text, f.lines.map( x => x.map (l =>LineGoodreceiving(l))))
+}
+
 case class BillOfDelivery[LineBillOfDelivery] (tid:Long = 0L,oid:Long = 0L, modelId:Int = 118,store:Option[String]=None, account:Option[String]= None,
                                              text:String ="", lines:Option[List[LineBillOfDelivery]]=Some(List.empty[LineBillOfDelivery]),
                                              modified:Boolean =false, created:Boolean = false, deleted:Boolean = false) extends Transaction [LineBillOfDelivery]{
@@ -383,6 +403,12 @@ case class BillOfDelivery[LineBillOfDelivery] (tid:Long = 0L,oid:Long = 0L, mode
       case _ => false
     }
 }
+object BillOfDelivery 
+{
+
+  def apply(f:IDocument[LineIDocument])  =  new BillOfDelivery[LineBillOfDelivery] (f.tid, f.oid, f.modelId, f.store, f.account, f.text, f.lines.map( x => x.map (l =>LineBillOfDelivery(l))))
+}
+
 case class LineInventoryInvoice  (tid:Long = 0L, transid:Long =0, modelId:Int = 111,item:Option[String] = None, unit:Option[String] = None, price: Amount = 0,
                                quantity:Amount = 0,vat:Option[String] = None, duedate:Option[Date] = Some(new Date()),text:String ="txt",
                                modified:Boolean= false, created:Boolean= false, deleted:Boolean= false) extends LineInventoryTransaction {
@@ -433,6 +459,12 @@ case class InventoryInvoice[LineInventoryInvoice] (tid:Long = 0L,oid:Long = 0L, 
       case _ => false
     }
 }
+
+object InventoryInvoice 
+{
+  def apply(f:IDocument[LineIDocument])  =  new InventoryInvoice[LineInventoryInvoice] (f.tid, f.oid, f.modelId, f.store, f.account, f.text, f.lines.map( x => x.map (l => LineInventoryInvoice(l))))
+}
+
 case class SalesInvoice[LineSalesInvoice] (tid:Long = 0L,oid:Long = 0L, modelId:Int = 120,store:Option[String]=None, account:Option[String]= None,
                                                    text:String ="", lines:Option[List[LineSalesInvoice]]=Some(List.empty[LineSalesInvoice]),
                                                    modified:Boolean =false, created:Boolean = true, deleted:Boolean = false) extends Transaction [LineSalesInvoice]{
@@ -446,6 +478,11 @@ case class SalesInvoice[LineSalesInvoice] (tid:Long = 0L,oid:Long = 0L, modelId:
       case that: SalesInvoice[LineSalesInvoice] => that.canEqual(this) && this.hashCode == that.hashCode
       case _ => false
     }
+}
+object SalesInvoice 
+{
+  def apply(f:IDocument[LineIDocument])  =  new SalesInvoice[LineSalesInvoice] (f.tid, f.oid, f.modelId, f.store, f.account, f.text, f.lines.map( x => 
+                                               x.map (l => LineSalesInvoice(l))))
 }
 case class LineVendorInvoice  (tid:Long = 0L, transid:Long =0, modelId:Int = 113,account:Option[String] = None,  side:Boolean = true, oaccount:Option[String] = None, amount: Amount = 0,
                                    duedate:Option[Date] = Some(new Date()),text:String ="txt",
@@ -642,8 +679,6 @@ case class FDocument[LineFDocument] (tid:Long = 0L,oid:Long = 0L, modelId:Int ,s
 }
 object FDocument 
 {
-
-
   def apply(f:CustomerInvoice[LineCustomerInvoice])  =  new FDocument (f.tid, f.oid, f.modelId, f.store, f.account, f.text, f.lines.map( x => x.map (l =>LineFDocument(l))))
   def apply(f:Settlement[LineSettlement])  =  new FDocument (f.tid, f.oid, f.modelId, f.store, f.account, f.text, f.lines.map( x => x.map (l =>LineFDocument(l))))
   def apply(f:VendorInvoice[LineVendorInvoice])  =  new FDocument (f.tid, f.oid, f.modelId, f.store, f.account, f.text, f.lines.map( x => x.map (l =>LineFDocument(l))))
@@ -668,12 +703,12 @@ case class IDocument[LineIDocument] (tid:Long = 0L,oid:Long = 0L, modelId:Int ,s
 object IDocument
 {
 
-def apply(f:SalesInvoice[LineSalesInvoice])  =  new IDocument (f.tid, f.oid, f.modelId, f.store, f.account, f.text, f.lines.map( x => x.map (l => LineIDocument(l))),f.modified, f.created, f.deleted)
-  def apply(f:InventoryInvoice[LineInventoryInvoice])  =  new IDocument (f.tid, f.oid, f.modelId, f.store, f.account, f.text, f.lines.map( x => x.map (l =>LineIDocument(l))), f.modified, f.created, f.deleted)
-def apply(f:PurchaseOrder[LinePurchaseOrder])  =  new IDocument (f.tid, f.oid, f.modelId, f.store, f.account, f.text, f.lines.map( x => x.map (l =>LineIDocument(l))), f.modified, f.created, f.deleted)
-def apply(f:Goodreceiving[LineGoodreceiving])  =  new IDocument (f.tid, f.oid, f.modelId, f.store, f.account, f.text, f.lines.map( x => x.map (l =>LineIDocument(l))),f.modified, f.created, f.deleted)
-def apply(f:BillOfDelivery[LineBillOfDelivery])  =  new IDocument (f.tid, f.oid, f.modelId, f.store, f.account, f.text, f.lines.map( x => x.map (l =>LineIDocument(l))), f.modified, f.created, f.deleted)
-
+def apply(f:SalesOrder[LineSalesOrder]): IDocument[LineIDocument]  =  new IDocument (f.tid, f.oid, f.modelId, f.store, f.account, f.text, f.lines.map( x => x.map (l => LineIDocument(l))),f.modified, f.created, f.deleted)
+def apply(f:InventoryInvoice[LineInventoryInvoice]):IDocument[LineIDocument]   =  new IDocument (f.tid, f.oid, f.modelId, f.store, f.account, f.text, f.lines.map( x => x.map (l =>LineIDocument(l))), f.modified, f.created, f.deleted)
+def apply(f:PurchaseOrder[LinePurchaseOrder]):IDocument[LineIDocument]   =  new IDocument (f.tid, f.oid, f.modelId, f.store, f.account, f.text, f.lines.map( x => x.map (l =>LineIDocument(l))), f.modified, f.created, f.deleted)
+def apply(f:Goodreceiving[LineGoodreceiving]):IDocument[LineIDocument]   =  new IDocument (f.tid, f.oid, f.modelId, f.store, f.account, f.text, f.lines.map( x => x.map (l =>LineIDocument(l))),f.modified, f.created, f.deleted)
+def apply(f:BillOfDelivery[LineBillOfDelivery]):IDocument[LineIDocument]   =  new IDocument (f.tid, f.oid, f.modelId, f.store, f.account, f.text, f.lines.map( x => x.map (l =>LineIDocument(l))), f.modified, f.created, f.deleted)
+def apply(f:SalesInvoice[LineSalesInvoice]): IDocument[LineIDocument]  =  new IDocument (f.tid, f.oid, f.modelId, f.store, f.account, f.text, f.lines.map( x => x.map (l => LineIDocument(l))),f.modified, f.created, f.deleted)
 
 }
 
