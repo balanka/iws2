@@ -78,6 +78,7 @@ object LineGoodreceivingList {
       val l =e.target.value
       $.modState(s => s.copy(item = s.item.map(_.copy(text = l))))>>setModfied
     }
+
     def updatePrice(e: ReactKeyboardEventI): Option[Callback] = {
       val i=e.target.value.trim
       log.debug(s"Item price is ${i}")
