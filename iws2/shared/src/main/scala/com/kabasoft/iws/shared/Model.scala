@@ -679,10 +679,10 @@ case class FDocument[LineFDocument] (tid:Long = 0L,oid:Long = 0L, modelId:Int ,s
 }
 object FDocument 
 {
-  def apply(f:CustomerInvoice[LineCustomerInvoice])  =  new FDocument (f.tid, f.oid, f.modelId, f.store, f.account, f.text, f.lines.map( x => x.map (l =>LineFDocument(l))))
-  def apply(f:Settlement[LineSettlement])  =  new FDocument (f.tid, f.oid, f.modelId, f.store, f.account, f.text, f.lines.map( x => x.map (l =>LineFDocument(l))))
-  def apply(f:VendorInvoice[LineVendorInvoice])  =  new FDocument (f.tid, f.oid, f.modelId, f.store, f.account, f.text, f.lines.map( x => x.map (l =>LineFDocument(l))))
-  def apply(f:Payment[LinePayment])  =  new FDocument (f.tid, f.oid, f.modelId, f.store, f.account, f.text, f.lines.map( x => x.map (l => LineFDocument(l))))
+  def apply(f:CustomerInvoice[LineCustomerInvoice])  =  new FDocument (f.tid, f.oid, f.modelId, f.store, f.account, f.text, f.lines.map( x => x.map (l =>LineFDocument(l))),f.modified, f.created, f.deleted)
+  def apply(f:Settlement[LineSettlement])  =  new FDocument (f.tid, f.oid, f.modelId, f.store, f.account, f.text, f.lines.map( x => x.map (l =>LineFDocument(l))),f.modified, f.created, f.deleted)
+  def apply(f:VendorInvoice[LineVendorInvoice])  =  new FDocument (f.tid, f.oid, f.modelId, f.store, f.account, f.text, f.lines.map( x => x.map (l =>LineFDocument(l))),f.modified, f.created, f.deleted)
+  def apply(f:Payment[LinePayment])  =  new FDocument (f.tid, f.oid, f.modelId, f.store, f.account, f.text, f.lines.map( x => x.map (l => LineFDocument(l))),f.modified, f.created, f.deleted)
 }
 
 case class IDocument[LineIDocument] (tid:Long = 0L,oid:Long = 0L, modelId:Int ,store:Option[String]=None, account:Option[String]= None,
