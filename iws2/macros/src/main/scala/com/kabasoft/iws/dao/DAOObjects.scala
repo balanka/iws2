@@ -210,14 +210,10 @@ object DAOObjects  {
     def create (modelId:Int) = Queries.createLinePurchaseOrder.run.transact(xa).run
     def update(model:LinePurchaseOrder) = { println(s" updating ${model}  items"); Queries.linePurchaseOrderUpdateName(model).run.transact(xa).run}
     def delete(model:LinePurchaseOrder):Int = Queries.linePurchaseOrderDelete(model.id.toLong).run.transact(xa).run
-    def all(model:LinePurchaseOrder):List[LinePurchaseOrder] =  Queries.linePurchaseOrderSelect.process.list.transact(xa).run.map(x =>
-                                LinePurchaseOrder(x._1,x._2, x._3, Some(x._4),Some(x._5), x._6, x._7,  Some(x._8), Some(x._9), x._10))
-    def  find(model:LinePurchaseOrder):List[LinePurchaseOrder] = Queries.linePurchaseOrderIdSelect(model.id.toLong).process.list.transact(xa).run.map(x =>
-                            LinePurchaseOrder(x._1,x._2, x._3, Some(x._4),Some(x._5), x._6, x._7,  Some(x._8), Some(x._9), x._10))
-    def findSome(model:LinePurchaseOrder) = Queries.linePurchaseOrderSelectSome(model.id).process.list.transact(xa).run.map(x =>
-                          LinePurchaseOrder(x._1,x._2, x._3, Some(x._4),Some(x._5), x._6, x._7,  Some(x._8), Some(x._9), x._10))
-    def findSome1(id:Long) = Queries.linePurchaseOrderIdSelect(id).process.list.transact(xa).run.map(x => LinePurchaseOrder(x._1,x._2, x._3, Some(x._4),
-                                                                                   Some(x._5), x._6, x._7,  Some(x._8), Some(x._9), x._10))
+    def all(model:LinePurchaseOrder):List[LinePurchaseOrder] =  Queries.linePurchaseOrderSelect.process.list.transact(xa).run.map(x => LinePurchaseOrder(x))
+    def  find(model:LinePurchaseOrder):List[LinePurchaseOrder] = Queries.linePurchaseOrderIdSelect(model.id.toLong).process.list.transact(xa).run.map(x => LinePurchaseOrder(x))
+    def findSome(model:LinePurchaseOrder) = Queries.linePurchaseOrderSelectSome(model.id).process.list.transact(xa).run.map(x => LinePurchaseOrder(x))
+    def findSome1(id:Long) = Queries.linePurchaseOrderIdSelect(id).process.list.transact(xa).run.map(x => LinePurchaseOrder(x))
   }
 
 implicit def purchaseOrderDAO = new DAO[PurchaseOrder[LinePurchaseOrder]]{
@@ -258,10 +254,7 @@ implicit def purchaseOrderDAO = new DAO[PurchaseOrder[LinePurchaseOrder]]{
                       x=> PurchaseOrder(x._1,x._2, x._3, Some(x._4), Some(x._5), x._6).copy(lines = Some(f(x._1))))
     def findSome(model:PurchaseOrder[LinePurchaseOrder]) = Queries.purchaseOrderSelectSome(model.id).process.list.transact(xa).run.map(
                       x=> PurchaseOrder(x._1, x._2, x._3, Some(x._4), Some(x._5), x._6).copy(lines = Some(f(x._1))))
-    def f (id:Long) = Queries.linePurchaseOrderIdSelect(id).process.list.transact(xa).run.map(x => LinePurchaseOrder(x._1,x._2, x._3, Some(x._4),
-                                                                                   Some(x._5), x._6, x._7,  Some(x._8), Some(x._9), x._10))
-   // def findSome1(id:Long) =Queries.purchaseOrderIdSelect(id).process.list.transact(xa).run.map(
-   //                  x=> PurchaseOrder(x._1,x._2, x._3, Some(x._4), Some(x._5), x._6).copy(lines = Some(f(x._1))))
+    def f (id:Long) = Queries.linePurchaseOrderIdSelect(id).process.list.transact(xa).run.map(x => LinePurchaseOrder(x)) 
     def  updateLineId(id:Long,line:LinePurchaseOrder):LinePurchaseOrder = line.copy(transid=id)
   }
 
@@ -281,14 +274,10 @@ implicit def purchaseOrderDAO = new DAO[PurchaseOrder[LinePurchaseOrder]]{
     def create (modelId:Int) = Queries.createLineGoodreceiving.run.transact(xa).run
     def update(model:LineGoodreceiving) = { println(s" updating ${model}  items"); Queries.lineGoodreceivingUpdateName(model).run.transact(xa).run}
     def delete(model:LineGoodreceiving):Int = Queries.lineGoodreceivingDelete(model.id.toLong).run.transact(xa).run
-    def all(model:LineGoodreceiving):List[LineGoodreceiving] =  Queries.lineGoodreceivingSelect.process.list.transact(xa).run.map(x =>
-      LineGoodreceiving(x._1,x._2, x._3, Some(x._4),Some(x._5), x._6, x._7,  Some(x._8), Some(x._9), x._10))
-    def  find(model:LineGoodreceiving):List[LineGoodreceiving] = Queries.lineGoodreceivingIdSelect(model.id.toLong).process.list.transact(xa).run.map(x =>
-      LineGoodreceiving(x._1,x._2, x._3, Some(x._4),Some(x._5), x._6, x._7,  Some(x._8), Some(x._9), x._10))
-    def findSome(model:LineGoodreceiving) = Queries.lineGoodreceivingSelectSome(model.id).process.list.transact(xa).run.map(x =>
-      LineGoodreceiving(x._1,x._2, x._3, Some(x._4),Some(x._5), x._6, x._7,  Some(x._8), Some(x._9), x._10))
-    def findSome1(id:Long) = Queries.lineGoodreceivingIdSelect(id).process.list.transact(xa).run.map(x => LineGoodreceiving(x._1,x._2, x._3, Some(x._4),
-      Some(x._5), x._6, x._7,  Some(x._8), Some(x._9), x._10))
+    def all(model:LineGoodreceiving):List[LineGoodreceiving] =  Queries.lineGoodreceivingSelect.process.list.transact(xa).run.map(x =>LineGoodreceiving(x))
+    def  find(model:LineGoodreceiving):List[LineGoodreceiving] = Queries.lineGoodreceivingIdSelect(model.id.toLong).process.list.transact(xa).run.map(x =>LineGoodreceiving(x))
+    def findSome(model:LineGoodreceiving) = Queries.lineGoodreceivingSelectSome(model.id).process.list.transact(xa).run.map(x =>LineGoodreceiving(x))
+    def findSome1(id:Long) = Queries.lineGoodreceivingIdSelect(id).process.list.transact(xa).run.map(x => LineGoodreceiving(x))
   }
 
   implicit def GoodreceivingDAO = new DAO[Goodreceiving[LineGoodreceiving]]{
@@ -326,10 +315,7 @@ implicit def purchaseOrderDAO = new DAO[PurchaseOrder[LinePurchaseOrder]]{
         x=> Goodreceiving(x._1,x._2, x._3, Some(x._4), Some(x._5), x._6).copy(lines = Some(f(x._1))))
     def findSome(model:Goodreceiving[LineGoodreceiving]) = Queries.goodreceivingSelectSome(model.id).process.list.transact(xa).run.map(
       x=> Goodreceiving(x._1, x._2, x._3, Some(x._4), Some(x._5), x._6).copy(lines = Some(f(x._1))))
-    def f (id:Long) =  Queries.lineGoodreceivingIdSelect(id).process.list.transact(xa).run.map(x => LineGoodreceiving(x._1,x._2, x._3, Some(x._4),
-      Some(x._5), x._6, x._7,  Some(x._8), Some(x._9), x._10))
-    //def findSome1(id:Long) =Queries.goodreceivingIdSelect(id).process.list.transact(xa).run.map(
-    //  x=> Goodreceiving(x._1,x._2, x._3, Some(x._4), Some(x._5), x._6).copy(lines = Some(f(x._1))))
+    def f (id:Long) =  Queries.lineGoodreceivingIdSelect(id).process.list.transact(xa).run.map(x => LineGoodreceiving(x))
     def  updateLineId(id:Long,line:LineGoodreceiving):LineGoodreceiving = line.copy(transid=id)
   }
 
@@ -349,14 +335,11 @@ implicit def purchaseOrderDAO = new DAO[PurchaseOrder[LinePurchaseOrder]]{
     def create(modelId:Int) = Queries.createLineInventoryInvoice.run.transact(xa).run
     def update(model:LineInventoryInvoice) = { println(s" updating ${model}  items"); Queries.lineInventoryInvoiceUpdateName(model).run.transact(xa).run}
     def delete(model:LineInventoryInvoice):Int = Queries.lineInventoryInvoiceDelete(model.id.toLong).run.transact(xa).run
-    def all(model:LineInventoryInvoice):List[LineInventoryInvoice] =  Queries.lineInventoryInvoiceSelect.process.list.transact(xa).run.map(x =>
-      LineInventoryInvoice(x._1,x._2, x._3, Some(x._4),Some(x._5), x._6, x._7,  Some(x._8), Some(x._9), x._10))
-    def  find(model:LineInventoryInvoice):List[LineInventoryInvoice] = Queries.lineInventoryInvoiceIdSelect(model.id.toLong).process.list.transact(xa).run.map(x =>
-      LineInventoryInvoice(x._1,x._2, x._3, Some(x._4),Some(x._5), x._6, x._7,  Some(x._8), Some(x._9), x._10))
-    def findSome(model:LineInventoryInvoice) = Queries.lineInventoryInvoiceSelectSome(model.id).process.list.transact(xa).run.map(x =>
-      LineInventoryInvoice(x._1,x._2, x._3, Some(x._4),Some(x._5), x._6, x._7,  Some(x._8), Some(x._9), x._10))
-    def findSome1(id:Long) = Queries.lineInventoryInvoiceIdSelect(id).process.list.transact(xa).run.map(x => LineInventoryInvoice(x._1,x._2, x._3, Some(x._4),
-      Some(x._5), x._6, x._7,  Some(x._8), Some(x._9), x._10))
+    def all(model:LineInventoryInvoice):List[LineInventoryInvoice] =  Queries.lineInventoryInvoiceSelect.process.list.transact(xa).run.map(x =>LineInventoryInvoice(x))
+    def  find(model:LineInventoryInvoice):List[LineInventoryInvoice] = Queries.lineInventoryInvoiceIdSelect(model.id.toLong).process.list.transact(xa).run.map(x =>LineInventoryInvoice(x))
+    def findSome(model:LineInventoryInvoice) = Queries.lineInventoryInvoiceSelectSome(model.id).process.list.transact(xa).run.map(x =>LineInventoryInvoice(x))
+    def findSome1(id:Long) = Queries.lineInventoryInvoiceIdSelect(id).process.list.transact(xa).run.map(x => LineInventoryInvoice(x))
+
   }
 
   implicit def inventoryInvoiceDAO = new DAO[InventoryInvoice[LineInventoryInvoice]]{
@@ -395,10 +378,7 @@ implicit def purchaseOrderDAO = new DAO[PurchaseOrder[LinePurchaseOrder]]{
         x=> InventoryInvoice(x._1,x._2, x._3, Some(x._4), Some(x._5), x._6).copy(lines = Some(f(x._1))))
     def findSome(model:InventoryInvoice[LineInventoryInvoice]) = Queries.inventoryInvoiceSelectSome(model.id).process.list.transact(xa).run.map(
       x=> InventoryInvoice(x._1, x._2, x._3, Some(x._4), Some(x._5), x._6).copy(lines = Some(f(x._1))))
-    def f (id:Long) = Queries.lineInventoryInvoiceIdSelect(id).process.list.transact(xa).run.map(x => LineInventoryInvoice(x._1,x._2, x._3, Some(x._4),
-      Some(x._5), x._6, x._7,  Some(x._8), Some(x._9), x._10))
-    //def findSome1(id:Long) =Queries.inventoryInvoiceIdSelect(id).process.list.transact(xa).run.map(
-    //  x=> InventoryInvoice(x._1,x._2, x._3, Some(x._4), Some(x._5), x._6).copy(lines = Some(f(x._1))))
+    def f (id:Long) = Queries.lineInventoryInvoiceIdSelect(id).process.list.transact(xa).run.map(x => LineInventoryInvoice(x))
     def  updateLineId(id:Long,line:LineInventoryInvoice):LineInventoryInvoice = line.copy(transid=id)
   }
 
@@ -417,14 +397,10 @@ implicit def purchaseOrderDAO = new DAO[PurchaseOrder[LinePurchaseOrder]]{
     def create (modelId:Int)= Queries.createLineVendorInvoice.run.transact(xa).run
     def update(model:LineVendorInvoice) = { println(s" updating ${model}  items"); Queries.lineVendorInvoiceUpdateName(model).run.transact(xa).run}
     def delete(model:LineVendorInvoice):Int = Queries.lineVendorInvoiceDelete(model.id.toLong).run.transact(xa).run
-    def all(model:LineVendorInvoice):List[LineVendorInvoice] =  Queries.lineVendorInvoiceSelect.process.list.transact(xa).run.map(x =>
-      LineVendorInvoice(x._1,x._2, x._3, Some(x._4),x._5, Some(x._6), x._7,  Some(x._8), x._9))
-    def  find(model:LineVendorInvoice):List[LineVendorInvoice] = Queries.lineVendorInvoiceIdSelect(model.id.toLong).process.list.transact(xa).run.map(x =>
-      LineVendorInvoice(x._1,x._2, x._3, Some(x._4),x._5, Some(x._6), x._7,  Some(x._8), x._9))
-    def findSome(model:LineVendorInvoice) = Queries.lineVendorInvoiceSelectSome(model.id).process.list.transact(xa).run.map(x =>
-      LineVendorInvoice(x._1,x._2, x._3, Some(x._4),x._5, Some(x._6), x._7,  Some(x._8), x._9))
-    def findSome1(id:Long) = Queries.lineVendorInvoiceIdSelect(id).process.list.transact(xa).run.map(x =>
-      LineVendorInvoice(x._1,x._2, x._3, Some(x._4),x._5, Some(x._6), x._7,  Some(x._8), x._9))
+    def all(model:LineVendorInvoice):List[LineVendorInvoice] =  Queries.lineVendorInvoiceSelect.process.list.transact(xa).run.map(x => LineVendorInvoice(x))
+    def  find(model:LineVendorInvoice):List[LineVendorInvoice] = Queries.lineVendorInvoiceIdSelect(model.id.toLong).process.list.transact(xa).run.map(x => LineVendorInvoice(x))
+    def findSome(model:LineVendorInvoice) = Queries.lineVendorInvoiceSelectSome(model.id).process.list.transact(xa).run.map(x =>LineVendorInvoice(x))
+    def findSome1(id:Long) = Queries.lineVendorInvoiceIdSelect(id).process.list.transact(xa).run.map(x =>LineVendorInvoice(x))
 
   }
 
@@ -464,12 +440,9 @@ implicit def purchaseOrderDAO = new DAO[PurchaseOrder[LinePurchaseOrder]]{
         x=> VendorInvoice(x._1,x._2, x._3, Some(x._4), Some(x._5), x._6).copy(lines = Some(f(x._1))))
     def findSome(model:VendorInvoice[LineVendorInvoice]) = Queries.vendorInvoiceSelectSome(model.id).process.list.transact(xa).run.map(
       x=> VendorInvoice(x._1, x._2, x._3, Some(x._4), Some(x._5), x._6).copy(lines = Some(f(x._1))))
-    def f (id:Long) =  Queries.lineVendorInvoiceIdSelect(id).process.list.transact(xa).run.map(x =>
-      LineVendorInvoice(x._1,x._2, x._3, Some(x._4),x._5, Some(x._6), x._7,  Some(x._8), x._9))
-   // def findSome1(id:Long) = Queries.vendorInvoiceIdSelect(id).process.list.transact(xa).run.map(
-   //   x=> VendorInvoice(x._1,x._2, x._3, Some(x._4), Some(x._5), x._6).copy(lines = Some(f(x._1))))
+    def f (id:Long) =  Queries.lineVendorInvoiceIdSelect(id).process.list.transact(xa).run.map(x =>LineVendorInvoice(x))
     def  updateLineId(id:Long,line:LineVendorInvoice):LineVendorInvoice = line.copy(transid=id)
-      def mapl(l:LineFDocument):LineVendorInvoice = LineVendorInvoice(l.tid,l.transid, l.modelId, l.account, l.side, l.oaccount, l.amount, l.duedate, l.text)
+      def mapl(l:LineFDocument):LineVendorInvoice = LineVendorInvoice(l)
 
     def mapx(t:Transaction[LineFDocument]):VendorInvoice[LineVendorInvoice] = VendorInvoice[LineVendorInvoice](t.tid,t.oid,
         t.modelId,  t.store, t.account,  t.text, t.lines.map( x => x.map(y =>mapl(y) )))
@@ -490,18 +463,11 @@ implicit def purchaseOrderDAO = new DAO[PurchaseOrder[LinePurchaseOrder]]{
     def create (lodelId:Int) = Queries.createLinePayment.run.transact(xa).run
     def update(model:LinePayment) = { println(s" updating ${model}  items"); Queries.linePaymentUpdateName(model).run.transact(xa).run}
     def delete(model:LinePayment):Int = Queries.linePaymentDelete(model.id.toLong).run.transact(xa).run
-    def all(model:LinePayment):List[LinePayment] =  Queries.linePaymentSelect.process.list.transact(xa).run.map(x =>
-      LinePayment(x._1,x._2, x._3, Some(x._4),x._5, Some(x._6), x._7,  Some(x._8), x._9))
-    def  find(model:LinePayment):List[LinePayment] = Queries.linePaymentIdSelect(model.id.toLong).process.list.transact(xa).run.map(x =>
-      LinePayment(x._1,x._2, x._3, Some(x._4),x._5, Some(x._6), x._7,  Some(x._8), x._9))
-    def findSome(model:LinePayment) = Queries.linePaymentSelectSome(model.id).process.list.transact(xa).run.map(x =>
-      LinePayment(x._1,x._2, x._3, Some(x._4),x._5, Some(x._6), x._7,  Some(x._8), x._9))
-    def findSome1(id:Long) = Queries.linePaymentIdSelect(id).process.list.transact(xa).run.map(x => 
-      LinePayment(x._1,x._2, x._3, Some(x._4),x._5, Some(x._6), x._7,  Some(x._8), x._9))
+    def all(model:LinePayment):List[LinePayment] =  Queries.linePaymentSelect.process.list.transact(xa).run.map(x => LinePayment(x))
+    def  find(model:LinePayment):List[LinePayment] = Queries.linePaymentIdSelect(model.id.toLong).process.list.transact(xa).run.map(x => LinePayment(x))
+    def findSome(model:LinePayment) = Queries.linePaymentSelectSome(model.id).process.list.transact(xa).run.map(x => LinePayment(x))
+    def findSome1(id:Long) = Queries.linePaymentIdSelect(id).process.list.transact(xa).run.map(x => LinePayment(x))
     def  updateLineId(id:Long,line:LinePayment):LinePayment = line.copy(transid=id)
-    //def mapx(l:LineFDocument):LinePayment = LinePayment(l.tid,l.transid, l.modelId, l.account, l.side, l.oaccount, l.amount, l.duedate, l.text)
-
-
   }
 
   implicit def paymentDAO = new DAO[Payment[LinePayment]]{
@@ -540,10 +506,7 @@ implicit def purchaseOrderDAO = new DAO[PurchaseOrder[LinePurchaseOrder]]{
         x=> Payment(x._1,x._2, x._3, Some(x._4), Some(x._5), x._6).copy(lines = Some(f(x._1))))
     def findSome(model:Payment[LinePayment]) = Queries.paymentSelectSome(model.id).process.list.transact(xa).run.map(
       x=> Payment(x._1, x._2, x._3, Some(x._4), Some(x._5), x._6).copy(lines = Some(f(x._1))))
-    def f (id:Long) = Queries.linePaymentIdSelect(id).process.list.transact(xa).run.map(x => 
-      LinePayment(x._1,x._2, x._3, Some(x._4),x._5, Some(x._6), x._7,  Some(x._8), x._9))
-   // def findSome1(id:Long) = Queries.paymentIdSelect(id).process.list.transact(xa).run.map(
-   //  x=> Payment(x._1,x._2, x._3, Some(x._4), Some(x._5), x._6).copy(lines = Some(f(x._1))))
+    def f (id:Long) = Queries.linePaymentIdSelect(id).process.list.transact(xa).run.map(x => LinePayment(x))
     def  updateLineId(id:Long,line:LinePayment):LinePayment = line.copy(transid=id)
 
 
@@ -564,14 +527,10 @@ implicit def purchaseOrderDAO = new DAO[PurchaseOrder[LinePurchaseOrder]]{
     def create (modelId:Int) = Queries.createLineSalesOrder.run.transact(xa).run
     def update(model:LineSalesOrder) = { println(s" updating ${model}  items"); Queries.lineSalesOrderUpdateName(model).run.transact(xa).run}
     def delete(model:LineSalesOrder):Int = Queries.lineSalesOrderDelete(model.id.toLong).run.transact(xa).run
-    def all(model:LineSalesOrder):List[LineSalesOrder] =  Queries.lineSalesOrderSelect.process.list.transact(xa).run.map(x =>
-      LineSalesOrder(x._1,x._2, x._3, Some(x._4),Some(x._5), x._6, x._7,  Some(x._8), Some(x._9), x._10))
-    def  find(model:LineSalesOrder):List[LineSalesOrder] = Queries.lineSalesOrderIdSelect(model.id.toLong).process.list.transact(xa).run.map(x =>
-      LineSalesOrder(x._1,x._2, x._3, Some(x._4),Some(x._5), x._6, x._7,  Some(x._8), Some(x._9), x._10))
-    def findSome(model:LineSalesOrder) = Queries.lineSalesOrderSelectSome(model.id).process.list.transact(xa).run.map(x =>
-      LineSalesOrder(x._1,x._2, x._3, Some(x._4),Some(x._5), x._6, x._7,  Some(x._8), Some(x._9), x._10))
-    def findSome1(id:Long) = Queries.lineSalesOrderIdSelect(id).process.list.transact(xa).run.map(x => LineSalesOrder(x._1,x._2, x._3, Some(x._4),
-      Some(x._5), x._6, x._7,  Some(x._8), Some(x._9), x._10))
+    def all(model:LineSalesOrder):List[LineSalesOrder] =  Queries.lineSalesOrderSelect.process.list.transact(xa).run.map(x =>  LineSalesOrder(x))
+    def  find(model:LineSalesOrder):List[LineSalesOrder] = Queries.lineSalesOrderIdSelect(model.id.toLong).process.list.transact(xa).run.map(x => LineSalesOrder(x))
+    def findSome(model:LineSalesOrder) = Queries.lineSalesOrderSelectSome(model.id).process.list.transact(xa).run.map(x => LineSalesOrder(x))
+    def findSome1(id:Long) = Queries.lineSalesOrderIdSelect(id).process.list.transact(xa).run.map(x => LineSalesOrder(x))
   }
 
   implicit def salesOrderDAO = new DAO[SalesOrder[LineSalesOrder]]{
@@ -581,11 +540,10 @@ implicit def purchaseOrderDAO = new DAO[PurchaseOrder[LinePurchaseOrder]]{
       val tid:Long = Queries.getSequence ("Salesorder", "id").unique.transact(xa).run;
       val ret= doobie.imports.Update[SalesOrder_TYPE](Queries.salesOrderInsertSQL).updateMany(model.map (t => f2(tid, t)).map(
         x=>(tid, x.oid, x.modelId, x.store.get,x.account.get, x.text))).transact(xa).run;
-      //model.map( x=>implicitly[DAO[LineSalesOrder]].insert(x.lines.getOrElse(List[LineSalesOrder]()).map( z => z.copy(transid=tid))))
       model.map( x=>implicitly[DAO[LineSalesOrder]].insert(x.lines.getOrElse(List[LineSalesOrder]())))
       ret
 
-    }
+      }
     def create (modelId:Int) = Queries.createSalesOrder1.run.transact(xa).run
     def update(model:SalesOrder[LineSalesOrder]) = {
       val ret = Queries.salesOrderUpdateName(model).run.transact(xa).run;
@@ -612,8 +570,7 @@ implicit def purchaseOrderDAO = new DAO[PurchaseOrder[LinePurchaseOrder]]{
         x=> SalesOrder(x._1,x._2, x._3, Some(x._4), Some(x._5), x._6).copy(lines = Some(f(x._1))))
     def findSome(model:SalesOrder[LineSalesOrder]) = Queries.salesOrderSelectSome(model.id).process.list.transact(xa).run.map(
       x=> SalesOrder(x._1, x._2, x._3, Some(x._4), Some(x._5), x._6).copy(lines = Some(f(x._1))))
-    def f (id:Long) = Queries.lineSalesOrderIdSelect(id).process.list.transact(xa).run.map(x => LineSalesOrder(x._1,x._2, x._3, Some(x._4),
-      Some(x._5), x._6, x._7,  Some(x._8), Some(x._9), x._10))
+    def f (id:Long) = Queries.lineSalesOrderIdSelect(id).process.list.transact(xa).run.map(x => LineSalesOrder(x))
     def  updateLineId(id:Long,line:LineSalesOrder):LineSalesOrder = line.copy(transid=id)
   }
 
@@ -634,14 +591,10 @@ implicit def purchaseOrderDAO = new DAO[PurchaseOrder[LinePurchaseOrder]]{
     def create (modelId:Int) = Queries.createLineBillOfDelivery.run.transact(xa).run
     def update(model:LineBillOfDelivery) = { println(s" updating ${model}  items"); Queries.lineBillOfDeliveryUpdateName(model).run.transact(xa).run}
     def delete(model:LineBillOfDelivery):Int = Queries.lineBillOfDeliveryDelete(model.id.toLong).run.transact(xa).run
-    def all(model:LineBillOfDelivery):List[LineBillOfDelivery] =  Queries.lineBillOfDeliverySelect.process.list.transact(xa).run.map(x =>
-      LineBillOfDelivery(x._1,x._2, x._3, Some(x._4),Some(x._5), x._6, x._7,  Some(x._8), Some(x._9), x._10))
-    def  find(model:LineBillOfDelivery):List[LineBillOfDelivery] = Queries.lineBillOfDeliveryIdSelect(model.id.toLong).process.list.transact(xa).run.map(x =>
-      LineBillOfDelivery(x._1,x._2, x._3, Some(x._4),Some(x._5), x._6, x._7,  Some(x._8), Some(x._9), x._10))
-    def findSome(model:LineBillOfDelivery) = Queries.lineBillOfDeliverySelectSome(model.id).process.list.transact(xa).run.map(x =>
-      LineBillOfDelivery(x._1,x._2, x._3, Some(x._4),Some(x._5), x._6, x._7,  Some(x._8), Some(x._9), x._10))
-    def findSome1(id:Long) = Queries.lineBillOfDeliveryIdSelect(id).process.list.transact(xa).run.map(x => LineBillOfDelivery(x._1,x._2, x._3, Some(x._4),
-      Some(x._5), x._6, x._7,  Some(x._8), Some(x._9), x._10))
+    def all(model:LineBillOfDelivery):List[LineBillOfDelivery] =  Queries.lineBillOfDeliverySelect.process.list.transact(xa).run.map(x =>LineBillOfDelivery(x))
+    def  find(model:LineBillOfDelivery):List[LineBillOfDelivery] = Queries.lineBillOfDeliveryIdSelect(model.id.toLong).process.list.transact(xa).run.map(x =>LineBillOfDelivery(x))
+    def findSome(model:LineBillOfDelivery) = Queries.lineBillOfDeliverySelectSome(model.id).process.list.transact(xa).run.map(x =>LineBillOfDelivery(x))
+    def findSome1(id:Long) = Queries.lineBillOfDeliveryIdSelect(id).process.list.transact(xa).run.map(x => LineBillOfDelivery(x))
   }
 
   implicit def billOfDeliveryDAO = new DAO[BillOfDelivery[LineBillOfDelivery]]{
@@ -679,7 +632,7 @@ implicit def purchaseOrderDAO = new DAO[PurchaseOrder[LinePurchaseOrder]]{
         x=> BillOfDelivery(x._1,x._2, x._3, Some(x._4), Some(x._5), x._6).copy(lines = Some(f(x._1))))
     def findSome(model:BillOfDelivery[LineBillOfDelivery]) = Queries.billOfDeliverySelectSome(model.id).process.list.transact(xa).run.map(
       x=> BillOfDelivery(x._1, x._2, x._3, Some(x._4), Some(x._5), x._6).copy(lines = Some(f(x._1))))
-    def f (id:Long) =  Queries.lineBillOfDeliveryIdSelect(id).process.list.transact(xa).run.map(x => LineBillOfDelivery(x._1,x._2, x._3, Some(x._4), Some(x._5), x._6, x._7,  Some(x._8), Some(x._9), x._10))
+    def f (id:Long) =  Queries.lineBillOfDeliveryIdSelect(id).process.list.transact(xa).run.map(x => LineBillOfDelivery(x))
     def  updateLineId(id:Long,line:LineBillOfDelivery):LineBillOfDelivery = line.copy(transid=id)
   }
 
@@ -700,14 +653,10 @@ implicit def purchaseOrderDAO = new DAO[PurchaseOrder[LinePurchaseOrder]]{
     def create(modelId:Int) = Queries.createLineSalesInvoice.run.transact(xa).run
     def update(model:LineSalesInvoice) = { println(s" updating ${model}  items"); Queries.lineSalesInvoiceUpdateName(model).run.transact(xa).run}
     def delete(model:LineSalesInvoice):Int = Queries.lineSalesInvoiceDelete(model.id.toLong).run.transact(xa).run
-    def all(model:LineSalesInvoice):List[LineSalesInvoice] =  Queries.lineSalesInvoiceSelect.process.list.transact(xa).run.map(x =>
-      LineSalesInvoice(x._1,x._2, x._3, Some(x._4),Some(x._5), x._6, x._7,  Some(x._8), Some(x._9), x._10))
-    def  find(model:LineSalesInvoice):List[LineSalesInvoice] = Queries.lineSalesInvoiceIdSelect(model.id.toLong).process.list.transact(xa).run.map(x =>
-      LineSalesInvoice(x._1,x._2, x._3, Some(x._4),Some(x._5), x._6, x._7,  Some(x._8), Some(x._9), x._10))
-    def findSome(model:LineSalesInvoice) = Queries.lineSalesInvoiceSelectSome(model.id).process.list.transact(xa).run.map(x =>
-      LineSalesInvoice(x._1,x._2, x._3, Some(x._4),Some(x._5), x._6, x._7,  Some(x._8), Some(x._9), x._10))
-    def findSome1(id:Long) = Queries.lineSalesInvoiceIdSelect(id).process.list.transact(xa).run.map(x => LineSalesInvoice(x._1,x._2, x._3, Some(x._4),
-      Some(x._5), x._6, x._7,  Some(x._8), Some(x._9), x._10))
+    def all(model:LineSalesInvoice):List[LineSalesInvoice] =  Queries.lineSalesInvoiceSelect.process.list.transact(xa).run.map(x =>LineSalesInvoice(x)) 
+    def find(model:LineSalesInvoice):List[LineSalesInvoice] = Queries.lineSalesInvoiceIdSelect(model.id.toLong).process.list.transact(xa).run.map(x =>LineSalesInvoice(x)) 
+    def findSome(model:LineSalesInvoice) = Queries.lineSalesInvoiceSelectSome(model.id).process.list.transact(xa).run.map(x =>LineSalesInvoice(x)) 
+    def findSome1(id:Long) = Queries.lineSalesInvoiceIdSelect(id).process.list.transact(xa).run.map(x => LineSalesInvoice(x)) 
   }
 
   implicit def salesInvoiceDAO = new DAO[SalesInvoice[LineSalesInvoice]]{
@@ -746,8 +695,7 @@ implicit def purchaseOrderDAO = new DAO[PurchaseOrder[LinePurchaseOrder]]{
         x=> SalesInvoice(x._1,x._2, x._3, Some(x._4), Some(x._5), x._6).copy(lines = Some(f(x._1))))
     def findSome(model:SalesInvoice[LineSalesInvoice]) = Queries.salesInvoiceSelectSome(model.id).process.list.transact(xa).run.map(
       x=> SalesInvoice(x._1, x._2, x._3, Some(x._4), Some(x._5), x._6).copy(lines = Some(f(x._1))))
-    def f (id:Long) = Queries.lineSalesInvoiceIdSelect(id).process.list.transact(xa).run.map(x => LineSalesInvoice(x._1,x._2, x._3, Some(x._4),
-      Some(x._5), x._6, x._7,  Some(x._8), Some(x._9), x._10))
+    def f (id:Long) = Queries.lineSalesInvoiceIdSelect(id).process.list.transact(xa).run.map(x => LineSalesInvoice(x))
 
     def  updateLineId(id:Long,line:LineSalesInvoice):LineSalesInvoice = line.copy(transid=id)
   }
@@ -767,14 +715,10 @@ implicit def purchaseOrderDAO = new DAO[PurchaseOrder[LinePurchaseOrder]]{
     def create (modelId:Int)= Queries.createLineCustomerInvoice.run.transact(xa).run
     def update(model:LineCustomerInvoice) = { println(s" updating ${model}  items"); Queries.lineCustomerInvoiceUpdateName(model).run.transact(xa).run}
     def delete(model:LineCustomerInvoice):Int = Queries.lineCustomerInvoiceDelete(model.id.toLong).run.transact(xa).run
-    def all(model:LineCustomerInvoice):List[LineCustomerInvoice] =  Queries.lineCustomerInvoiceSelect.process.list.transact(xa).run.map(x =>
-      LineCustomerInvoice(x._1,x._2, x._3, Some(x._4),x._5, Some(x._6), x._7,  Some(x._8), x._9))
-    def  find(model:LineCustomerInvoice):List[LineCustomerInvoice] = Queries.lineCustomerInvoiceIdSelect(model.id.toLong).process.list.transact(xa).run.map(x =>
-      LineCustomerInvoice(x._1,x._2, x._3, Some(x._4),x._5, Some(x._6), x._7,  Some(x._8), x._9))
-    def findSome(model:LineCustomerInvoice) = Queries.lineCustomerInvoiceSelectSome(model.id).process.list.transact(xa).run.map(x =>
-      LineCustomerInvoice(x._1,x._2, x._3, Some(x._4),x._5, Some(x._6), x._7,  Some(x._8), x._9))
-    def findSome1(id:Long) = Queries.lineCustomerInvoiceIdSelect(id).process.list.transact(xa).run.map(x =>
-      LineCustomerInvoice(x._1,x._2, x._3, Some(x._4),x._5, Some(x._6), x._7,  Some(x._8), x._9))
+    def all(model:LineCustomerInvoice):List[LineCustomerInvoice] =  Queries.lineCustomerInvoiceSelect.process.list.transact(xa).run.map(x => LineCustomerInvoice(x))
+    def  find(model:LineCustomerInvoice):List[LineCustomerInvoice] = Queries.lineCustomerInvoiceIdSelect(model.id.toLong).process.list.transact(xa).run.map(x =>LineCustomerInvoice(x))
+    def findSome(model:LineCustomerInvoice) = Queries.lineCustomerInvoiceSelectSome(model.id).process.list.transact(xa).run.map(x => LineCustomerInvoice(x))
+    def findSome1(id:Long) = Queries.lineCustomerInvoiceIdSelect(id).process.list.transact(xa).run.map(x => LineCustomerInvoice(x))
 
   }
 
@@ -814,8 +758,7 @@ implicit def purchaseOrderDAO = new DAO[PurchaseOrder[LinePurchaseOrder]]{
         x=> CustomerInvoice(x._1,x._2, x._3, Some(x._4), Some(x._5), x._6).copy(lines = Some(f(x._1))))
     def findSome(model:CustomerInvoice[LineCustomerInvoice]) = Queries.customerInvoiceSelectSome(model.id).process.list.transact(xa).run.map(
       x=> CustomerInvoice(x._1, x._2, x._3, Some(x._4), Some(x._5), x._6).copy(lines = Some(f(x._1))))
-    def f (id:Long) =  Queries.lineCustomerInvoiceIdSelect(id).process.list.transact(xa).run.map(x =>
-      LineCustomerInvoice(x._1,x._2, x._3, Some(x._4),x._5, Some(x._6), x._7,  Some(x._8), x._9))
+    def f (id:Long) =  Queries.lineCustomerInvoiceIdSelect(id).process.list.transact(xa).run.map(x =>LineCustomerInvoice(x))
     def  updateLineId(id:Long,line:LineCustomerInvoice):LineCustomerInvoice = line.copy(transid=id)
 
   }
@@ -835,15 +778,11 @@ implicit def purchaseOrderDAO = new DAO[PurchaseOrder[LinePurchaseOrder]]{
     def create (lodelId:Int) = Queries.createLineSettlement.run.transact(xa).run
     def update(model:LineSettlement) = { println(s" updating ${model}  items"); Queries.lineSettlementUpdateName(model).run.transact(xa).run}
     def delete(model:LineSettlement):Int = Queries.lineSettlementDelete(model.id.toLong).run.transact(xa).run
-    def all(model:LineSettlement):List[LineSettlement] =  Queries.lineSettlementSelect.process.list.transact(xa).run.map(x =>
-      LineSettlement(x._1,x._2, x._3, Some(x._4),x._5, Some(x._6), x._7,  Some(x._8), x._9))
-    def  find(model:LineSettlement):List[LineSettlement] = Queries.lineSettlementIdSelect(model.id.toLong).process.list.transact(xa).run.map(x =>
-      LineSettlement(x._1,x._2, x._3, Some(x._4),x._5, Some(x._6), x._7,  Some(x._8), x._9))
-    def findSome(model:LineSettlement) = Queries.lineSettlementSelectSome(model.id).process.list.transact(xa).run.map(x =>
-      LineSettlement(x._1,x._2, x._3, Some(x._4),x._5, Some(x._6), x._7,  Some(x._8), x._9))
-    def findSome1(id:Long) = Queries.lineSettlementIdSelect(id).process.list.transact(xa).run.map(x =>
-      LineSettlement(x._1,x._2, x._3, Some(x._4),x._5, Some(x._6), x._7,  Some(x._8), x._9))
-    def  updateLineId(id:Long,line:LineSettlement):LineSettlement = line.copy(transid=id)
+    def all(model:LineSettlement):List[LineSettlement] =  Queries.lineSettlementSelect.process.list.transact(xa).run.map(x => LineSettlement(x))
+    def find(model:LineSettlement):List[LineSettlement] = Queries.lineSettlementIdSelect(model.id.toLong).process.list.transact(xa).run.map(x => LineSettlement(x))
+    def findSome(model:LineSettlement) = Queries.lineSettlementSelectSome(model.id).process.list.transact(xa).run.map(x => LineSettlement(x))
+    def findSome1(id:Long) = Queries.lineSettlementIdSelect(id).process.list.transact(xa).run.map(x =>LineSettlement(x))
+    def updateLineId(id:Long,line:LineSettlement):LineSettlement = line.copy(transid=id)
   }
 
   implicit def settlementDAO = new DAO[Settlement[LineSettlement]]{
@@ -882,9 +821,7 @@ implicit def purchaseOrderDAO = new DAO[PurchaseOrder[LinePurchaseOrder]]{
         x=> Settlement(x._1,x._2, x._3, Some(x._4), Some(x._5), x._6).copy(lines = Some(f(x._1))))
     def findSome(model:Settlement[LineSettlement]) = Queries.settlementSelectSome(model.id).process.list.transact(xa).run.map(
       x=> Settlement(x._1, x._2, x._3, Some(x._4), Some(x._5), x._6).copy(lines = Some(f(x._1))))
-    def f (id:Long) = Queries.lineSettlementIdSelect(id).process.list.transact(xa).run.map(x =>
-      LineSettlement(x._1,x._2, x._3, Some(x._4),x._5, Some(x._6), x._7,  Some(x._8), x._9))
-
+    def f (id:Long) = Queries.lineSettlementIdSelect(id).process.list.transact(xa).run.map(x =>LineSettlement(x))
     def  updateLineId(id:Long,line:LineSettlement):LineSettlement = line.copy(transid=id)
 
   }

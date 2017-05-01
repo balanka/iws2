@@ -15,7 +15,8 @@ object common {
   type Amount = scala.math.BigDecimal
   def today = new Date()
   type ACCOUNT_TYPE =(String, String, Int, String, String,  Date, Date)
-  type ARTICLE_TYPE =(String, String, Int, String, scala.math.BigDecimal, scala.math.BigDecimal, scala.math.BigDecimal,String, String, String, String)
+  type ARTICLE_TYPE =(String, String, Int, String, scala.math.BigDecimal, scala.math.BigDecimal, scala.math.BigDecimal,
+                        String, String, String, String)
   type STORE_TYPE = (String, String, Int, String,  String, String, String, String)
 
   type SalesOrder_TYPE =(Long,Long,Int, String,String, String)
@@ -38,6 +39,8 @@ object common {
   type LineSettlement_TYPE = (Long,Long,Int, String,Boolean, String, BigDecimal, Date, String)
   type Settlement_TYPE =(Long,Long,Int, String,String, String)
   type BillOfDelivery_TYPE =(Long,Long,Int, String,String, String)
+  type FDocument_TYPE =(Long,Long,Int, String,String, String)
+  type LineFDocument_TYPE = (Long,Long,Int, String,Boolean, String, BigDecimal, Date, String)
 
 }
 sealed trait IWS {
@@ -255,6 +258,11 @@ case class LinePurchaseOrder  (tid:Long = 0L, transid:Long =0, modelId:Int = 102
      result
   }
 }
+object LinePurchaseOrder
+{
+  //def apply(l:LineFDocument) = new LineSalesInvoice(l.tid,l.transid, l.modelId, l.account, l.side, l.oaccount, l.amount, l.duedate, l.text, l.modified, l.created, l.deleted)
+  def apply(l:LinePurchaseOrder_TYPE) = new LinePurchaseOrder(l._1,l._2, l._3, Some(l._4), Some(l._5), l._6, l._7, Some(l._8), Some(l._9),l._10) 
+}
 case class LineSalesOrder  (tid:Long = 0L, transid:Long =0, modelId:Int = 117,item:Option[String] = None, unit:Option[String] = None, price: Amount = 0,
                                quantity:Amount = 0,vat:Option[String] = None, duedate:Option[Date] = Some(new Date()),text:String ="txt",
                                modified:Boolean= false, created:Boolean= false, deleted:Boolean= false) extends LineInventoryTransaction {
@@ -275,6 +283,11 @@ case class LineSalesOrder  (tid:Long = 0L, transid:Long =0, modelId:Int = 117,it
     result = prime * result + transid.hashCode
     result
   }
+}
+object LineSalesOrder
+{
+  //def apply(l:LineFDocument) = new LineSalesInvoice(l.tid,l.transid, l.modelId, l.account, l.side, l.oaccount, l.amount, l.duedate, l.text, l.modified, l.created, l.deleted)
+  def apply(l:LineSalesOrder_TYPE) = new LineSalesOrder(l._1,l._2, l._3, Some(l._4), Some(l._5), l._6, l._7, Some(l._8), Some(l._9),l._10) 
 }
 case class LineGoodreceiving  (tid:Long = 0L, transid:Long =0, modelId:Int = 105,item:Option[String] = None, unit:Option[String] = None, price: Amount = 0,
                                quantity:Amount = 0,vat:Option[String] = None, duedate:Option[Date] = Some(new Date()),text:String ="txt",
@@ -297,6 +310,11 @@ case class LineGoodreceiving  (tid:Long = 0L, transid:Long =0, modelId:Int = 105
     result
   }
 }
+object LineGoodreceiving
+{
+  //def apply(l:LineFDocument) = new LineSalesInvoice(l.tid,l.transid, l.modelId, l.account, l.side, l.oaccount, l.amount, l.duedate, l.text, l.modified, l.created, l.deleted)
+  def apply(l:LineGoodreceiving_TYPE) = new LineGoodreceiving(l._1,l._2, l._3, Some(l._4), Some(l._5), l._6, l._7, Some(l._8), Some(l._9),l._10) 
+}
 case class LineBillOfDelivery  (tid:Long = 0L, transid:Long =0, modelId:Int = 119,item:Option[String] = None, unit:Option[String] = None, price: Amount = 0,
                                quantity:Amount = 0,vat:Option[String] = None, duedate:Option[Date] = Some(new Date()),text:String ="txt",
                                modified:Boolean= false, created:Boolean= false, deleted:Boolean= false) extends LineInventoryTransaction {
@@ -317,6 +335,11 @@ case class LineBillOfDelivery  (tid:Long = 0L, transid:Long =0, modelId:Int = 11
     result = prime * result + transid.hashCode
     result
   }
+}
+object LineBillOfDelivery
+{
+  //def apply(l:LineFDocument) = new LineSalesInvoice(l.tid,l.transid, l.modelId, l.account, l.side, l.oaccount, l.amount, l.duedate, l.text, l.modified, l.created, l.deleted)
+  def apply(l:LineBillOfDelivery_TYPE) = new LineBillOfDelivery(l._1,l._2, l._3, Some(l._4), Some(l._5), l._6, l._7, Some(l._8), Some(l._9),l._10) 
 }
 case class PurchaseOrder[LinePurchaseOrder] (tid:Long = 0L,oid:Long = 0L, modelId:Int = 101,store:Option[String]=None, account:Option[String]= None,
                                              text:String ="", lines:Option[List[LinePurchaseOrder]]=Some(List.empty[LinePurchaseOrder]),
@@ -396,6 +419,11 @@ case class LineInventoryInvoice  (tid:Long = 0L, transid:Long =0, modelId:Int = 
     result
   }
 }
+object LineInventoryInvoice
+{
+  //def apply(l:LineFDocument) = new LineSalesInvoice(l.tid,l.transid, l.modelId, l.account, l.side, l.oaccount, l.amount, l.duedate, l.text, l.modified, l.created, l.deleted)
+  def apply(l:LineInventoryInvoice_TYPE) = new LineInventoryInvoice(l._1,l._2, l._3, Some(l._4), Some(l._5), l._6, l._7, Some(l._8), Some(l._9),l._10) 
+}
 case class LineSalesInvoice  (tid:Long = 0L, transid:Long =0, modelId:Int = 121,item:Option[String] = None, unit:Option[String] = None, price: Amount = 0,
                                   quantity:Amount = 0,vat:Option[String] = None, duedate:Option[Date] = Some(new Date()),text:String ="txt",
                                   modified:Boolean= false, created:Boolean= false, deleted:Boolean= false) extends LineInventoryTransaction {
@@ -415,6 +443,11 @@ case class LineSalesInvoice  (tid:Long = 0L, transid:Long =0, modelId:Int = 121,
     result = prime * result + transid.hashCode
     result
   }
+}
+object LineSalesInvoice
+{
+  //def apply(l:LineFDocument) = new LineSalesInvoice(l.tid,l.transid, l.modelId, l.account, l.side, l.oaccount, l.amount, l.duedate, l.text, l.modified, l.created, l.deleted)
+  def apply(l:LineSalesInvoice_TYPE) = new LineSalesInvoice(l._1,l._2, l._3, Some(l._4), Some(l._5), l._6, l._7, Some(l._8), Some(l._9),l._10) 
 }
 case class InventoryInvoice[LineInventoryInvoice] (tid:Long = 0L,oid:Long = 0L, modelId:Int = 110,store:Option[String]=None, account:Option[String]= None,
                                                    text:String ="", lines:Option[List[LineInventoryInvoice]]=Some(List.empty[LineInventoryInvoice]),
@@ -467,6 +500,7 @@ case class LineVendorInvoice  (tid:Long = 0L, transid:Long =0, modelId:Int = 113
 object LineVendorInvoice
 {
   def apply(l:LineFDocument) = new LineVendorInvoice(l.tid,l.transid, l.modelId, l.account, l.side, l.oaccount, l.amount, l.duedate, l.text, l.modified, l.created, l.deleted)
+  def apply(l:LineVendorInvoice_TYPE) = new LineVendorInvoice(l._1,l._2, l._3, Some(l._4), l._5, Some(l._6), l._7, Some(l._8), l._9)
 }
 case class LineCustomerInvoice  (tid:Long = 0L, transid:Long =0, modelId:Int = 123,account:Option[String] = None,  side:Boolean = true, oaccount:Option[String] = None, amount: Amount = 0,
                                duedate:Option[Date] = Some(new Date()),text:String ="txt",
@@ -492,6 +526,7 @@ case class LineCustomerInvoice  (tid:Long = 0L, transid:Long =0, modelId:Int = 1
 object LineCustomerInvoice
 {
   def apply(l:LineFDocument) = new LineCustomerInvoice(l.tid,l.transid, l.modelId, l.account, l.side, l.oaccount, l.amount, l.duedate, l.text, l.modified, l.created, l.deleted)
+   def apply(l:LineCustomerInvoice_TYPE) = new LineCustomerInvoice(l._1,l._2, l._3, Some(l._4), l._5, Some(l._6), l._7, Some(l._8), l._9)
 }
 case class VendorInvoice[LineVendorInvoice] (tid:Long = 0L,oid:Long = 0L, modelId:Int = 112,store:Option[String]=None, account:Option[String]= None,
                                              text:String ="", lines:Option[List[LineVendorInvoice]]=Some(List.empty[LineVendorInvoice]),
@@ -559,6 +594,7 @@ case class LinePayment  (tid:Long = 0L, transid:Long =0, modelId:Int = 115,accou
 object LinePayment 
 {
  def apply(l:LineFDocument) = new LinePayment(l.tid,l.transid, l.modelId, l.account, l.side, l.oaccount, l.amount, l.duedate, l.text, l.modified, l.created, l.deleted)
+ def apply(l:LinePayment_TYPE) = new LinePayment(l._1,l._2, l._3, Some(l._4), l._5, Some(l._6), l._7, Some(l._8), l._9)
 }
 
 case class LineSettlement  (tid:Long = 0L, transid:Long =0, modelId:Int = 125,account:Option[String] = None,  side:Boolean = true, oaccount:Option[String] = None, amount: Amount = 0,
@@ -585,6 +621,7 @@ case class LineSettlement  (tid:Long = 0L, transid:Long =0, modelId:Int = 125,ac
 object LineSettlement
 {
   def apply(l:LineFDocument) = new LineSettlement(l.tid,l.transid, l.modelId, l.account, l.side, l.oaccount, l.amount, l.duedate, l.text, l.modified, l.created, l.deleted)
+   def apply(l:LineSettlement_TYPE) = new LineSettlement(l._1,l._2, l._3, Some(l._4), l._5, Some(l._6), l._7, Some(l._8), l._9)
 }
 
 case class Payment[LinePayment] (tid:Long = 0L,oid:Long = 0L, modelId:Int = 114,store:Option[String]=None, account:Option[String]= None,
@@ -652,6 +689,7 @@ case class LineFDocument  (tid:Long = 0L, transid:Long =0, modelId:Int,account:O
 object LineFDocument 
 {
  def apply(l:LineFinancialsTransaction) = new LineFDocument(l.tid,l.transid, l.modelId, l.account, l.side, l.oaccount, l.amount, l.duedate, l.text, l.modified, l.created, l.deleted)
+  def apply(l:LineFDocument_TYPE) = new LineFDocument(l._1,l._2, l._3, Some(l._4), l._5, Some(l._6), l._7, Some(l._8), l._9)
 }
 case class FDocument[LineFDocument] (tid:Long = 0L,oid:Long = 0L, modelId:Int ,store:Option[String]=None, account:Option[String]= None,
                                  text:String ="", lines:Option[List[LineFDocument]]=Some(List.empty[LineFDocument]),
@@ -685,27 +723,6 @@ object FDocument
              LineFDocument(l.tid,l.transid, l.modelId, l.account, l.side, l.oaccount, l.amount, l.duedate, l.text, l.modified, l.created, l.deleted)))))
 }
 
-// Registre general des affaires  frappees d'appel
-//N°d'ordre	Appelant	Intimé	Objet	Origine
-//Repertoire des arrets  civils (CAD)
-//N°d’arrêt	Date d’audience	N°RG	Nom des parties	Objet	Nature d’arrêt	Origine de juridiction	Chambre
-//Registre des appels an correctionels
-//N°d'ordre	Date	Prénoms et nom des prévenus	Parti Civil	Prévention	Date et n°de jugement	Origine de Juridiction	Conservation
-//  Registre des affaires criminelles
-//N°d'ordre	Date d'entrée	1ère autorité saisie	Identité complète des accusés		Date des Faits	Nature et lieux des infractions	Suite Donnée	Partie civil
-/*
-case class  GeneralRegister(id:String ="", modelId:Int=1000,appelandId:String ="", intimeId:String ="", enterdate:Option[Date]=Some(new Date())
-                            ,reason:String ="", origin:String="") extends IWS
-case class  CAD(id:String ="", modelId:Int=1002, registerId:String ="", openingDate:Option[Date]=Some(new Date()), enterdate:Option[Date]=Some(new Date()),
-                parties:Seq[String]=Seq.empty[String], reason:String ="", typ:String ="", origin:String="", chamber:String="") extends IWS
-
-case class  CorrectionalRegister(id:String ="", modelId:Int=1001, appelandId:String ="", intimeId:String ="", enterdate:Option[Date]=Some(new Date()),
-                                 origin:String="",reason:String ="") extends IWS
-
-case class  CrimeRegister(id:String ="", modelId:Int=1003,name:String ="", enterdate:Option[Date]=Some(new Date()),
-                          parties:Seq[String]=Seq.empty[String], prevention:String="",jugementdate:Option[Date]=Some(new Date()),
-                          jugementId:String ="",origin:String="",conservation:String ="" ) extends IWS
- */
 
 object  Company_{ def unapply (in:Company) =Some(in.id,in.name,in.modelId,  in.street,in.city,in.state,in.zip,
   in.bankAccountId, in.purchasingClearingAccountId, in.salesClearingAccountId, in.paymentClearingAccountId,

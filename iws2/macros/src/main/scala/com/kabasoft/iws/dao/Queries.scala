@@ -64,7 +64,7 @@ object Queries  {
   def costCenterSelectSome = { id:String =>sql"SELECT * FROM costcenter where id =$id".query[CostCenter]}
   def costCenterUpdateName= {(model:CostCenter) =>sql"Update costcenter set  name =${model.name},description=${model.description} where id =${model.id}".update}
   def costCenterDelete = {id:String =>sql"Delete FROM costcenter where id =$id".update}
-  def companyInsertSQL = "INSERT INTO (id, name, modelId,street, city,state,zip,bankAccountId, purchasingClearingAccountId, " +
+  def companyInsertSQL = "INSERT INTO company(id, name, modelId,street, city,state,zip,bankAccountId, purchasingClearingAccountId, " +
     "salesClearingAccountId, paymentClearingAccountId, settlementClearingAccountId, periode, nextPeriode, taxCode, vatCode )" +
     " company VALUES (?, ?,?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?,?,?)"
   def companySelect = sql"SELECT * FROM company".query[Company]
@@ -74,7 +74,7 @@ object Queries  {
   def companyUpdateName= {(model:Company) =>sql"Update company set  name =${model.name},  street=${model.street}, city=${model.city}, zip=${model.zip}, state =${model.state},  bankAccountId = ${model.bankAccountId}, purchasingClearingAccountId =${model.purchasingClearingAccountId}, salesClearingAccountId =${model.salesClearingAccountId}, paymentClearingAccountId =${model.paymentClearingAccountId}, settlementClearingAccountId =${model.settlementClearingAccountId}, periode = ${model.periode}, nextPeriode =${model.nextPeriode},taxCode =${model.taxCode}, vatCode =${model.vatId} where id =${model.id}".update}
   def companyDelete = {id:String =>sql"Delete FROM company where id =$id".update}
 
-  def customerInsertSQL = "INSERT INTO (id, name, modelId,accountId,street, city,state,zip) customer VALUES (?, ?,?, ?, ?, ?, ?, ?)"
+  def customerInsertSQL = "INSERT INTO customer (id, name, modelId,accountId,street, city,state,zip)  VALUES (?, ?,?, ?, ?, ?, ?, ?)"
   def customerSelect = sql"SELECT id, name, modelId,accountId,street, city,state,zip FROM customer".query[Customer]
   def customerIdSelect(id:String)  = sql"SELECT id, name, modelId,accountId,street, city,state,zip FROM customer where id =$id".query[Customer]
   def customerSelect1 = sql"SELECT *  FROM customer".query[Customer]
