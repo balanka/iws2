@@ -41,6 +41,8 @@ object common {
   type BillOfDelivery_TYPE =(Long,Long,Int, String,String, String)
   type FDocument_TYPE =(Long,Long,Int, String,String, String)
   type LineFDocument_TYPE = (Long,Long,Int, String,Boolean, String, BigDecimal, Date, String)
+  type IDocument_TYPE = (Long,Long,Int, String,String, String)
+  type LineIDocument_TYPE = (Long,Long,Int, String,String,BigDecimal,BigDecimal,String, Date, String)
 
 }
 sealed trait IWS {
@@ -137,8 +139,9 @@ sealed trait LineTransaction extends IWS {
 sealed trait  LineInventoryTransaction extends LineTransaction {
    def item: Option[String]
    def unit: Option[String]
-  def price: Amount
+   def price: Amount
    def quantity: Amount
+  def vat:Option[String]
    }
 sealed trait  LineFinancialsTransaction extends LineTransaction {
   def account: Option[String]
@@ -262,7 +265,7 @@ case class LinePurchaseOrder  (tid:Long = 0L, transid:Long =0, modelId:Int = 102
 }
 object LinePurchaseOrder
 {
-  //def apply(l:LineFDocument) = new LineSalesInvoice(l.tid,l.transid, l.modelId, l.account, l.side, l.oaccount, l.amount, l.duedate, l.text, l.modified, l.created, l.deleted)
+  def apply(l:LineIDocument) = new LinePurchaseOrder(l.tid,l.transid, l.modelId, l.item, l.unit, l.price, l.quantity, l.vat, l.duedate, l.text, l.modified, l.created, l.deleted)
   def apply(l:LinePurchaseOrder_TYPE) = new LinePurchaseOrder(l._1,l._2, l._3, Some(l._4), Some(l._5), l._6, l._7, Some(l._8), Some(l._9),l._10) 
 }
 case class LineSalesOrder  (tid:Long = 0L, transid:Long =0, modelId:Int = 117,item:Option[String] = None, unit:Option[String] = None, price: Amount = 0,
@@ -281,7 +284,7 @@ case class LineSalesOrder  (tid:Long = 0L, transid:Long =0, modelId:Int = 117,it
 }
 object LineSalesOrder
 {
-  //def apply(l:LineFDocument) = new LineSalesInvoice(l.tid,l.transid, l.modelId, l.account, l.side, l.oaccount, l.amount, l.duedate, l.text, l.modified, l.created, l.deleted)
+  def apply(l:LineIDocument) = new LineSalesOrder(l.tid,l.transid, l.modelId, l.item, l.unit, l.price, l.quantity, l.vat, l.duedate, l.text, l.modified, l.created, l.deleted)
   def apply(l:LineSalesOrder_TYPE) = new LineSalesOrder(l._1,l._2, l._3, Some(l._4), Some(l._5), l._6, l._7, Some(l._8), Some(l._9),l._10) 
 }
 case class LineGoodreceiving  (tid:Long = 0L, transid:Long =0, modelId:Int = 105,item:Option[String] = None, unit:Option[String] = None, price: Amount = 0,
@@ -300,7 +303,7 @@ case class LineGoodreceiving  (tid:Long = 0L, transid:Long =0, modelId:Int = 105
 }
 object LineGoodreceiving
 {
-  //def apply(l:LineFDocument) = new LineSalesInvoice(l.tid,l.transid, l.modelId, l.account, l.side, l.oaccount, l.amount, l.duedate, l.text, l.modified, l.created, l.deleted)
+  def apply(l:LineIDocument) = new LineGoodreceiving(l.tid,l.transid, l.modelId, l.item, l.unit, l.price, l.quantity, l.vat, l.duedate, l.text, l.modified, l.created, l.deleted)
   def apply(l:LineGoodreceiving_TYPE) = new LineGoodreceiving(l._1,l._2, l._3, Some(l._4), Some(l._5), l._6, l._7, Some(l._8), Some(l._9),l._10) 
 }
 case class LineBillOfDelivery  (tid:Long = 0L, transid:Long =0, modelId:Int = 119,item:Option[String] = None, unit:Option[String] = None, price: Amount = 0,
@@ -319,7 +322,7 @@ case class LineBillOfDelivery  (tid:Long = 0L, transid:Long =0, modelId:Int = 11
 }
 object LineBillOfDelivery
 {
-  //def apply(l:LineFDocument) = new LineSalesInvoice(l.tid,l.transid, l.modelId, l.account, l.side, l.oaccount, l.amount, l.duedate, l.text, l.modified, l.created, l.deleted)
+  def apply(l:LineIDocument) = new LineBillOfDelivery(l.tid,l.transid, l.modelId, l.item, l.unit, l.price, l.quantity, l.vat, l.duedate, l.text, l.modified, l.created, l.deleted)
   def apply(l:LineBillOfDelivery_TYPE) = new LineBillOfDelivery(l._1,l._2, l._3, Some(l._4), Some(l._5), l._6, l._7, Some(l._8), Some(l._9),l._10) 
 }
 case class PurchaseOrder[LinePurchaseOrder] (tid:Long = 0L,oid:Long = 0L, modelId:Int = 101,store:Option[String]=None, account:Option[String]= None,
@@ -395,7 +398,7 @@ case class LineInventoryInvoice  (tid:Long = 0L, transid:Long =0, modelId:Int = 
 }
 object LineInventoryInvoice
 {
-  //def apply(l:LineFDocument) = new LineSalesInvoice(l.tid,l.transid, l.modelId, l.account, l.side, l.oaccount, l.amount, l.duedate, l.text, l.modified, l.created, l.deleted)
+  def apply(l:LineIDocument) = new LineInventoryInvoice(l.tid,l.transid, l.modelId, l.item, l.unit, l.price, l.quantity, l.vat, l.duedate, l.text, l.modified, l.created, l.deleted)
   def apply(l:LineInventoryInvoice_TYPE) = new LineInventoryInvoice(l._1,l._2, l._3, Some(l._4), Some(l._5), l._6, l._7, Some(l._8), Some(l._9),l._10) 
 }
 case class LineSalesInvoice  (tid:Long = 0L, transid:Long =0, modelId:Int = 121,item:Option[String] = None, unit:Option[String] = None, price: Amount = 0,
@@ -413,7 +416,7 @@ case class LineSalesInvoice  (tid:Long = 0L, transid:Long =0, modelId:Int = 121,
 }
 object LineSalesInvoice
 {
-  //def apply(l:LineFDocument) = new LineSalesInvoice(l.tid,l.transid, l.modelId, l.account, l.side, l.oaccount, l.amount, l.duedate, l.text, l.modified, l.created, l.deleted)
+  def apply(l:LineIDocument) = new LineSalesInvoice(l.tid,l.transid, l.modelId, l.item, l.unit, l.price, l.quantity, l.vat, l.duedate, l.text, l.modified, l.created, l.deleted)
   def apply(l:LineSalesInvoice_TYPE) = new LineSalesInvoice(l._1,l._2, l._3, Some(l._4), Some(l._5), l._6, l._7, Some(l._8), Some(l._9),l._10) 
 }
 case class InventoryInvoice[LineInventoryInvoice] (tid:Long = 0L,oid:Long = 0L, modelId:Int = 110,store:Option[String]=None, account:Option[String]= None,
@@ -641,19 +644,58 @@ object FDocument
 {
 
 
-  def apply(f:CustomerInvoice[LineCustomerInvoice])  =  new FDocument (f.tid, f.oid, f.modelId, f.store, f.account, f.text, f.lines.map( x => x.map (l =>(
-    LineFDocument(l.tid,l.transid, l.modelId, l.account, l.side, l.oaccount, l.amount, l.duedate, l.text, l.modified, l.created, l.deleted)))))
-
-  def apply(f:Settlement[LineSettlement])  =  new FDocument (f.tid, f.oid, f.modelId, f.store, f.account, f.text, f.lines.map( x => x.map (l =>(
-    LineFDocument(l.tid,l.transid, l.modelId, l.account, l.side, l.oaccount, l.amount, l.duedate, l.text, l.modified, l.created, l.deleted)))))
-
-  def apply(f:VendorInvoice[LineVendorInvoice])  =  new FDocument (f.tid, f.oid, f.modelId, f.store, f.account, f.text, f.lines.map( x => x.map (l =>(
-             LineFDocument(l.tid,l.transid, l.modelId, l.account, l.side, l.oaccount, l.amount, l.duedate, l.text, l.modified, l.created, l.deleted)))))
-
-  def apply(f:Payment[LinePayment])  =  new FDocument (f.tid, f.oid, f.modelId, f.store, f.account, f.text, f.lines.map( x => x.map (l =>(
-             LineFDocument(l.tid,l.transid, l.modelId, l.account, l.side, l.oaccount, l.amount, l.duedate, l.text, l.modified, l.created, l.deleted)))))
+  def apply(f:CustomerInvoice[LineCustomerInvoice])  =  new FDocument (f.tid, f.oid, f.modelId, f.store, f.account, f.text, f.lines.map( x => x.map (l =>LineFDocument(l))))
+  def apply(f:Settlement[LineSettlement])  =  new FDocument (f.tid, f.oid, f.modelId, f.store, f.account, f.text, f.lines.map( x => x.map (l =>LineFDocument(l))))
+  def apply(f:VendorInvoice[LineVendorInvoice])  =  new FDocument (f.tid, f.oid, f.modelId, f.store, f.account, f.text, f.lines.map( x => x.map (l =>LineFDocument(l))))
+  def apply(f:Payment[LinePayment])  =  new FDocument (f.tid, f.oid, f.modelId, f.store, f.account, f.text, f.lines.map( x => x.map (l => LineFDocument(l))))
 }
 
+case class IDocument[LineIDocument] (tid:Long = 0L,oid:Long = 0L, modelId:Int ,store:Option[String]=None, account:Option[String]= None,
+                                     text:String ="", lines:Option[List[LineIDocument]]=Some(List.empty[LineIDocument]),
+                                     modified:Boolean =false, created:Boolean = true, deleted:Boolean = false) extends Transaction [LineIDocument]{
+  def add(line:LineIDocument) = copy(lines = Some(getLines ++: List(line)))
+  def getLines:List[LineIDocument] = lines.getOrElse(List.empty[LineIDocument])
+  def getLinesWithId(id:Long) = getLines.filter(equals(_,id))
+  def replaceLine( newLine:LineIDocument) = copy(lines = Some( getLines map ( old => if (newLine.equals(old))  newLine else old )))
+  override def  canEqual(a: Any) = a.isInstanceOf[IDocument[LineIDocument]]
+  override def equals(that: Any): Boolean =
+    that match {
+      case that: IDocument[LineIDocument] => that.canEqual(this) && this.hashCode == that.hashCode
+      case _ => false
+    }
+
+}
+object IDocument
+{
+
+def apply(f:SalesInvoice[LineSalesInvoice])  =  new IDocument (f.tid, f.oid, f.modelId, f.store, f.account, f.text, f.lines.map( x => x.map (l => LineIDocument(l))),f.modified, f.created, f.deleted)
+  def apply(f:InventoryInvoice[LineInventoryInvoice])  =  new IDocument (f.tid, f.oid, f.modelId, f.store, f.account, f.text, f.lines.map( x => x.map (l =>LineIDocument(l))), f.modified, f.created, f.deleted)
+def apply(f:PurchaseOrder[LinePurchaseOrder])  =  new IDocument (f.tid, f.oid, f.modelId, f.store, f.account, f.text, f.lines.map( x => x.map (l =>LineIDocument(l))), f.modified, f.created, f.deleted)
+def apply(f:Goodreceiving[LineGoodreceiving])  =  new IDocument (f.tid, f.oid, f.modelId, f.store, f.account, f.text, f.lines.map( x => x.map (l =>LineIDocument(l))),f.modified, f.created, f.deleted)
+def apply(f:BillOfDelivery[LineBillOfDelivery])  =  new IDocument (f.tid, f.oid, f.modelId, f.store, f.account, f.text, f.lines.map( x => x.map (l =>LineIDocument(l))), f.modified, f.created, f.deleted)
+
+
+}
+
+case class LineIDocument  (tid:Long = 0L, transid:Long =0, modelId:Int,item:Option[String] = None, unit:Option[String] = None, price: Amount = 0,
+                           quantity:Amount = 0,vat:Option[String] = None, duedate:Option[Date] = Some(new Date()),text:String ="txt",
+                           modified:Boolean= false, created:Boolean= false, deleted:Boolean= false) extends LineInventoryTransaction {
+  def eq (id:Long):Boolean = tid == id
+  def eq0:Boolean = tid == 0L
+  def eqId(id:Long):Boolean = tid == id
+  def canEqual(a: Any) = a.isInstanceOf[LineIDocument]
+  override def equals(that: Any): Boolean =
+    that match {
+      case that: LineIDocument => that.canEqual(this) && this.hashCode == that.hashCode
+      case _ => false
+    }
+}
+object LineIDocument
+{
+  def apply(l:LineInventoryTransaction) = new LineIDocument(l.tid,l.transid, l.modelId, l.item, l.unit, l.price, l.quantity, l.vat, l.duedate, l.text, l.modified, l.created, l.deleted)
+  def apply(l:LineIDocument_TYPE) = new LineIDocument(l._1,l._2, l._3, Some(l._4), Some(l._5), l._6, l._7, Some(l._8), Some(l._9), l._10)
+  //def apply(l:LineIDocument_TYPE) = new LineIDocument(l._1,l._2, l._3, Some(l._4), Some(l._5), l._6, l._7, Some(l._8), l._9, l._10, l._11,l._12)
+}
 
 object  Company_{ def unapply (in:Company) =Some(in.id,in.name,in.modelId,  in.street,in.city,in.state,in.zip,
   in.bankAccountId, in.purchasingClearingAccountId, in.salesClearingAccountId, in.paymentClearingAccountId,
