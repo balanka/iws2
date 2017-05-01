@@ -466,7 +466,7 @@ case class InventoryInvoice[LineInventoryInvoice] (tid:Long = 0L,oid:Long = 0L, 
 case class SalesInvoice[LineSalesInvoice] (tid:Long = 0L,oid:Long = 0L, modelId:Int = 120,store:Option[String]=None, account:Option[String]= None,
                                                    text:String ="", lines:Option[List[LineSalesInvoice]]=Some(List.empty[LineSalesInvoice]),
                                                    modified:Boolean =false, created:Boolean = true, deleted:Boolean = false) extends Transaction [LineSalesInvoice]{
-  def add(line:LineSalesInvoice) = copy(lines = Some(getLines ++: List(line)))
+  def  add(line:LineSalesInvoice) = copy(lines = Some(getLines ++: List(line)))
   def getLines:List[LineSalesInvoice] = lines.getOrElse(List.empty[LineSalesInvoice])
   def getLinesWithId(id:Long) = getLines.filter(equals(_,id))
   def replaceLine( newLine:LineSalesInvoice) = copy(lines = Some( getLines map ( old => if (newLine.equals(old))  newLine else old )))
