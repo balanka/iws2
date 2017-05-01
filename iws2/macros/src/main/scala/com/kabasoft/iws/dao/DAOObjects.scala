@@ -301,7 +301,7 @@ implicit def purchaseOrderDAO = new DAO[PurchaseOrder[LinePurchaseOrder]]{
 
       println(s" PO Line inserted K0 ${k0}   ${newLines}");
       println(s" PO Line updated K2 ${k1}   ");
-      println(s" PO Line deleted K2 ${k2}   ");
+      println(s" PO Line deleted K2   ${k2}   ");
       ret
     }
     def delete(model:Goodreceiving[LineGoodreceiving]):Int = {

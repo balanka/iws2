@@ -14,7 +14,7 @@ class ApiService extends Api {
 
    def welcome(name: String): String = s"Welcome to IWS, $name! Time is now ${new Date}"
 
-  //  def call[T: TypeTag](value: T) = MakeService.make [typeTag[T].tpe].create(value)
+
 
   def create(item:IWS) ={
 

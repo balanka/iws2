@@ -17,7 +17,7 @@ import com.kabasoft.iws.shared.Model._
 
 object Queries  {
 
-  def create: Update0 = createSchema.update
+  def  create: Update0 = createSchema.update
   def bankInsertSQL= "INSERT INTO Bank (id, name, modelId, description)  VALUES (?, ?, ?, ?)"
   def bankSelect =  sql"SELECT * FROM Bank".query[Bank]
   def bankIdSelect(id:String) = sql"SELECT  *FROM Bank where id =$id".query[Bank]
