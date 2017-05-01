@@ -125,6 +125,14 @@ sealed trait LineTransaction extends IWS {
   def modified:Boolean
   def created:Boolean
   def deleted:Boolean
+    override def hashCode:Int = {
+    val prime = 31
+    var result = 1
+    result = prime * result + tid.toInt
+    result = prime * result + transid.hashCode
+    result = prime * result + modelId.hashCode
+     result
+  }
  }
 sealed trait  LineInventoryTransaction extends LineTransaction {
    def item: Option[String]
@@ -250,13 +258,7 @@ case class LinePurchaseOrder  (tid:Long = 0L, transid:Long =0, modelId:Int = 102
       case that: LinePurchaseOrder => that.canEqual(this) && this.hashCode == that.hashCode
       case _ => false
     }
-  override def hashCode:Int = {
-    val prime = 31
-    var result = 1
-    result = prime * result + tid.toInt
-    result = prime * result + transid.hashCode
-     result
-  }
+
 }
 object LinePurchaseOrder
 {
@@ -276,13 +278,6 @@ case class LineSalesOrder  (tid:Long = 0L, transid:Long =0, modelId:Int = 117,it
       case that: LineSalesOrder => that.canEqual(this) && this.hashCode == that.hashCode
       case _ => false
     }
-  override def hashCode:Int = {
-    val prime = 31
-    var result = 1
-    result = prime * result + tid.toInt
-    result = prime * result + transid.hashCode
-    result
-  }
 }
 object LineSalesOrder
 {
@@ -302,13 +297,6 @@ case class LineGoodreceiving  (tid:Long = 0L, transid:Long =0, modelId:Int = 105
       case that: LineGoodreceiving => that.canEqual(this) && this.hashCode == that.hashCode
       case _ => false
     }
-  override def hashCode:Int = {
-    val prime = 31
-    var result = 1
-    result = prime * result + tid.toInt
-    result = prime * result + transid.hashCode
-    result
-  }
 }
 object LineGoodreceiving
 {
@@ -328,13 +316,6 @@ case class LineBillOfDelivery  (tid:Long = 0L, transid:Long =0, modelId:Int = 11
       case that: LineBillOfDelivery => that.canEqual(this) && this.hashCode == that.hashCode
       case _ => false
     }
-  override def hashCode:Int = {
-    val prime = 31
-    var result = 1
-    result = prime * result + tid.toInt
-    result = prime * result + transid.hashCode
-    result
-  }
 }
 object LineBillOfDelivery
 {
@@ -411,13 +392,6 @@ case class LineInventoryInvoice  (tid:Long = 0L, transid:Long =0, modelId:Int = 
       case that: LineInventoryInvoice => that.canEqual(this) && this.hashCode == that.hashCode
       case _ => false
     }
-  override def hashCode:Int = {
-    val prime = 31
-    var result = 1
-    result = prime * result + tid.toInt
-    result = prime * result + transid.hashCode
-    result
-  }
 }
 object LineInventoryInvoice
 {
@@ -436,13 +410,6 @@ case class LineSalesInvoice  (tid:Long = 0L, transid:Long =0, modelId:Int = 121,
       case that: LineSalesInvoice => that.canEqual(this) && this.hashCode == that.hashCode
       case _ => false
     }
-  override def hashCode:Int = {
-    val prime = 31
-    var result = 1
-    result = prime * result + tid.toInt
-    result = prime * result + transid.hashCode
-    result
-  }
 }
 object LineSalesInvoice
 {
@@ -489,13 +456,6 @@ case class LineVendorInvoice  (tid:Long = 0L, transid:Long =0, modelId:Int = 113
       case that: LineVendorInvoice => that.canEqual(this) && this.hashCode == that.hashCode
       case _ => false
     }
-  override def hashCode:Int = {
-    val prime = 31
-    var result = 1
-    result = prime * result + tid.toInt
-    result = prime * result + transid.hashCode
-    result
-  }
 }
 object LineVendorInvoice
 {
@@ -514,13 +474,6 @@ case class LineCustomerInvoice  (tid:Long = 0L, transid:Long =0, modelId:Int = 1
       case that: LineCustomerInvoice => that.canEqual(this) && this.hashCode == that.hashCode
       case _ => false
     }
-  override def hashCode:Int = {
-    val prime = 31
-    var result = 1
-    result = prime * result + tid.toInt
-    result = prime * result + transid.hashCode
-    result
-  }
 }
 
 object LineCustomerInvoice
@@ -582,13 +535,6 @@ case class LinePayment  (tid:Long = 0L, transid:Long =0, modelId:Int = 115,accou
       case that: LinePayment => that.canEqual(this) && this.hashCode == that.hashCode
       case _ => false
     }
-  override def hashCode:Int = {
-    val prime = 31
-    var result = 1
-    result = prime * result + tid.toInt
-    result = prime * result + transid.hashCode
-    result
-  }
 
 }
 object LinePayment 
@@ -609,14 +555,6 @@ case class LineSettlement  (tid:Long = 0L, transid:Long =0, modelId:Int = 125,ac
       case that: LineSettlement => that.canEqual(this) && this.hashCode == that.hashCode
       case _ => false
     }
-  override def hashCode:Int = {
-    val prime = 31
-    var result = 1
-    result = prime * result + tid.toInt
-    result = prime * result + transid.hashCode
-    result
-  }
-
 }
 object LineSettlement
 {
@@ -678,13 +616,6 @@ case class LineFDocument  (tid:Long = 0L, transid:Long =0, modelId:Int,account:O
       case that: LineFDocument => that.canEqual(this) && this.hashCode == that.hashCode
       case _ => false
     }
-  override def hashCode:Int = {
-    val prime = 31
-    var result = 1
-    result = prime * result + tid.toInt
-    result = prime * result + transid.hashCode
-    result
-  }
 }
 object LineFDocument 
 {
