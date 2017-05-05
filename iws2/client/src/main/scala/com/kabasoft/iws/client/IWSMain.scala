@@ -116,13 +116,12 @@ object IWSMain extends js.JSApp {
       | staticRoute("#bank", BankPage$) ~> renderR(ctl => x11(p11 =>(BANK(p11.asInstanceOf[ModelProxy[Pot[Data]]]))))
       | staticRoute("#bacc", BankAccountPage$) ~> renderR(ctl => x12(p12 =>(BANKACCOUNT(p12.asInstanceOf[ModelProxy[Pot[Data]]]))))
       | staticRoute("#iinv", InventoryInvoicePage$) ~> renderR(ctl => x110(proxy110 => INVENTORYINVOICE("INVENTORYINVOICE",  {"110"},proxy110.asInstanceOf[ModelProxy[Pot[Data]]])))
-      //| staticRoute("#vinv", VendorInvoicePage$) ~> renderR(ctl => x112(proxy112 => VENDORINVOICE(proxy112.asInstanceOf[ModelProxy[Pot[Data]]],112,112,2,1)))
+
        | staticRoute("#cinv", CustomerInvoicePage$) ~> renderR(ctl => x122(proxy122 => SALES(proxy122.asInstanceOf[ModelProxy[Pot[Data]]],122,122,2,3, customerInvoice, lineCustomerInvoice, store, customer,"Sales Invoice")))
        | staticRoute("#vinv", VendorInvoicePage$) ~> renderR(ctl => x112(proxy112 => FDOCUMENT(proxy112.asInstanceOf[ModelProxy[Pot[Data]]],112,110,2,1,vendorInvoice,lineVendorInvoice, store, supplier,"Vendor Invoice")))
        | staticRoute("#setl", SettlementPage$) ~> renderR(ctl => x124(proxy124 => SALES(proxy124.asInstanceOf[ModelProxy[Pot[Data]]],124,122,2,3, settlement,lineSettlement, store, customer,"Settlement")))
 
        | staticRoute("#pay", PaymentPage$) ~> renderR(ctl => x114(proxy114 => FDOCUMENT(proxy114.asInstanceOf[ModelProxy[Pot[Data]]],114,112,2,1,payment,linePayment, store, supplier,"Payment")))
-      //| staticRoute("#pay", PaymentPage$) ~> renderR(ctl => x114(proxy114 => PAYMENT(proxy114.asInstanceOf[ModelProxy[Pot[Data]]])))
       | staticRoute("#catalog", CatalogPage$) ~> renderR(ctl => ProductCalalog.FilterableProductTable(ProductCalalog.PRODUCTS))
        ).notFound(redirectToPage(DashboardPage$)(Redirect.Replace))
   }.renderWith(layout)

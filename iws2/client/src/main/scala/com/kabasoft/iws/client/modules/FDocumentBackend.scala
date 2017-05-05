@@ -121,7 +121,7 @@ abstract class FDocumentBackend [C,D] ($: BackendScope[Props[FDocument[LineFDocu
     oitems  = IWSCircuit.zoom(_.store.get.models.get(p.otransModelId)).eval(IWSCircuit.getRootModel).get.get.items.asInstanceOf[List[FDocument[LineFDocument]]].toSet
     val items = gitems.toList.sorted
     val otems = oitems.toList.sorted
-    log.debug(s"Notemsotemsotemsotemsotems>>>>  ${otems}")
+
     val header = List(saveButton, newButton)
     val contentTab1 = FDocumentList( items, p.title, item => edit(item), item => p.proxy.dispatch(Delete(item)))
     val contentTab2 = buildForm(p, s, otems, items,header)
@@ -152,7 +152,6 @@ abstract class FDocumentBackend [C,D] ($: BackendScope[Props[FDocument[LineFDocu
                     <.td(^.cls := "col-md-24 col-md-8", ^.width := "50%", ComboBox("Store", itemsx = storeList(p.storeModelId), defValue = s.item.map(_.store.getOrElse("")).getOrElse(""), updateStore _)),
                     <.td(^.cls := "col-md-24 col-md-12", ^.width := "50%", ComboBox("Supplier", itemsx = supplierList(p.accountModelId), defValue = s.item.map(_.account.getOrElse("")).getOrElse(""), updateAccount _))
                   ),
-
                   <.tr(bss.formGroup,
                     <.td(LineFDocumentList(porder, p.instance2, AddNewLine, saveLine, deleteLine), ^.colSpan := 4)
                   )
