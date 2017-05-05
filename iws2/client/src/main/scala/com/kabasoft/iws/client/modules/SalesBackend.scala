@@ -11,14 +11,14 @@ class SalesBackend ($: BackendScope[Props[FDocument[LineFDocument], LineFDocumen
   FDocumentBackend [Store, Customer] ($){
 
 
-  override def  storeList (p: Props[FDocument[LineFDocument], LineFDocument, Store, Customer]) = {
-       val stores =  IWSCircuit.zoom(_.store.get.models.get(p.storeModelId)).eval(IWSCircuit.getRootModel).
+  override def  storeList (modelId:Int) = {
+       val stores =  IWSCircuit.zoom(_.store.get.models.get(modelId)).eval(IWSCircuit.getRootModel).
          getOrElse(Ready(Data(List.empty[Store]))).get.items.asInstanceOf[List[Store]].toSet
          stores.toList.filter(_.id !="-1") .sortBy(_.id) map (iws =>(iws.id+"|"+iws.name))
     }
- override  def  supplierList ( p: Props[FDocument[LineFDocument], LineFDocument, Store, Customer])= 
+ override  def  supplierList ( modelId:Int)= 
  {
-   val accounts =  IWSCircuit.zoom(_.store.get.models.get(p.accountModelId)).eval(IWSCircuit.getRootModel).
+   val accounts =  IWSCircuit.zoom(_.store.get.models.get(modelId)).eval(IWSCircuit.getRootModel).
      getOrElse(Ready(Data(List.empty[Customer]))).get.items.asInstanceOf[List[Customer]].toSet
   accounts.toList.filter(_.id !="-1") .sortBy(_.id) map (iws =>(iws.id+"|"+iws.name))
 }

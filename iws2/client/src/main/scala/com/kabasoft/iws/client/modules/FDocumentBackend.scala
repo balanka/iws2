@@ -129,8 +129,8 @@ abstract class FDocumentBackend [C,D] ($: BackendScope[Props[FDocument[LineFDocu
   }
 
 
-    def  storeList (p: Props[FDocument[LineFDocument], LineFDocument, C,D]) :List[String]
-    def  supplierList (p: Props[FDocument[LineFDocument], LineFDocument, C,D]):List[String]
+    def  storeList (modelId:Int):List[String]
+    def  supplierList (modelId:Int):List[String]
 
   def buildForm (p: Props[FDocument[LineFDocument], LineFDocument, C,D], s:State[FDocument[LineFDocument]],
                        otems:List[FDocument[LineFDocument]], items:List[FDocument[LineFDocument]], header:Seq[ReactElement]) :ReactElement =
@@ -149,8 +149,8 @@ abstract class FDocumentBackend [C,D] ($: BackendScope[Props[FDocument[LineFDocu
                     // <.td(^.cls :="col-xs-24 col-md-2",   ^.width:="10%",  buildItemZ1[String]("Id", s.item.map(_.id), "id")),
                     <.td(^.cls := "col-md-24 col-md-2", ^.width := "10%", ComboBox("id", itemsx = buildTransIdList(items), s.item.map(_.id).getOrElse(""),  updateId _)),
                     <.td(^.cls := "col-md-24 col-md-2", ^.width := "10%", ComboBoxL("oid", itemsx = buildTransIdList(otems), s.item.map(_.oid).getOrElse(0), updateOid _)),
-                    <.td(^.cls := "col-md-24 col-md-8", ^.width := "50%", ComboBox("Store", itemsx = storeList(p), defValue = s.item.map(_.store.getOrElse("")).getOrElse(""), updateStore _)),
-                    <.td(^.cls := "col-md-24 col-md-12", ^.width := "50%", ComboBox("Supplier", itemsx = supplierList(p), defValue = s.item.map(_.account.getOrElse("")).getOrElse(""), updateAccount _))
+                    <.td(^.cls := "col-md-24 col-md-8", ^.width := "50%", ComboBox("Store", itemsx = storeList(p.storeModelId), defValue = s.item.map(_.store.getOrElse("")).getOrElse(""), updateStore _)),
+                    <.td(^.cls := "col-md-24 col-md-12", ^.width := "50%", ComboBox("Supplier", itemsx = supplierList(p.accountModelId), defValue = s.item.map(_.account.getOrElse("")).getOrElse(""), updateAccount _))
                   ),
 
                   <.tr(bss.formGroup,

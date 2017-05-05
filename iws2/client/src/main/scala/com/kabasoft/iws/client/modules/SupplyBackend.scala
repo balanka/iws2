@@ -11,15 +11,15 @@ class SupplyBackend($: BackendScope[Props[FDocument[LineFDocument], LineFDocumen
     FDocumentBackend [Store, Supplier] ($){
 
 
-  override def  storeList(p: Props[FDocument[LineFDocument], LineFDocument, Store, Supplier]):List[String] = {
+  override def  storeList(modelId:Int):List[String] = {
     
-    val stores =  IWSCircuit.zoom(_.store.get.models.get(p.storeModelId)).eval(IWSCircuit.getRootModel).
+    val stores =  IWSCircuit.zoom(_.store.get.models.get(modelId)).eval(IWSCircuit.getRootModel).
       getOrElse(Ready(Data(List.empty[Store]))).get.items.asInstanceOf[List[Store]].toSet
       stores.toList.filter(_.id !="-1") .sortBy(_.id) map (iws =>(iws.id+"|"+iws.name))
   }
 
-  override def  supplierList( p: Props[FDocument[LineFDocument], LineFDocument, Store, Supplier]):List[String] = {
-         val accounts =  IWSCircuit.zoom(_.store.get.models.get(p.accountModelId)).eval(IWSCircuit.getRootModel).
+  override def  supplierList(modelId:Int):List[String] = {
+         val accounts =  IWSCircuit.zoom(_.store.get.models.get(modelId)).eval(IWSCircuit.getRootModel).
            getOrElse(Ready(Data(List.empty[Supplier]))).get.items.asInstanceOf[List[Supplier]].toSet
           accounts.toList.filter(_.id !="-1") .sortBy(_.id) map (iws =>(iws.id+"|"+iws.name))
  }
