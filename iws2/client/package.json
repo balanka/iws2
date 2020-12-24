@@ -19,7 +19,7 @@
     "imagemin": "^4.0.0",
     "less": "^2.3.1",
     "less-loader": "^2.2.2",
-    "lodash": "^3.9.3",
+    "lodash": ">=4.17.19",
     "node-libs-browser": "^0.5.2",
     "react-hot-loader": "^1.2.7",
     "style-loader": "^0.13.0",
@@ -45,6 +45,6 @@
     "react-tagsinput": "^3.0.3",
     "react-tap-event-plugin": "^0.2.1",
     "svg-loader": "0.0.2",
-    "highlight.js": "8.9.1"
+    "highlight.js": ">=9.18.2"
   }
 }
